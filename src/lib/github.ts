@@ -1,4 +1,4 @@
-const repo = process.env.NEXT_PUBLIC_GITHUB_REPO || "scarecr0w12/cortex";
+const repo = process.env.NEXT_PUBLIC_GITHUB_REPO || "CortexPrism/cortex";
 
 interface GitHubRepo {
   stargazers_count: number;

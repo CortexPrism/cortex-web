@@ -27,7 +27,7 @@ const footerLinks = [
       { href: "/changelog", label: "Changelog" },
       { href: "/openapi", label: "API Docs" },
       {
-        href: "https://github.com/scarecr0w12/cortex",
+        href: "https://github.com/CortexPrism/cortex",
         label: "GitHub",
         external: true,
       },
@@ -90,7 +90,7 @@ export function Footer() {
             <span>Powered by Deno</span>
             <span>·</span>
             <a
-              href="https://github.com/scarecr0w12/cortex"
+              href="https://github.com/CortexPrism/cortex"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-indigo-400 transition-colors"

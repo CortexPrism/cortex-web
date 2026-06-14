@@ -56,10 +56,10 @@ async function getChangelogMD(repo: string): Promise<string | null> {
 
 export default async function ChangelogPage() {
   const [websiteCommits, cortexCommits, websiteChangelog, cortexChangelog] = await Promise.all([
-    getRecentCommits("scarecr0w12", "cortex-web", 8),
-    getRecentCommits("scarecr0w12", "cortex", 8),
-    getChangelogMD("scarecr0w12/cortex-web"),
-    getChangelogMD("scarecr0w12/cortex"),
+    getRecentCommits("CortexPrism", "cortex-web", 8),
+    getRecentCommits("CortexPrism", "cortex", 8),
+    getChangelogMD("CortexPrism/cortex-web"),
+    getChangelogMD("CortexPrism/cortex"),
   ]);
 
   const allCommits = [...websiteCommits, ...cortexCommits]
@@ -72,11 +72,11 @@ export default async function ChangelogPage() {
         <h1 className="text-4xl md:text-5xl font-bold text-[#e2e2ea]">Changelog</h1>
         <p className="mt-4 text-lg text-[#9090a8]">
           Release history from{" "}
-          <a href="https://github.com/scarecr0w12/cortex-web" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
+          <a href="https://github.com/CortexPrism/cortex-web" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
             cortex-web
           </a>
           {" "}and{" "}
-          <a href="https://github.com/scarecr0w12/cortex" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
+          <a href="https://github.com/CortexPrism/cortex" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
             cortex
           </a>
         </p>
@@ -152,7 +152,7 @@ export default async function ChangelogPage() {
 
       <div className="mt-12 flex items-center justify-center gap-4">
         <a
-          href="https://github.com/scarecr0w12/cortex-web/commits/main"
+          href="https://github.com/CortexPrism/cortex-web/commits/main"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300"
@@ -162,7 +162,7 @@ export default async function ChangelogPage() {
         </a>
         <span className="text-[#333]">·</span>
         <a
-          href="https://github.com/scarecr0w12/cortex/blob/main/CHANGELOG.md"
+          href="https://github.com/CortexPrism/cortex/blob/main/CHANGELOG.md"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300"

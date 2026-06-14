@@ -1,6 +1,6 @@
 # CortexPrism Website
 
-The official website and marketplace for the [CortexPrism](https://github.com/scarecr0w12/cortex) project — an open-source agentic harness system.
+The official website and marketplace for the [CortexPrism](https://github.com/CortexPrism/cortex) project — an open-source agentic harness system.
 
 ## Architecture
 
@@ -119,7 +119,7 @@ src/
 | `DATABASE_URL` | `file:./prisma/marketplace.db` | SQLite database path |
 | `JWT_SECRET` | (auto-generated) | Secret for JWT token signing |
 | `NEXT_PUBLIC_SITE_URL` | `https://cortexprism.io` | Canonical site URL |
-| `NEXT_PUBLIC_GITHUB_REPO` | `scarecr0w12/cortex` | GitHub repo for stats |
+| `NEXT_PUBLIC_GITHUB_REPO` | `CortexPrism/cortex` | GitHub repo for stats |
 
 ## Default Admin
 

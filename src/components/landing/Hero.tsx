@@ -40,7 +40,7 @@ export function Hero() {
               Browse Marketplace
             </Link>
             <a
-              href="https://github.com/scarecr0w12/cortex"
+              href="https://github.com/CortexPrism/cortex"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-[#9090a8] hover:text-[#e2e2ea] hover:bg-[#111118] transition-colors"

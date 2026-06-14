@@ -12,14 +12,14 @@ const sections = [
     icon: Bug,
     title: "Report Issues",
     description: "Found a bug or have a feature request? Open an issue on GitHub with a clear description, reproduction steps, and expected behavior.",
-    link: "https://github.com/scarecr0w12/cortex/issues",
+    link: "https://github.com/CortexPrism/cortex/issues",
     label: "Open an Issue",
   },
   {
     icon: BookOpen,
     title: "Submit Pull Requests",
     description: "Fork the repository, create a feature branch, make your changes, and submit a PR. Make sure to follow the coding conventions and add tests.",
-    link: "https://github.com/scarecr0w12/cortex/pulls",
+    link: "https://github.com/CortexPrism/cortex/pulls",
     label: "View Pull Requests",
   },
   {
@@ -83,7 +83,7 @@ export default function ContributePage() {
                 <span className="text-[#55556a]"># Clone the repository</span>
                 {"\n"}
                 <span className="text-green-400">git clone</span>
-                <span className="text-[#e2e2ea]"> https://github.com/scarecr0w12/cortex.git</span>
+                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
                 {"\n"}
                 <span className="text-green-400">cd</span>
                 <span className="text-[#e2e2ea]"> cortex</span>
@@ -102,7 +102,7 @@ export default function ContributePage() {
           </div>
           <p>
             For more details, check the{" "}
-            <Link href="https://github.com/scarecr0w12/cortex/blob/main/CONTRIBUTING.md" className="text-indigo-400 hover:text-indigo-300">
+            <Link href="https://github.com/CortexPrism/cortex/blob/main/CONTRIBUTING.md" className="text-indigo-400 hover:text-indigo-300">
               Contributing Guide
             </Link>{" "}
             on GitHub.

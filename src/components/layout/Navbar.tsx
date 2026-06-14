@@ -113,7 +113,7 @@ export function Navbar() {
               </Link>
             )}
             <a
-              href="https://github.com/scarecr0w12/cortex"
+              href="https://github.com/CortexPrism/cortex"
               target="_blank"
               rel="noopener noreferrer"
               className="ml-2 px-4 py-2 text-sm font-medium rounded-lg accent-gradient text-white hover:opacity-90 transition-opacity"
@@ -180,7 +180,7 @@ export function Navbar() {
               </Link>
             )}
             <a
-              href="https://github.com/scarecr0w12/cortex"
+              href="https://github.com/CortexPrism/cortex"
               target="_blank"
               className="block px-3 py-2 text-sm text-indigo-400 font-medium"
             >

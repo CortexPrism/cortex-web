@@ -6,7 +6,7 @@ services:
     environment:
       - DATABASE_URL=file:./prisma/marketplace.db
       - NEXT_PUBLIC_SITE_URL=https://cortexprism.io
-      - NEXT_PUBLIC_GITHUB_REPO=scarecr0w12/cortex
+      - NEXT_PUBLIC_GITHUB_REPO=CortexPrism/cortex
     volumes:
       - ./prisma:/app/prisma
     restart: unless-stopped
