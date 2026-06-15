@@ -28,6 +28,10 @@ All notable changes to the CortexPrism website will be documented in this file.
   - Admin review workflow endpoints (GET/PUT for plugins and agents)
 - Shared ScreenshotGallery and ReviewSection components (eliminating ~8KB of duplicate code)
 - Prisma schema migration step in Dockerfile startup
+- Plugin Getting Started guide (CLI commands, Web UI, configuration, lifecycle states, plugin store layout)
+- Extension points documentation (tools, CLI commands, LLM providers, UI panels, config extensions)
+- PluginContext API reference with config store, state store, and logger
+- Full manifest reference with capabilities enum, trust levels, and UI settings schema
 
 ### Changed
 - Documentation sidebar sections are now collapsible with chevron indicators

@@ -69,6 +69,7 @@ const sidebarSections: SidebarSection[] = [
     title: "Developer Guide",
     links: [
       { href: "/docs/developer-guide", label: "Overview" },
+      { href: "/docs/developer-guide/getting-started", label: "Getting Started" },
       { href: "/docs/developer-guide/plugin-types", label: "Plugin Types" },
       { href: "/docs/developer-guide/esm-plugin", label: "ESM Plugins" },
       { href: "/docs/developer-guide/mcp-plugin", label: "MCP Plugins" },

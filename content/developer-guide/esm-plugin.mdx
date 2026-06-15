@@ -167,6 +167,145 @@ export default definePlugin({
 });
 ```
 
+## Extension Points
+
+Beyond capabilities, ESM plugins can extend CortexPrism through several extension points. Export named exports from your entry point module.
+
+### Tools
+
+Export a `tools` array to register tool definitions with the agent loop:
+
+```typescript
+import type { Tool, PluginContext } from "cortex/plugins";
+
+const weatherTool: Tool = {
+  definition: {
+    name: "get_weather",
+    description: "Get current weather for a city",
+    params: [
+      { name: "city", type: "string", description: "City name", required: true },
+    ],
+    capabilities: ["network:fetch"],
+  },
+  execute: async (args, ctx) => {
+    const res = await fetch(`https://api.weather.example/${args.city}`);
+    const data = await res.text();
+    return { toolName: "get_weather", success: true, output: data, durationMs: 0 };
+  },
+};
+
+export const tools = [weatherTool];
+```
+
+### CLI Commands
+
+Declare commands in the manifest and export a handler:
+
+```json
+{
+  "cliCommands": [
+    {
+      "name": "my-command",
+      "description": "My custom CLI command",
+      "options": [
+        { "name": "verbose", "type": "boolean", "description": "Verbose output", "flag": "-v" }
+      ]
+    }
+  ]
+}
+```
+
+```typescript
+export async function myCommand(args: Record<string, unknown>) {
+  console.log(`Running with args:`, args);
+}
+```
+
+### LLM Providers
+
+Export a `providers` map to add new AI provider integrations:
+
+```typescript
+export const providers = {
+  "my-provider": (config: Record<string, unknown>) => ({
+    name: "my-provider",
+    defaultModel: "my-model",
+    async complete(opts) { /* ... */ },
+    async *stream(opts) { /* ... */ },
+  }),
+};
+```
+
+### UI Panels
+
+Define panels in the manifest. Each panel has an HTML file served by the CortexPrism Web UI:
+
+```json
+{
+  "ui": {
+    "panels": [
+      { "id": "weather", "title": "Weather", "icon": "cloud", "htmlPath": "./ui/panel.html" }
+    ],
+    "settings": [
+      {
+        "section": "API",
+        "fields": [
+          { "key": "apiKey", "label": "Weather API Key", "type": "secret", "defaultValue": "" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Lifecycle Hooks
+
+Your entry point module can export lifecycle hooks that the plugin manager calls automatically:
+
+```typescript
+import type { PluginContext } from "cortex/plugins";
+
+export const onLoad = async (ctx: PluginContext) => {
+  // Called when the plugin transitions from INSTALLED to ACTIVE
+  // Use for initialization: connect to services, allocate resources
+  ctx.logger.info("Plugin loaded");
+  await ctx.state.set("startedAt", new Date().toISOString());
+};
+
+export const onUnload = async (ctx: PluginContext) => {
+  // Called when the plugin transitions from ACTIVE to UNLOADING
+  // Use for cleanup: close connections, release resources
+  ctx.logger.info("Plugin unloaded");
+};
+```
+
+### PluginContext
+
+Lifecycle hooks receive a `PluginContext` with these properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `ctx.logger` | `Logger` | Structured logger prefixed with plugin name |
+| `ctx.config` | `ConfigStore` | Plugin configuration from `~/.cortex/config.json` |
+| `ctx.state` | `StateStore` | In-memory key-value store persisted to `state.json` |
+| `ctx.pluginDir` | `string` | Plugin installation directory |
+| `ctx.dataDir` | `string` | Plugin-private data directory (`~/.cortex/data/plugins/<name>/data/`) |
+
+Use `ctx.config` and `ctx.state` instead of direct file access for portability.
+
+### Plugin Store Layout
+
+When installed, plugin data is stored under `~/.cortex/data/plugins/`:
+
+```
+~/.cortex/data/plugins/
+├── <plugin-name>/
+│   ├── esm/          # downloaded ESM source
+│   ├── wasm/         # downloaded WASM binaries
+│   ├── data/         # plugin-private data
+│   └── state.json    # persisted plugin state (ctx.state)
+```
+
 ## Testing
 
 Test plugins with the CortexPrism test harness:
