@@ -8,7 +8,7 @@ import { ScreenshotGallery } from "@/components/marketplace/ScreenshotGallery";
 import { ReviewSection } from "@/components/marketplace/ReviewSection";
 import { formatDate, formatNumber } from "@/lib/utils";
 import {
-  Globe, Github, User, ExternalLink, Star, GitFork, Tag
+  Globe, Github, User, ExternalLink, Star, GitFork, Tag, Settings, Zap, Award
 } from "lucide-react";
 
 interface Screenshot {
@@ -57,25 +57,27 @@ const kindColors: Record<string, "indigo" | "green" | "purple"> = {
 export function PluginDetailView({ plugin }: PluginDetailProps) {
   return (
     <div>
-      <div className="glass-card p-8 mb-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-2xl shrink-0">
+      <div className="glass-card p-6 md:p-8 mb-8">
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 mb-6">
+          <div className="w-12 md:w-14 h-12 md:h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xl md:text-2xl flex-shrink-0">
             {plugin.icon ? (
-              <img src={plugin.icon} alt="" className="w-10 h-10 rounded-lg" />
+              <img src={plugin.icon} alt="" className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
             ) : (
               <span className="text-indigo-400 font-bold">{plugin.name.charAt(0)}</span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h1 className="text-2xl font-bold text-[#e2e2ea]">{plugin.name}</h1>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#e2e2ea]">{plugin.name}</h1>
               <Badge variant={kindColors[plugin.kind] || "default"}>{plugin.kind.toUpperCase()}</Badge>
-              <span className="text-sm font-mono text-[#55556a]">v{plugin.version}</span>
+            </div>
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <span className="text-xs md:text-sm font-mono text-[#55556a]">v{plugin.version}</span>
               {plugin.license && (
                 <Badge variant="default">{plugin.license}</Badge>
               )}
             </div>
-            <p className="text-[#9090a8]">{plugin.description}</p>
+            <p className="text-sm md:text-base text-[#9090a8]">{plugin.description}</p>
           </div>
         </div>
 
@@ -144,9 +146,44 @@ export function PluginDetailView({ plugin }: PluginDetailProps) {
 
       <ScreenshotGallery screenshots={plugin.screenshots} showThumbnails />
 
+      {/* Configuration Section */}
+      {(plugin.kind || plugin.entryPoint || plugin.license) && (
+        <div className="glass-card p-8 mb-8">
+          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-6 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-emerald-400" /> Configuration
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {plugin.kind && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Plugin Type</div>
+                <div className="text-base font-semibold text-[#e2e2ea]">
+                  <Badge variant={kindColors[plugin.kind] || "default"} className="inline-block">
+                    {plugin.kind.toUpperCase()}
+                  </Badge>
+                </div>
+              </div>
+            )}
+            {plugin.entryPoint && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Entry Point</div>
+                <div className="text-sm font-mono text-indigo-400">{plugin.entryPoint}</div>
+              </div>
+            )}
+            {plugin.license && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">License</div>
+                <div className="text-base font-semibold text-[#e2e2ea]">{plugin.license}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {plugin.capabilities.length > 0 && (
         <div className="glass-card p-6 mb-8">
-          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-3">Capabilities</h2>
+          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-3 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-emerald-400" /> Capabilities
+          </h2>
           <div className="flex flex-wrap gap-2">
             {plugin.capabilities.map((cap) => (
               <Badge key={cap} variant="indigo">{cap}</Badge>
@@ -167,6 +204,32 @@ export function PluginDetailView({ plugin }: PluginDetailProps) {
           </div>
         </div>
       )}
+
+      {/* Stats Section */}
+      <div className="glass-card p-6 md:p-8 mb-8">
+        <h2 className="text-lg font-semibold text-[#e2e2ea] mb-6 flex items-center gap-2">
+          <Award className="w-5 h-5 text-yellow-400" /> Statistics
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Downloads</div>
+            <div className="text-2xl font-bold gradient-text">{formatNumber(plugin.downloads)}</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Rating</div>
+            <div className="text-2xl font-bold text-yellow-400">{plugin.rating.toFixed(1)}</div>
+            <div className="text-xs text-[#55556a]">/ 5.0</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Version</div>
+            <div className="text-xl font-bold text-[#e2e2ea] font-mono">v{plugin.version}</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Published</div>
+            <div className="text-sm text-[#9090a8]">{formatDate(plugin.createdAt)}</div>
+          </div>
+        </div>
+      </div>
 
       <ReviewSection itemId={plugin.id} type="plugin" />
 

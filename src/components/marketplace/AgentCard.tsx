@@ -23,6 +23,7 @@ interface AgentCardProps {
     repository: string | null;
     githubStars: number;
   };
+  featured?: boolean;
 }
 
 const iconColors = [
@@ -40,24 +41,35 @@ function hashColor(name: string) {
   return iconColors[Math.abs(h) % iconColors.length];
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, featured = false }: AgentCardProps) {
   return (
     <Link href={`/marketplace/agents/${agent.slug}`}>
       <div
         className={cn(
-          "group relative h-full rounded-xl border border-[rgba(255,255,255,0.07)]",
-          "bg-[#111118] transition-all duration-300",
-          "hover:border-[rgba(99,102,241,0.3)] hover:bg-[#18181f] hover:shadow-lg hover:shadow-indigo-500/5",
-          "hover:-translate-y-0.5"
+          "group relative h-full rounded-xl border transition-all duration-300",
+          "flex flex-col",
+          featured
+            ? "border-indigo-500/30 bg-gradient-to-br from-[#18181f] via-[#111118] to-[#0f0f15] hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-500/20 hover:-translate-y-1"
+            : "border-[rgba(255,255,255,0.07)] bg-[#111118] hover:border-[rgba(99,102,241,0.3)] hover:bg-[#18181f] hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5"
         )}
       >
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-b from-violet-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {featured && (
+          <div className="absolute top-0 right-0 px-3 py-1 rounded-bl-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-xs font-semibold text-white shadow-lg">
+            Featured
+          </div>
+        )}
+        <div className={cn(
+          "absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+          featured
+            ? "bg-gradient-to-b from-indigo-500/10 via-transparent to-transparent"
+            : "bg-gradient-to-b from-violet-500/5 via-transparent to-transparent"
+        )} />
 
-        <div className="relative p-5 flex flex-col h-full">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
+        <div className="relative p-5 md:p-6 flex flex-col h-full">
+          <div className="flex items-start justify-between mb-4 gap-2">
+            <div className="flex items-center gap-3 min-w-0">
               <div className={cn(
-                "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-sm font-bold text-white shadow-lg",
+                "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-sm font-bold text-white shadow-lg flex-shrink-0",
                 hashColor(agent.name)
               )}>
                 {agent.icon ? (
@@ -66,15 +78,15 @@ export function AgentCard({ agent }: AgentCardProps) {
                   agent.name.charAt(0).toUpperCase()
                 )}
               </div>
-              <div>
-                <h3 className="text-[15px] font-semibold text-[#e2e2ea] leading-tight group-hover:text-white transition-colors">
+              <div className="min-w-0">
+                <h3 className="text-sm md:text-[15px] font-semibold text-[#e2e2ea] leading-tight group-hover:text-white transition-colors truncate">
                   {agent.name}
                 </h3>
                 <span className="text-xs text-[#55556a] font-mono">v{agent.version}</span>
               </div>
             </div>
             {agent.provider && (
-              <Badge variant="indigo">{agent.provider}</Badge>
+              <Badge variant="indigo" className="flex-shrink-0">{agent.provider}</Badge>
             )}
           </div>
 

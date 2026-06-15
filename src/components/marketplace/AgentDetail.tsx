@@ -9,7 +9,7 @@ import { ReviewSection } from "@/components/marketplace/ReviewSection";
 import { formatDate, formatNumber } from "@/lib/utils";
 import {
   Github, User, Brain, Thermometer, Globe, ExternalLink, Star, GitFork,
-  Tag, Wrench
+  Tag, Wrench, Settings, Award
 } from "lucide-react";
 
 interface Screenshot {
@@ -55,23 +55,25 @@ interface AgentDetailProps {
 export function AgentDetailView({ agent }: AgentDetailProps) {
   return (
     <div>
-      <div className="glass-card p-8 mb-8">
-        <div className="flex items-start gap-4 mb-6">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-2xl shrink-0">
+      <div className="glass-card p-6 md:p-8 mb-8">
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 mb-6">
+          <div className="w-12 md:w-14 h-12 md:h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-xl md:text-2xl flex-shrink-0">
             {agent.icon ? (
-              <img src={agent.icon} alt="" className="w-10 h-10 rounded-lg" />
+              <img src={agent.icon} alt="" className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
             ) : (
               <span className="text-purple-400 font-bold">{agent.name.charAt(0)}</span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h1 className="text-2xl font-bold text-[#e2e2ea]">{agent.name}</h1>
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#e2e2ea]">{agent.name}</h1>
               {agent.provider && <Badge variant="indigo">{agent.provider}</Badge>}
-              <span className="text-sm font-mono text-[#55556a]">v{agent.version}</span>
+            </div>
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <span className="text-xs md:text-sm font-mono text-[#55556a]">v{agent.version}</span>
               {agent.license && <Badge variant="default">{agent.license}</Badge>}
             </div>
-            <p className="text-[#9090a8]">{agent.description}</p>
+            <p className="text-sm md:text-base text-[#9090a8]">{agent.description}</p>
           </div>
         </div>
 
@@ -176,6 +178,67 @@ export function AgentDetailView({ agent }: AgentDetailProps) {
           </div>
         </div>
       )}
+
+      {/* Configuration Section */}
+      {(agent.provider || agent.model || agent.temperature !== null) && (
+        <div className="glass-card p-8 mb-8">
+          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-6 flex items-center gap-2">
+            <Settings className="w-5 h-5 text-indigo-400" /> Configuration
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {agent.provider && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">AI Provider</div>
+                <div className="text-base font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-indigo-400" />
+                  {agent.provider}
+                </div>
+              </div>
+            )}
+            {agent.model && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Model</div>
+                <div className="text-base font-semibold text-[#e2e2ea] font-mono">{agent.model}</div>
+              </div>
+            )}
+            {agent.temperature !== null && (
+              <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+                <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Temperature</div>
+                <div className="text-base font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Thermometer className="w-4 h-4 text-orange-400" />
+                  {agent.temperature}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Stats Section */}
+      <div className="glass-card p-6 md:p-8 mb-8">
+        <h2 className="text-lg font-semibold text-[#e2e2ea] mb-6 flex items-center gap-2">
+          <Award className="w-5 h-5 text-yellow-400" /> Statistics
+        </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Downloads</div>
+            <div className="text-2xl font-bold gradient-text">{formatNumber(agent.downloads)}</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Rating</div>
+            <div className="text-2xl font-bold text-yellow-400">{agent.rating.toFixed(1)}</div>
+            <div className="text-xs text-[#55556a]">/ 5.0</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Version</div>
+            <div className="text-xl font-bold text-[#e2e2ea] font-mono">v{agent.version}</div>
+          </div>
+          <div className="rounded-lg bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] p-4">
+            <div className="text-xs font-semibold text-[#55556a] uppercase tracking-wide mb-2">Published</div>
+            <div className="text-sm text-[#9090a8]">{formatDate(agent.createdAt)}</div>
+          </div>
+        </div>
+      </div>
 
       {agent.systemPrompt && (
         <div className="glass-card p-8 mb-8">

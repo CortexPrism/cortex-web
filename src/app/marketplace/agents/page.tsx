@@ -74,14 +74,14 @@ export default function AgentListingPage() {
         <p className="text-[#9090a8]">Pre-configured agent configurations for various tasks and domains.</p>
       </div>
 
-      <div className="space-y-4 mb-8">
+      <div className="space-y-6 mb-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#55556a]" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search agents by name..."
+            placeholder="Search agents by name, description, or model..."
             className="w-full pl-10 pr-10 py-3 bg-[#111118] border border-[rgba(255,255,255,0.07)] rounded-xl text-sm text-[#e2e2ea] placeholder:text-[#55556a] focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-colors"
           />
           {search && (
@@ -91,52 +91,71 @@ export default function AgentListingPage() {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-[#55556a] font-medium mr-1">Category:</span>
-          <button
-            onClick={() => { setSelectedCategory(""); setPage(1) }}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-              !selectedCategory
-                ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20"
-                : "bg-[#111118] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:text-[#e2e2ea]"
-            }`}
-          >
-            All
-          </button>
-          {categories.map(cat => (
+        {/* Category Filter Section */}
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-2 mb-3 justify-between">
+            <h3 className="text-xs font-semibold text-[#e2e2ea] uppercase tracking-wider">Categories</h3>
+            {selectedCategory && (
+              <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">
+                1 selected
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pb-2">
             <button
-              key={cat.id}
-              onClick={() => { setSelectedCategory(cat.slug); setPage(1) }}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-colors border ${
-                selectedCategory === cat.slug
-                  ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20"
-                  : "bg-[#111118] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:text-[#e2e2ea]"
+              onClick={() => { setSelectedCategory(""); setPage(1) }}
+              className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${
+                !selectedCategory
+                  ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
+                  : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:border-indigo-500/30 hover:text-[#e2e2ea]"
               }`}
             >
-              {cat.name}
+              All Categories
             </button>
-          ))}
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => { setSelectedCategory(cat.slug); setPage(1) }}
+                className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${
+                  selectedCategory === cat.slug
+                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
+                    : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:border-indigo-500/30 hover:text-[#e2e2ea]"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
 
-          {providers.length > 0 && (
-            <>
-              <span className="w-px h-6 bg-[rgba(255,255,255,0.07)] mx-2" />
-              <span className="text-xs text-[#55556a] font-medium mr-1">Provider:</span>
+        {/* Provider Filter Section */}
+        {providers.length > 0 && (
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-xs font-semibold text-[#e2e2ea] uppercase tracking-wider">AI Providers</h3>
+              {selectedProvider && (
+                <span className="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded">
+                  1 selected
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
               {providers.map(p => (
                 <button
                   key={p}
                   onClick={() => { setSelectedProvider(selectedProvider === p ? "" : p); setPage(1) }}
-                  className={`px-3 py-1.5 text-sm rounded-lg transition-colors border ${
+                  className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 border font-medium ${
                     selectedProvider === p
-                      ? "bg-purple-500/10 text-purple-300 border-purple-500/20"
-                      : "bg-[#111118] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:text-[#e2e2ea]"
+                      ? "bg-purple-500/20 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/20"
+                      : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:border-purple-500/30 hover:text-[#e2e2ea]"
                   }`}
                 >
                   {p}
                 </button>
               ))}
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {data && !loading && (
@@ -147,7 +166,7 @@ export default function AgentListingPage() {
       )}
 
       {loading ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="glass-card p-5 animate-pulse">
               <div className="w-10 h-10 rounded-lg bg-[#18181f] mb-3" />
@@ -175,7 +194,7 @@ export default function AgentListingPage() {
         </div>
       ) : data && data.agents.length > 0 ? (
         <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.agents.map(agent => (
               <AgentCard key={agent.id} agent={agent} />
             ))}

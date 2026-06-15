@@ -2,6 +2,41 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.2.0] — 2026-06-15
+
+### Added
+- Enhanced marketplace card design with featured item support and improved visual hierarchy
+  - Featured badge and gradient backgrounds for showcase items
+  - Better hover effects with lift animations and category-specific color themes
+  - Improved responsive design with proper padding and text truncation
+- Improved marketplace categorization and filtering system
+  - Reorganized filter UI into dedicated glass cards with visual organization
+  - Category filter section with "All Categories" button and visual selection indicators
+  - AI Provider filter section for agents (purple-themed)
+  - Plugin Type filter section with color-coded badges (emerald/teal/purple)
+  - Better filter visibility with increased touch targets on mobile
+- Enhanced marketplace listing pages with new profile features
+  - Configuration sections on detail pages showing provider, model, temperature, entry point, license
+  - Statistics grid displays (downloads, rating, version, published date)
+  - Better visual hierarchy with icon indicators and responsive layouts
+- Redesigned main marketplace page with improved visual hierarchy
+  - Gradient-enhanced category showcase cards (emerald for plugins, purple for agents)
+  - Three-column marketplace overview with stats and quick links
+  - "Why Use the Marketplace?" feature highlight section
+  - Better visual separation between sections with category-specific colors
+- Mobile-responsive marketplace improvements
+  - Grid layouts responsive across all screen sizes (1-2-3 columns)
+  - Improved card padding and typography on mobile devices
+  - Flexible detail page headers (vertical on mobile, horizontal on desktop)
+  - Better filter button layouts with horizontal scrolling on small screens
+  - Responsive stats grid (2 columns on mobile, 4 on desktop/large)
+
+### Changed
+- Marketplace pages now use consistent glass-card styling with improved spacing
+- Agent and plugin cards have updated styling with gradient backgrounds
+- Detail page headers reorganized for better responsive behavior
+- Filter sections now have dedicated glass cards instead of inline flex layouts
+
 ## [0.1.1] — 2026-06-15
 
 ### Added

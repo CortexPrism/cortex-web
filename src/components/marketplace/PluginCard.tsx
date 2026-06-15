@@ -22,6 +22,7 @@ interface PluginCardProps {
     repository: string | null;
     githubStars: number;
   };
+  featured?: boolean;
 }
 
 const kindColors: Record<string, { badge: "indigo" | "green" | "purple"; from: string; to: string }> = {
@@ -51,7 +52,7 @@ function hashColor(name: string) {
   return iconColors[Math.abs(h) % iconColors.length];
 }
 
-export function PluginCard({ plugin }: PluginCardProps) {
+export function PluginCard({ plugin, featured = false }: PluginCardProps) {
   const kc = kindColors[plugin.kind] || kindColors.esm;
   const bg = kindGradients[plugin.kind] || kindGradients.esm;
 
@@ -59,19 +60,27 @@ export function PluginCard({ plugin }: PluginCardProps) {
     <Link href={`/marketplace/plugins/${plugin.slug}`}>
       <div
         className={cn(
-          "group relative h-full rounded-xl border border-[rgba(255,255,255,0.07)]",
-          "bg-[#111118] transition-all duration-300",
-          "hover:border-[rgba(99,102,241,0.3)] hover:bg-[#18181f] hover:shadow-lg hover:shadow-indigo-500/5",
-          "hover:-translate-y-0.5"
+          "group relative h-full rounded-xl border transition-all duration-300 flex flex-col",
+          featured
+            ? "border-emerald-500/30 bg-gradient-to-br from-[#18181f] via-[#111118] to-[#0f0f15] hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/20 hover:-translate-y-1"
+            : "border-[rgba(255,255,255,0.07)] bg-[#111118] hover:border-[rgba(99,102,241,0.3)] hover:bg-[#18181f] hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5"
         )}
       >
-        <div className={cn("absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-b", bg)} />
+        {featured && (
+          <div className="absolute top-0 right-0 px-3 py-1 rounded-bl-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-xs font-semibold text-white shadow-lg">
+            Featured
+          </div>
+        )}
+        <div className={cn(
+          "absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-b",
+          featured ? "from-emerald-500/10 via-transparent to-transparent" : bg
+        )} />
 
-        <div className="relative p-5 flex flex-col h-full">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
+        <div className="relative p-5 md:p-6 flex flex-col h-full">
+          <div className="flex items-start justify-between mb-4 gap-2">
+            <div className="flex items-center gap-3 min-w-0">
               <div className={cn(
-                "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-sm font-bold text-white shadow-lg",
+                "w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-sm font-bold text-white shadow-lg flex-shrink-0",
                 hashColor(plugin.name)
               )}>
                 {plugin.icon ? (
@@ -80,14 +89,14 @@ export function PluginCard({ plugin }: PluginCardProps) {
                   plugin.name.charAt(0).toUpperCase()
                 )}
               </div>
-              <div>
-                <h3 className="text-[15px] font-semibold text-[#e2e2ea] leading-tight group-hover:text-white transition-colors">
+              <div className="min-w-0">
+                <h3 className="text-sm md:text-[15px] font-semibold text-[#e2e2ea] leading-tight group-hover:text-white transition-colors truncate">
                   {plugin.name}
                 </h3>
                 <span className="text-xs text-[#55556a] font-mono">v{plugin.version}</span>
               </div>
             </div>
-            <Badge variant={kc.badge}>{plugin.kind.toUpperCase()}</Badge>
+            <Badge variant={kc.badge} className="flex-shrink-0">{plugin.kind.toUpperCase()}</Badge>
           </div>
 
           <p className="text-sm text-[#9090a8] leading-relaxed line-clamp-2 mb-4 flex-1">
