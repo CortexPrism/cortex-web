@@ -24,6 +24,10 @@ model User {
   isActive        Boolean          @default(true)
   discordId       String?          @unique
   discordUsername String?
+  githubId        String?          @unique
+  githubToken     String?
+  roleId          String?
+  userRole        Role?            @relation(fields: [roleId], references: [id])
   plugins           Plugin[]
   agents            AgentConfig[]
   reviews           SubmissionReview[]
@@ -55,6 +59,7 @@ model Role {
   createdAt   DateTime @default(now())
 
   permissions RolePermission[]
+  users       User[]
   @@map("Role")
 }
 

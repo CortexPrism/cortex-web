@@ -75,8 +75,6 @@ async function main() {
     }
   }
 
-  const adminRole = await prisma.role.findUnique({ where: { key: "admin" } });
-
   const users = [
     { email: "admin@cortexprism.io", username: "admin", password: "admin12345", role: "admin" },
     { email: "jacob@cortexprism.io", username: "jacob", password: "password123", role: "admin" },
@@ -92,7 +90,6 @@ async function main() {
           username: u.username,
           passwordHash: hash,
           role: u.role,
-          roleId: adminRole?.id || null,
         },
       });
       console.log(`${u.role} user created (${u.email} / ${u.password})`);
