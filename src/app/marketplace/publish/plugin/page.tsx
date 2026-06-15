@@ -1,21 +1,17 @@
-import type { Metadata } from "next";
-import { PublishForm } from "@/components/marketplace/PublishForm";
-import { SITE_URL } from "@/lib/seo";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Publish a Plugin — CortexPrism Marketplace",
-  description:
-    "Submit your ESM module, MCP server, or WASM plugin to the CortexPrism marketplace. Share your extensions with the open-source agentic harness community.",
-  alternates: { canonical: `${SITE_URL}/marketplace/publish/plugin` },
-  openGraph: {
-    title: "Publish a Plugin — CortexPrism Marketplace",
-    description:
-      "Share your plugin with the CortexPrism community. Submit ESM modules, MCP servers, or WASM plugins to the marketplace.",
-    url: `${SITE_URL}/marketplace/publish/plugin`,
-  },
-};
+import { useState } from "react";
+import { PublishForm } from "@/components/marketplace/PublishForm";
+import { GitHubImportForm } from "@/components/marketplace/GitHubImportForm";
+import { FileText, GitBranch } from "lucide-react";
 
 export default function PublishPluginPage() {
+  const [mode, setMode] = useState<"form" | "github">(
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("source") === "github" ? "github" : "form"
+      : "form"
+  );
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
@@ -24,7 +20,27 @@ export default function PublishPluginPage() {
           Share your plugin with the CortexPrism community.
         </p>
       </div>
-      <PublishForm type="plugin" />
+
+      <div className="flex gap-2 mb-6">
+        <button onClick={() => setMode("form")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors ${
+            mode === "form"
+              ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+              : "bg-[#111118] text-[#9090a8] border border-[rgba(255,255,255,0.07)]"
+          }`}>
+          <FileText className="w-4 h-4" /> Manual Form
+        </button>
+        <button onClick={() => setMode("github")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-colors ${
+            mode === "github"
+              ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+              : "bg-[#111118] text-[#9090a8] border border-[rgba(255,255,255,0.07)]"
+          }`}>
+          <GitBranch className="w-4 h-4" /> GitHub Import
+        </button>
+      </div>
+
+      {mode === "form" ? <PublishForm type="plugin" /> : <GitHubImportForm type="plugin" />}
     </div>
   );
 }

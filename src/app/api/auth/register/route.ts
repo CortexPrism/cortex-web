@@ -9,6 +9,29 @@ const RegisterSchema = z.object({
   password: z.string().min(8),
 });
 
+function formatUser(user: {
+  id: string; email: string; username: string; displayName: string | null;
+  role: string; avatar: string | null; bio: string | null; website: string | null;
+  location: string | null; socialLinks: string | null; preferences: string | null;
+  emailVerified: boolean; createdAt: Date;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    displayName: user.displayName,
+    role: user.role,
+    avatar: user.avatar,
+    bio: user.bio,
+    website: user.website,
+    location: user.location,
+    socialLinks: user.socialLinks ? JSON.parse(user.socialLinks) : null,
+    preferences: user.preferences ? JSON.parse(user.preferences) : null,
+    emailVerified: user.emailVerified,
+    createdAt: user.createdAt.toISOString(),
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -30,7 +53,7 @@ export async function POST(request: NextRequest) {
     const token = signToken({ userId: user.id, role: user.role });
     return Response.json({
       token,
-      user: { id: user.id, email: user.email, username: user.username, role: user.role },
+      user: formatUser(user),
     }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

@@ -11,17 +11,67 @@ model User {
   id            String           @id @default(cuid())
   email         String           @unique
   username      String           @unique
+  displayName   String?
   passwordHash  String
   role          String           @default("user")
   avatar        String?
   bio           String?
   website       String?
+  location      String?
+  socialLinks   String?          // JSON: { twitter?, github?, discord?, linkedin? }
+  preferences   String?          // JSON: { emailNotifications?, theme? }
+  emailVerified Boolean          @default(false)
+  githubId      String?          @unique
+  githubToken   String?
+  isActive      Boolean          @default(true)
+  roleId        String?
+  userRole      Role?            @relation(fields: [roleId], references: [id])
   plugins       Plugin[]
   agents        AgentConfig[]
   reviews       SubmissionReview[]
   ratings       UserRating[]
+  auditLogs     AuditLog[]
+  githubConnections GitHubConnection[]
+  topicScans    GitHubTopicScan[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
+
+  @@map("User")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  key         String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+  @@map("Permission")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  key         String   @unique
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  permissions RolePermission[]
+  users       User[]
+  @@map("Role")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("RolePermission")
 }
 
 model Plugin {
@@ -47,6 +97,7 @@ model Plugin {
   githubForks     Int              @default(0)
   githubTopics    String?
   githubLastCommit DateTime?
+  githubImportId  String?
   categoryId      String?
   category        Category?        @relation(fields: [categoryId], references: [id])
   status          String           @default("pending")
@@ -86,6 +137,7 @@ model AgentConfig {
   githubForks     Int              @default(0)
   githubTopics    String?
   githubLastCommit DateTime?
+  githubImportId  String?
   categoryId      String?
   category        Category?        @relation(fields: [categoryId], references: [id])
   status          String           @default("pending")
@@ -169,4 +221,91 @@ model AgentVersion {
   tags         String?
   systemPrompt String?
   createdAt    DateTime    @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entity     String?
+  entityId   String?
+  metadata   String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@map("AuditLog")
+}
+
+model GitHubConnection {
+  id              String   @id @default(cuid())
+  owner           String
+  repo            String
+  branch          String   @default("main")
+  isActive        Boolean  @default(true)
+  lastSyncAt      DateTime?
+  webhookSecret   String?
+  syncPlugins     Boolean  @default(true)
+  syncAgents      Boolean  @default(false)
+  autoApprove     Boolean  @default(false)
+  manifestPath    String   @default("cortex.json")
+  createdById     String?
+  createdBy       User?    @relation(fields: [createdById], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([owner, repo])
+  @@map("GitHubConnection")
+}
+
+model GitHubTopicScan {
+  id         String   @id @default(cuid())
+  topic      String
+  status     String   @default("pending") // pending | running | completed | failed
+  resultCount Int     @default(0)
+  importedCount Int   @default(0)
+  error      String?
+  startedAt  DateTime?
+  completedAt DateTime?
+  createdById String?
+  createdBy  User?    @relation(fields: [createdById], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  results    DiscoveredRepo[]
+
+  @@map("GitHubTopicScan")
+}
+
+model DiscoveredRepo {
+  id             String   @id @default(cuid())
+  scanId         String
+  scan           GitHubTopicScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  owner          String
+  repo           String
+  fullName       String
+  description    String?
+  htmlUrl        String
+  stars          Int      @default(0)
+  topics         String   @default("[]") // JSON array
+  repoKind       String?  // "plugin" | "agent" | "unknown"
+  manifestFound  Boolean  @default(false)
+  manifestData   String?  // JSON of manifest if found
+  importStatus   String   @default("pending") // pending | imported | skipped | error
+  importedId     String?  // id of created Plugin or AgentConfig
+  error          String?
+  createdAt      DateTime @default(now())
+
+  @@unique([scanId, fullName])
+  @@map("DiscoveredRepo")
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Setting")
 }

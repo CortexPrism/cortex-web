@@ -1,17 +1,15 @@
 {
   "name": "cortexprism-web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && mkdir -p .next/standalone/prisma && cp prisma/prisma/marketplace.db .next/standalone/prisma/marketplace.db && cp .env .next/standalone/.env && DATABASE_URL=\"file:/root/cortex-web/.next/standalone/prisma/marketplace.db\" npx prisma db push --skip-generate",
+    "build": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public && mkdir -p .next/standalone/prisma && cp prisma/marketplace.db .next/standalone/prisma/marketplace.db && cp .env .next/standalone/.env && DATABASE_URL=\"file:/root/cortex-web/.next/standalone/prisma/marketplace.db\" npx prisma db push --skip-generate",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
-    "db:seed": "npx tsx prisma/seed.ts",
-    "db:studio": "npx prisma studio",
-    "setup": "npx prisma generate && npx prisma db push && npx tsx prisma/seed.ts"
+    "db:studio": "npx prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

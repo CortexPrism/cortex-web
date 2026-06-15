@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
+import { createAuditLog } from "@/lib/audit";
 
 export async function GET(request: NextRequest) {
   const user = getAuthUser(request);
@@ -10,19 +11,44 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") || "pending";
+  const search = searchParams.get("search") || "";
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
 
-  const plugins = await prisma.plugin.findMany({
-    where: { status },
-    include: { category: true, user: { select: { id: true, username: true, email: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const where: Record<string, unknown> = { status };
+  if (search) {
+    where.OR = [
+      { name: { contains: search } },
+      { description: { contains: search } },
+    ];
+  }
+
+  const [plugins, total] = await Promise.all([
+    prisma.plugin.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        category: true,
+        user: { select: { id: true, username: true, email: true } },
+        reviews: { include: { reviewer: { select: { username: true } } }, orderBy: { createdAt: "desc" } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.plugin.count({ where }),
+  ]);
 
   return Response.json({
     plugins: plugins.map((p) => ({
       ...p,
       capabilities: JSON.parse(p.capabilities || "[]"),
       category: p.category?.name || null,
+      tags: JSON.parse(p.tags || "[]"),
     })),
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
   });
 }
 
@@ -52,6 +78,14 @@ export async function PUT(request: NextRequest) {
         action,
         notes: notes || null,
       },
+    });
+
+    await createAuditLog({
+      userId: user!.userId,
+      action: `submission.${action}`,
+      entity: "plugin",
+      entityId: id,
+      metadata: { name: plugin.name },
     });
 
     return Response.json({ plugin });

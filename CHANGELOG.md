@@ -2,6 +2,73 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.3.0] — 2026-06-15
+
+### Added
+- Full RBAC system with granular permissions and role management
+  - `Permission`, `Role`, and `RolePermission` database models with 9 predefined permissions
+  - Three built-in roles: Administrator (full access), Moderator (review/content), Developer (publish)
+  - Admin UI for managing users, roles, and permissions at `/admin/users` and `/admin/roles`
+  - Permission checks via `hasPermission()` and `hasAnyPermission()` middleware functions
+  - Role-based access control throughout all admin API routes
+- GitHub topic scanner for discovering Cortex ecosystem repos
+  - Search GitHub by cortex-related topics (`cortex-plugin`, `cortex-agent`, `esm`, `mcp`, `wasm`, etc.)
+  - Automatic manifest detection from `cortex.json`, `manifest.json`, and common paths
+  - Auto-classifies repos as plugin or agent based on manifest content
+  - Scan history, result pagination, per-repo import with auto-approve option
+  - Admin UI at `/admin/github/scanner` with topic quick-pick buttons
+- GitHub repository import API (`POST /api/marketplace/import`)
+  - Accepts a GitHub repository URL, fetches manifest and metadata automatically
+  - Auto-detects plugin vs agent from manifest fields (kind/capabilities vs provider/model)
+  - Fetches README.md and stores it for display on detail pages
+  - Fetches repository metadata (stars, forks, topics, license)
+  - Fetches icon (icon.png/icon.svg) from repo root
+  - Returns 409 if plugin/agent already exists to prevent duplicates
+  - Tabbed publish UI: manual form or GitHub import at `/marketplace/publish/plugin`
+- Admin settings page (`/admin/settings`) for GitHub API token configuration
+  - Token stored in database via `Setting` model, with env var fallback (`GITHUB_TOKEN`)
+  - Clear documentation about token scopes (`public_repo` only) and rate limit benefits
+- Enhanced admin sidebar with navigation for: Dashboard, Submissions, Users, Roles, GitHub Connections, Topic Scanner, Settings, Activity Log
+- Admin dashboard with stats cards, pending submission alerts, recent activity feed
+- Admin submission review with review notes, review history, search, pagination, status filters
+- Admin user management with role assignment dropdown, suspend/activate controls
+- Admin GitHub connection management with per-repo sync, auto-approve, activate/deactivate
+- Admin activity log with action type filtering and pagination
+- Audit logging system (`AuditLog` model) that tracks all admin actions
+  - Submission approvals/rejections, GitHub connections, topic scans
+  - Silently fails to never break the main application flow
+- `GitHubConnection` model for managing connected repositories
+  - Per-repo config for branch, manifest path, sync plugins/agents, auto-approve
+  - One-click sync button with result feedback
+- Enhanced user profile system
+  - `displayName`, `location`, `socialLinks` (Twitter/X, GitHub, Discord, LinkedIn) fields
+  - `preferences` JSON field (email notifications, theme selection)
+  - `emailVerified` boolean flag for email verification status
+  - Rich public profile page with social links, stats row, published content grid
+  - Tabbed settings page with Profile, Account, Security, Preferences, and Danger Zone sections
+  - Username and email editing with duplicate checking
+  - Account deletion with typed confirmation flow
+  - Theme preference selector (dark/light/system)
+- Auth system now returns and caches full user objects (avatar, bio, website, displayName, socialLinks, preferences, emailVerified)
+- `refreshUser()` method on AuthContext for re-fetching user data from server
+
+### Changed
+- Database path normalized: `DATABASE_URL` changed to `file:./marketplace.db` (relative to schema file)
+- Removed nested `prisma/prisma/` database directory — database now lives at `prisma/marketplace.db`
+- All admin API routes now use permission-based auth checks alongside admin role check
+- Marketplace landing page changed from static to dynamic rendering for real-time counts
+- Login, register, and profile API routes return enriched user objects with all profile fields
+
+### Fixed
+- Database path mismatch causing inconsistent state between dev server and build
+- Marketplace plugin/agent counts being stale due to static page generation
+- Module-scoped token variable in admin pages causing stale auth state
+- Removed seed and setup scripts from package.json to prevent accidental data overwrites
+
+### Removed
+- `db:seed` and `setup` npm scripts to prevent accidental production data loss
+- Nested `prisma/prisma/` database directory structure
+
 ## [0.2.0] — 2026-06-15
 
 ### Added

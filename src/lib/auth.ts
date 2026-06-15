@@ -30,7 +30,12 @@ export async function getUserFromToken(token: string) {
   if (!payload) return null;
   const user = await prisma.user.findUnique({
     where: { id: payload.userId },
-    select: { id: true, email: true, username: true, role: true, avatar: true, bio: true, website: true, createdAt: true },
+    select: {
+      id: true, email: true, username: true, displayName: true,
+      role: true, avatar: true, bio: true, website: true,
+      location: true, socialLinks: true, preferences: true,
+      emailVerified: true, createdAt: true,
+    },
   });
   return user;
 }

@@ -335,6 +335,44 @@ The submission starts with `status: "pending"`. It will not appear in public lis
 }
 ```
 
+### Import from GitHub Repository
+
+**`POST /api/marketplace/import`** (requires auth)
+
+Automatically imports a plugin or agent from a public GitHub repository. The endpoint fetches the manifest, README, and metadata (stars, forks, topics, license) from the repo.
+
+```json
+{
+  "repository": "https://github.com/owner/my-plugin",
+  "branch": "main",
+  "autoApprove": false,
+  "manifestPath": "cortex.json",
+  "categoryId": "cmq..."
+}
+```
+
+The endpoint auto-detects the type:
+- **Plugin** if manifest contains `kind` (esm/mcp/wasm) or `capabilities`
+- **Agent** if manifest contains `provider`, `model`, `systemPrompt`, or `soulContent`
+
+Response (201 Created):
+```json
+{
+  "success": true,
+  "type": "plugin",
+  "plugin": {
+    "id": "cmpxyz...",
+    "name": "my-plugin",
+    "slug": "my-plugin",
+    "version": "1.0.0",
+    "kind": "esm",
+    "status": "pending"
+  }
+}
+```
+
+Will return `409 Conflict` if a plugin or agent with the same name already exists.
+
 ### Check Submission Status
 
 **`GET /api/user/submissions`** (requires auth, returns user's own items)
@@ -376,10 +414,33 @@ Authorization: Bearer <token>
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/api/admin/submissions/plugins?status=pending` | List pending plugin submissions |
-| `PUT` | `/api/admin/submissions/plugins` | Approve/reject plugin |
-| `GET` | `/api/admin/submissions/agents?status=pending` | List pending agent submissions |
-| `PUT` | `/api/admin/submissions/agents` | Approve/reject agent |
+| `GET` | `/api/admin/submissions/plugins?status=pending` | List pending plugin submissions (paginated, searchable) |
+| `PUT` | `/api/admin/submissions/plugins` | Approve/reject plugin with review notes |
+| `GET` | `/api/admin/submissions/agents?status=pending` | List pending agent submissions (paginated, searchable) |
+| `PUT` | `/api/admin/submissions/agents` | Approve/reject agent with review notes |
+| `GET` | `/api/admin/users` | List users with role assignment (paginated, searchable) |
+| `PUT` | `/api/admin/users` | Update user role, status |
+| `GET` | `/api/admin/users/[id]` | Get user details |
+| `DELETE` | `/api/admin/users/[id]` | Soft-delete (deactivate) user |
+| `GET` | `/api/admin/roles` | List all roles with permissions |
+| `POST` | `/api/admin/roles` | Create a new role |
+| `PUT` | `/api/admin/roles` | Update role name, description, permissions |
+| `DELETE` | `/api/admin/roles` | Delete a custom role |
+| `GET` | `/api/admin/permissions` | List all permissions |
+| `POST` | `/api/admin/permissions` | Create a new permission |
+| `GET` | `/api/admin/stats` | Dashboard statistics |
+| `GET` | `/api/admin/audit-logs` | Activity log with filters |
+| `GET` | `/api/admin/github-connections` | List connected repos |
+| `POST` | `/api/admin/github-connections` | Connect a repository |
+| `PUT` | `/api/admin/github-connections` | Update connection config |
+| `DELETE` | `/api/admin/github-connections` | Remove connection |
+| `POST` | `/api/admin/github-connections/[id]/sync` | Trigger import sync |
+| `GET` | `/api/admin/github-topic-scanner` | List topic scans |
+| `POST` | `/api/admin/github-topic-scanner` | Trigger a topic scan |
+| `GET` | `/api/admin/github-topic-scanner/[id]` | Get scan results |
+| `POST` | `/api/admin/github-topic-scanner/[id]/import` | Import a discovered repo |
+| `GET` | `/api/admin/settings` | List runtime settings |
+| `PUT` | `/api/admin/settings` | Update a setting value |
 
 Admin approve/reject body:
 
@@ -406,17 +467,33 @@ Admin approve/reject body:
 | `GET` | `/api/marketplace/agents/:id/download` | No | Download agent config |
 | `POST` | `/api/marketplace/agents` | Yes | Submit an agent |
 | `PUT` | `/api/marketplace/agents/:id` | Yes | Update an agent |
+| `POST` | `/api/marketplace/import` | Yes | Import plugin/agent from GitHub repo |
 | `DELETE` | `/api/marketplace/agents/:id` | Yes | Delete an agent |
 | `GET` | `/api/marketplace/categories` | No | List categories |
 | `GET` | `/api/marketplace/stats` | No | Marketplace statistics |
 | `POST` | `/api/auth/register` | No | Create account |
 | `POST` | `/api/auth/login` | No | Login |
-| `GET` | `/api/auth/me` | Yes | Current user |
+| `GET` | `/api/auth/me` | Yes | Current user (enriched profile) |
+| `PUT` | `/api/auth/me` | Yes | Update profile, account, preferences |
+| `DELETE` | `/api/auth/me` | Yes | Delete account (with confirmation) |
 | `GET` | `/api/user/submissions` | Yes | User's submissions |
-| `GET` | `/api/admin/submissions/plugins` | Admin | List pending plugins |
+| `GET` | `/api/admin/submissions/plugins` | Admin | List plugins with status filter |
 | `PUT` | `/api/admin/submissions/plugins` | Admin | Approve/reject plugin |
-| `GET` | `/api/admin/submissions/agents` | Admin | List pending agents |
+| `GET` | `/api/admin/submissions/agents` | Admin | List agents with status filter |
 | `PUT` | `/api/admin/submissions/agents` | Admin | Approve/reject agent |
+| `GET` | `/api/admin/users` | Admin | List users |
+| `PUT` | `/api/admin/users` | Admin | Update user role/status |
+| `GET` | `/api/admin/users/[id]` | Admin | User details |
+| `GET/POST/PUT/DELETE` | `/api/admin/roles` | Admin | Manage roles |
+| `GET/POST` | `/api/admin/permissions` | Admin | Manage permissions |
+| `GET` | `/api/admin/stats` | Admin | Dashboard stats |
+| `GET` | `/api/admin/audit-logs` | Admin | Activity log |
+| `GET/POST/PUT/DELETE` | `/api/admin/github-connections` | Admin | Manage repo connections |
+| `POST` | `/api/admin/github-connections/[id]/sync` | Admin | Trigger repo sync |
+| `GET/POST` | `/api/admin/github-topic-scanner` | Admin | Manage topic scans |
+| `GET` | `/api/admin/github-topic-scanner/[id]` | Admin | Scan results |
+| `POST` | `/api/admin/github-topic-scanner/[id]/import` | Admin | Import discovered repo |
+| `GET/PUT` | `/api/admin/settings` | Admin | Runtime settings |
 | `GET` | `/api/docs/openapi.json` | No | OpenAPI 3.1 spec |
 
 ### Base URL
@@ -504,6 +581,23 @@ interface AgentConfig {
 | `readme` | No | string | Full README markdown |
 | `categoryId` | No | string | Category UUID |
 
+### GitHubImport (POST body for `/api/marketplace/import`)
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `repository` | Yes | string | Public GitHub repo URL (`https://github.com/owner/repo`) |
+| `branch` | No | string | Git branch (default: `main`, auto-detects from repo) |
+| `autoApprove` | No | boolean | Skip review queue (admin only, default: `false`) |
+| `manifestPath` | No | string | Custom manifest path (default: auto-detects `cortex.json`, `manifest.json`) |
+| `categoryId` | No | string | Category UUID |
+
+The import endpoint:
+1. Fetches repo metadata (stars, forks, topics, license, default branch)
+2. Reads the manifest from the repository
+3. Auto-detects plugin vs agent from manifest content
+4. Fetches README.md and icon (icon.png/icon.svg) from the repo
+5. Creates a marketplace submission with all metadata
+
 ---
 
 ## Example: Full CLI Integration
@@ -524,6 +618,25 @@ cortex plugin install marketplace:cortexprism.io/plugins/python-executor
 cortex agent import marketplace:cortexprism.io/agents/code-reviewer
 # → fetches https://cortexprism.io/api/marketplace/agents/code-reviewer/download
 # → saves agent configuration locally
+```
+
+### Scripted GitHub Import (curl example)
+
+```bash
+# Import a plugin from a GitHub repository
+curl -X POST https://cortexprism.io/api/marketplace/import \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"repository": "https://github.com/owner/my-cortex-plugin"}'
+
+# Import with auto-approve (admin only)
+curl -X POST https://cortexprism.io/api/marketplace/import \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "repository": "https://github.com/owner/my-plugin",
+    "autoApprove": true
+  }'
 ```
 
 ### Scripted Discovery (curl/jq example)

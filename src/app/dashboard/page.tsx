@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/shared/Badge";
-import { Plus, Package, Bot } from "lucide-react";
+import { Plus, Package, Bot, GitBranch } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
 interface Submission {
@@ -64,7 +64,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
         <Link href="/marketplace/publish/plugin" className="glass-card-hover p-5 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center"><Plus className="w-5 h-5 text-indigo-400" /></div>
           <div><div className="font-semibold text-[#e2e2ea]">Publish Plugin</div><div className="text-sm text-[#55556a]">Submit a new plugin</div></div>
@@ -72,6 +72,10 @@ export default function DashboardPage() {
         <Link href="/marketplace/publish/agent" className="glass-card-hover p-5 flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center"><Plus className="w-5 h-5 text-purple-400" /></div>
           <div><div className="font-semibold text-[#e2e2ea]">Publish Agent</div><div className="text-sm text-[#55556a]">Submit a new agent config</div></div>
+        </Link>
+        <Link href="/marketplace/publish/plugin?source=github" className="glass-card-hover p-5 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-[#18181f] flex items-center justify-center"><GitBranch className="w-5 h-5 text-[#9090a8]" /></div>
+          <div><div className="font-semibold text-[#e2e2ea]">Import from GitHub</div><div className="text-sm text-[#55556a]">Publish from a repository</div></div>
         </Link>
       </div>
 

@@ -5,6 +5,8 @@ import { ArrowRight, Puzzle, Bot, Sparkles, TrendingUp, Zap } from "lucide-react
 import { formatNumber } from "@/lib/utils";
 import { SITE_URL } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "CortexPrism Marketplace — Plugins & Agent Configurations",
   description:
