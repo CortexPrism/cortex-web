@@ -2,9 +2,32 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
-## [Unreleased]
+## [0.1.1] — 2026-06-15
 
 ### Added
+- Profile editing: bio, website, and avatar fields via settings page (`/dashboard/settings`)
+- Password change API and UI with current password verification and bcrypt hashing
+- Confirm password field on registration page with client-side validation
+- Navbar logout button in user dropdown (desktop + mobile)
+- "Edit Profile" link on own public profile page via `ProfileActions` client component
+- `updateUser` method in AuthContext for syncing profile changes to state and localStorage
+- Shared `authenticateRequest()` helper in `@/lib/auth` to deduplicate API auth logic
+- Jacob seed user (admin@cortexprism.io / password123) as admin
+- Dynamic password hashing in seed script (bcrypt at runtime, not hardcoded hash)
+- Navbar dropdown close delay (200ms) to prevent premature dismissal on hover gap
+
+### Changed
+- `getUserFromToken` now includes `website` field in Prisma select
+- PUT `/api/auth/me` skips redundant DB refetch after update (merges in-memory)
+- PUT `/api/auth/password` uses `verifyToken` (JWT-only) instead of full-profile DB query
+- Registration form styling consistent with login page design system
+
+### Fixed
+- Navbar dropdown closing too quickly when cursor crosses button-to-menu gap
+- Stale `.next` webpack cache causing 500 errors on profile and settings pages
+- Production database replaced on every deploy (build script copies seed DB)
+
+### Added (from prior unreleased)
 - Comprehensive SEO improvements for improved natural search traffic
   - `robots.txt` with crawl directives (disallows auth/admin pages, blocks GPTBot/CCBot)
   - `sitemap.xml` with dynamic generation of all 80+ pages, docs, and marketplace items

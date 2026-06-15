@@ -6,7 +6,7 @@ import {
   Menu, X, ChevronDown, LogIn, LogOut,
   LayoutDashboard, User, Github,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
 import { LogoMark } from "@/components/shared/LogoMark";
@@ -29,7 +29,22 @@ export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { user, loading, logout } = useAuth();
+
+  const handleDropdownEnter = useCallback((label: string) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setOpenDropdown(label);
+  }, []);
+
+  const handleDropdownLeave = useCallback(() => {
+    closeTimerRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200);
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[rgba(255,255,255,0.07)] bg-[#0a0a0f]/85 backdrop-blur-xl" aria-label="Main navigation">
@@ -49,8 +64,8 @@ export function Navbar() {
                 <div
                   key={link.label}
                   className="relative"
-                  onMouseEnter={() => setOpenDropdown(link.label)}
-                  onMouseLeave={() => setOpenDropdown(null)}
+                  onMouseEnter={() => handleDropdownEnter(link.label)}
+                  onMouseLeave={handleDropdownLeave}
                 >
                   <button
                     className={cn(
@@ -146,8 +161,8 @@ export function Navbar() {
             ) : user ? (
               <div
                 className="relative"
-                onMouseEnter={() => setOpenDropdown("user")}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => handleDropdownEnter("user")}
+                onMouseLeave={handleDropdownLeave}
               >
                 <button className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg accent-gradient text-white hover:opacity-90 transition-opacity">
                   <User className="w-4 h-4" />

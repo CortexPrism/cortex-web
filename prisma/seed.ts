@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -14,13 +15,20 @@ async function main() {
     prisma.category.upsert({ where: { slug: "security" }, update: {}, create: { name: "Security", slug: "security" } }),
   ]);
 
-  const adminExists = await prisma.user.findUnique({ where: { email: "admin@cortexprism.io" } });
-  if (!adminExists) {
-    const hash = "$2b$12$uLMC.1/n48Wfsgpo8M/Pa.KWVdds1M4CjISd7qvoAgrR9Mm3g5miq";
-    await prisma.user.create({
-      data: { email: "admin@cortexprism.io", username: "admin", passwordHash: hash, role: "admin" },
-    });
-    console.log("Admin user created (admin@cortexprism.io / admin12345)");
+  const users = [
+    { email: "admin@cortexprism.io", username: "admin", password: "admin12345", role: "admin" as const },
+    { email: "jacob@cortexprism.io", username: "jacob", password: "password123", role: "admin" as const },
+  ];
+
+  for (const u of users) {
+    const exists = await prisma.user.findUnique({ where: { email: u.email } });
+    if (!exists) {
+      const hash = await bcrypt.hash(u.password, 12);
+      await prisma.user.create({
+        data: { email: u.email, username: u.username, passwordHash: hash, role: u.role },
+      });
+      console.log(`${u.role} user created (${u.email} / ${u.password})`);
+    }
   }
 
   console.log("Seed complete: categories and admin user created");
