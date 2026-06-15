@@ -57,13 +57,17 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { key, value } = body;
 
-    if (!key || !DISCORD_KEYS.includes(key)) {
-      return Response.json({ error: "Invalid or missing key" }, { status: 400 });
+    if (!key || typeof key !== "string" || !DISCORD_KEYS.includes(key as typeof DISCORD_KEYS[number])) {
+      return Response.json({ error: "Invalid or missing key: " + String(key) }, { status: 400 });
     }
 
     if (value === null || value === "") {
       await prisma.setting.delete({ where: { key } }).catch(() => {});
       return Response.json({ success: true, message: "Setting cleared" });
+    }
+
+    if (typeof value !== "string") {
+      return Response.json({ error: "Value must be a string" }, { status: 400 });
     }
 
     await prisma.setting.upsert({
@@ -73,8 +77,9 @@ export async function PUT(request: NextRequest) {
     });
 
     return Response.json({ success: true });
-  } catch {
-    return Response.json({ error: "Failed to update setting" }, { status: 400 });
+  } catch (error) {
+    console.error("Failed to update Discord setting:", error);
+    return Response.json({ error: "Failed to update setting: " + (error instanceof Error ? error.message : "Unknown error") }, { status: 400 });
   }
 }
 

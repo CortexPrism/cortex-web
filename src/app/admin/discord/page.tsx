@@ -70,23 +70,26 @@ export default function AdminDiscordPage() {
 
   const saveSetting = async (key: string) => {
     const headers = authHeaders();
-    if (!headers.authorization) return;
+    if (!headers.authorization) { showMsg("error", "Not authenticated"); return; }
     setSaving(key);
     try {
+      const value = formValues[key];
       const res = await fetch("/api/admin/discord", {
         method: "PUT",
         headers: { "Content-Type": "application/json", ...headers },
-        body: JSON.stringify({ key, value: formValues[key] || null }),
+        body: JSON.stringify({ key, value: value || null }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         showMsg("success", key.replace("discord_", "").replace(/_/g, " ") + " saved");
-        fetchSettings();
+        if (settings) {
+          setSettings({ ...settings, [key]: value || null });
+        }
       } else {
-        const data = await res.json().catch(() => ({}));
-        showMsg("error", data.error || "Save failed");
+        showMsg("error", data.error || "Save failed (HTTP " + res.status + ")");
       }
-    } catch {
-      showMsg("error", "Connection error");
+    } catch (e) {
+      showMsg("error", "Connection error: " + (e as Error).message);
     }
     setSaving(null);
   };
