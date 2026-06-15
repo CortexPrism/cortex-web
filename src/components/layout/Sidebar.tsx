@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Search, SearchX } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface SidebarSection {
   links: { href: string; label: string }[];
 }
 
-const sidebarSections: SidebarSection[] = [
+const staticSections: SidebarSection[] = [
   {
     title: "Getting Started",
     links: [
@@ -52,20 +52,6 @@ const sidebarSections: SidebarSection[] = [
     ],
   },
   {
-    title: "Knowledge Base",
-    links: [
-      { href: "/docs/knowledge-base", label: "Overview" },
-      { href: "/docs/knowledge-base/faq", label: "FAQ" },
-      { href: "/docs/knowledge-base/troubleshooting", label: "Troubleshooting" },
-      { href: "/docs/knowledge-base/best-practices", label: "Best Practices" },
-      { href: "/docs/knowledge-base/provider-guide", label: "Provider Guide" },
-      { href: "/docs/knowledge-base/sandbox-guide", label: "Sandbox Guide" },
-      { href: "/docs/knowledge-base/migration-guide", label: "Migration Guide" },
-      { href: "/docs/knowledge-base/security-guidelines", label: "Security" },
-      { href: "/docs/knowledge-base/performance-tuning", label: "Performance" },
-    ],
-  },
-  {
     title: "Developer Guide",
     links: [
       { href: "/docs/developer-guide", label: "Overview" },
@@ -86,8 +72,6 @@ const sidebarSections: SidebarSection[] = [
     links: [{ href: "/docs/design-docs", label: "Index" }],
   },
 ];
-
-const allLinks = sidebarSections.flatMap((s) => s.links);
 
 function CollapsibleSection({
   section,
@@ -144,9 +128,49 @@ function CollapsibleSection({
   );
 }
 
+interface KbLink {
+  title: string;
+  slug: string;
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const [search, setSearch] = useState("");
+  const [kbLinks, setKbLinks] = useState<KbLink[]>([]);
+  const [kbLoading, setKbLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/knowledge-base?limit=100")
+      .then((res) => res.json())
+      .then((data) => {
+        setKbLinks(data.articles || []);
+        setKbLoading(false);
+      })
+      .catch(() => setKbLoading(false));
+  }, []);
+
+  const sidebarSections = useMemo(() => {
+    const kbLinks_ = kbLinks;
+    const kbLoading_ = kbLoading;
+    const kbSectionData: SidebarSection = {
+      title: "Knowledge Base",
+      links: [
+        { href: "/docs/knowledge-base", label: "Overview" },
+        ...(kbLoading_
+          ? [{ href: "", label: "Loading..." }]
+          : kbLinks_.map((a) => ({ href: `/docs/knowledge-base/${a.slug}`, label: a.title }))
+        ),
+      ],
+    };
+    const sections = [...staticSections];
+    sections.splice(3, 0, kbSectionData);
+    return sections;
+  }, [kbLinks, kbLoading]);
+
+  const allLinks = useMemo(
+    () => sidebarSections.flatMap((s) => s.links).filter((l) => l.href),
+    [sidebarSections]
+  );
 
   const filteredLinks = useMemo(() => {
     if (!search.trim()) return null;
@@ -154,7 +178,7 @@ export function Sidebar() {
     return allLinks.filter(
       (l) => l.label.toLowerCase().includes(q) || l.href.toLowerCase().includes(q)
     );
-  }, [search]);
+  }, [search, allLinks]);
 
   if (!pathname.startsWith("/getting-started") && !pathname.startsWith("/docs")) {
     return null;

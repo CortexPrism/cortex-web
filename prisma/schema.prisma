@@ -35,7 +35,9 @@ model User {
   auditLogs         AuditLog[]
   githubConnections GitHubConnection[]
   githubTopicScans  GitHubTopicScan[]
-  createdAt         DateTime         @default(now())
+  notifications         Notification[]
+  knowledgeBaseArticles KnowledgeBaseArticle[]
+  createdAt             DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }
 
@@ -298,6 +300,37 @@ model DiscoveredRepo {
 
   @@unique([scanId, fullName])
   @@map("DiscoveredRepo")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "submission_approved" | "submission_rejected" | "new_submission" | "system"
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@map("Notification")
+}
+
+model KnowledgeBaseArticle {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  description String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdBy   String?
+  author      User?    @relation(fields: [createdBy], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("KnowledgeBaseArticle")
 }
 
 model Setting {

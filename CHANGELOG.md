@@ -2,6 +2,29 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.5.0] — 2026-06-15
+
+### Added
+- Database-driven Knowledge Base CMS with full admin management UI
+  - `KnowledgeBaseArticle` database model with title, slug, content, description, published, sortOrder, createdBy
+  - Public API: `GET /api/knowledge-base` (list published) and `GET /api/knowledge-base/[slug]` (single article)
+  - Admin API: `GET/POST /api/admin/knowledge-base` and `GET/PUT/DELETE /api/admin/knowledge-base/[id]` with Zod validation, slug uniqueness checks, and audit logging
+  - Admin UI at `/admin/knowledge-base` with table view, pagination, search, delete confirmation dialog
+  - Split-view create/edit form with Markdown editor and live preview via `MdxContent` component
+  - Auto-generated slugs from title with manual override, published/draft toggle, sort order
+  - Dynamic sidebar links fetched from API, replacing hardcoded Knowledge Base section
+  - Dynamic search index in `DocSearch` component including KB articles
+  - Knowledge Base index page renders article listing grid with descriptions
+  - Migration script (`scripts/migrate-knowledge-base.ts`) to migrate 9 existing MDX files to database
+  - `src/lib/knowledge-base.ts` shared query helpers with pagination, search, and stats
+  - Sitemap and `generateStaticParams` updated to source KB slugs from database
+
+### Changed
+- Knowledge Base articles now served from database instead of filesystem (`content/knowledge-base/` is archived)
+- Docs page (`src/app/docs/[[...slug]]/page.tsx`) routes KB section to database while preserving other sections
+- Sidebar Knowledge Base section dynamically populated from `GET /api/knowledge-base`
+- Sitemap KB entries sourced from `getKbSlugs()` (database) instead of `getContentSlugs()` (filesystem)
+
 ## [0.4.0] — 2026-06-15
 
 ### Added

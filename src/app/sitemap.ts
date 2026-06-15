@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { getContentSlugs } from "@/lib/markdown";
+import { getKbSlugs } from "@/lib/knowledge-base";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
@@ -44,17 +45,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const docsEntries: MetadataRoute.Sitemap = [];
   for (const [dir, section] of Object.entries(sectionMap)) {
-    const slugs = getContentSlugs(section);
-    for (const slug of slugs) {
-      const pathSegments = [dir, slug === "index" ? "" : slug]
-        .filter(Boolean)
-        .join("/");
+    if (dir === "knowledge-base") {
       docsEntries.push({
-        url: `${SITE_URL}/docs/${pathSegments}`,
+        url: `${SITE_URL}/docs/${dir}`,
         lastModified: new Date(),
         changeFrequency: "weekly",
         priority: 0.7,
       });
+      const slugs = await getKbSlugs();
+      for (const slug of slugs) {
+        docsEntries.push({
+          url: `${SITE_URL}/docs/${dir}/${slug}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      }
+    } else {
+      const slugs = getContentSlugs(section);
+      for (const slug of slugs) {
+        const pathSegments = [dir, slug === "index" ? "" : slug]
+          .filter(Boolean)
+          .join("/");
+        docsEntries.push({
+          url: `${SITE_URL}/docs/${pathSegments}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      }
     }
   }
 
