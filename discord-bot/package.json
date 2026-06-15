@@ -6,7 +6,9 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "deploy-commands": "tsx src/deploy-commands.ts"
+    "deploy-commands": "tsx src/deploy-commands.ts",
+    "db:generate": "prisma generate --schema=../prisma/schema.prisma && cp -r ../node_modules/.prisma/client node_modules/.prisma/client",
+    "postinstall": "npm run db:generate"
   },
   "dependencies": {
     "discord.js": "^14.18.0",

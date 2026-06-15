@@ -1,7 +1,7 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { prisma } from "../index";
 
-export async function handlePlugin(interaction: CommandInteraction) {
+export async function handlePlugin(interaction: ChatInputCommandInteraction) {
   const action = interaction.options.get("action")?.value as string;
   const query = interaction.options.get("query")?.value as string;
 
@@ -35,7 +35,7 @@ export async function handlePlugin(interaction: CommandInteraction) {
       .setTitle(`Plugin Search: "${query}"`)
       .setDescription(`Found ${plugins.length} plugin(s)`)
       .addFields(
-        plugins.map((p) => ({
+        plugins.map((p: { id: string; name: string; description: string; downloads: number; rating: number }) => ({
           name: p.name,
           value: `\`${p.id}\` — ${p.description.slice(0, 100)}${p.description.length > 100 ? "..." : ""}\n⬇ ${p.downloads} | ⭐ ${p.rating}`,
           inline: false,

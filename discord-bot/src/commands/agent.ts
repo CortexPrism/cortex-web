@@ -1,7 +1,7 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { prisma } from "../index";
 
-export async function handleAgent(interaction: CommandInteraction) {
+export async function handleAgent(interaction: ChatInputCommandInteraction) {
   const action = interaction.options.get("action")?.value as string;
   const query = interaction.options.get("query")?.value as string;
 
@@ -35,7 +35,7 @@ export async function handleAgent(interaction: CommandInteraction) {
       .setTitle(`Agent Search: "${query}"`)
       .setDescription(`Found ${agents.length} agent(s)`)
       .addFields(
-        agents.map((a) => ({
+        agents.map((a: { id: string; name: string; description: string; provider: string | null; downloads: number; rating: number }) => ({
           name: a.name,
           value: `\`${a.id}\` — ${a.description.slice(0, 100)}${a.description.length > 100 ? "..." : ""}\nProvider: ${a.provider || "N/A"} | ⬇ ${a.downloads} | ⭐ ${a.rating}`,
           inline: false,

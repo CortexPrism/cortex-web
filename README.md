@@ -357,8 +357,7 @@ The Discord bot is a standalone service in `discord-bot/`:
 
 ```bash
 cd discord-bot
-npm install
-npx prisma generate --schema=../prisma/schema.prisma
+npm install          # also runs db:generate (generates Prisma client and copies it locally)
 
 # Register slash commands (run once)
 npx tsx src/deploy-commands.ts

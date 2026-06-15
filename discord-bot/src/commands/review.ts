@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { prisma } from "../index";
 
 const ADMIN_IDS = (process.env.DISCORD_ADMIN_IDS || "").split(",").filter(Boolean);
@@ -10,7 +10,7 @@ async function getWebsiteUser(discordId: string) {
   });
 }
 
-export async function handleReview(interaction: CommandInteraction) {
+export async function handleReview(interaction: ChatInputCommandInteraction) {
   const websiteUser = await getWebsiteUser(interaction.user.id);
   const isAdminUser = ADMIN_IDS.includes(interaction.user.id) || websiteUser?.role === "admin";
 
@@ -48,7 +48,7 @@ export async function handleReview(interaction: CommandInteraction) {
     if (pendingPlugins.length > 0) {
       embed.addFields({
         name: "🟣 Plugins",
-        value: pendingPlugins.map((p) =>
+        value: pendingPlugins.map((p: { id: string; name: string; user: { username: string | null; discordUsername: string | null } | null }) =>
           `\`${p.id}\` **${p.name}** by ${p.user?.username || "Unknown"}${p.user?.discordUsername ? ` (${p.user.discordUsername})` : ""}`,
         ).join("\n") || "None",
       });
@@ -57,7 +57,7 @@ export async function handleReview(interaction: CommandInteraction) {
     if (pendingAgents.length > 0) {
       embed.addFields({
         name: "🤖 Agents",
-        value: pendingAgents.map((a) =>
+        value: pendingAgents.map((a: { id: string; name: string; user: { username: string | null; discordUsername: string | null } | null }) =>
           `\`${a.id}\` **${a.name}** by ${a.user?.username || "Unknown"}${a.user?.discordUsername ? ` (${a.user.discordUsername})` : ""}`,
         ).join("\n") || "None",
       });

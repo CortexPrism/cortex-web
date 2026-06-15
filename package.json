@@ -9,7 +9,10 @@
     "lint": "next lint",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "discord:install": "cd discord-bot && npm install",
+    "discord:dev": "cd discord-bot && npx tsx src/index.ts",
+    "discord:deploy": "cd discord-bot && npx tsx src/deploy-commands.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

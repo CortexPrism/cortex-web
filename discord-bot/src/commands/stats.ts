@@ -1,7 +1,7 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { prisma } from "../index";
 
-export async function handleStats(interaction: CommandInteraction) {
+export async function handleStats(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply();
 
   const [pluginCount, agentCount, approvedPlugins, approvedAgents] = await Promise.all([
