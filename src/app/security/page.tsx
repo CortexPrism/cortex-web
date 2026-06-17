@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Shield, Lock, Eye, FileSearch, Server, Wrench } from "lucide-react";
+import { Shield, Lock, Eye, FileSearch, Server, Wrench, FileCode } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -68,6 +68,19 @@ const layers = [
     ],
   },
   {
+    icon: FileCode,
+    title: "CPL (Capability Level)",
+    description:
+      "YAML-based policy files defining capability boundaries for the agent. Rules can be managed via the CLI or auto-loaded from a policy file. Each rule specifies kind, effect, pattern, and priority.",
+    details: [
+      "YAML policy files with versioned schema",
+      "Rules evaluated by priority order (ASC) — first match wins",
+      "Supports shell, tool, and domain rule kinds",
+      "Allow or deny effects with descriptive reasons",
+      "Auto-loaded from ~/.cortex/policy.yml if present",
+    ],
+  },
+  {
     icon: Server,
     title: "Sandboxed Code Execution",
     description:
@@ -98,10 +111,10 @@ const layers = [
     icon: Wrench,
     title: "Approval Gates",
     description:
-      "Sensitive operations require explicit user approval before execution. The shell and code_exec tools have built-in approval gates.",
+      "Sensitive operations can require explicit user approval before execution. The shell and code_exec tools have configurable approval gates that can be toggled per session or policy.",
     details: [
-      "Shell command execution requires approval by default",
-      "Code execution in sandbox requires approval",
+      "Shell command execution can require approval (configurable)",
+      "Code execution in sandbox can require approval (configurable)",
       "Configurable approval timeout",
       "Policy-based automatic approval for trusted patterns",
       "Full audit of all approved and rejected operations",

@@ -19,13 +19,13 @@ retrieve(query, embedder)
 
 ## Memory Tiers
 
-| Tier | Database Table | Persistence | Content |
-|------|---------------|-------------|---------|
-| **Ephemeral (T1)** | In-memory | Session only | Current conversation context |
-| **Episodic (T2)** | `episodic_memory` | Session cross | Turn summaries of user+agent exchanges |
-| **Semantic (T3)** | `semantic_memory` | Long-term | Injected facts and knowledge |
-| **Archival (T4)** | Compressed history | Permanent | Compressed/aggregated historical data |
-| **Reflection (T5)** | `reflection_memory` | Permanent | LLM-extracted behavior patterns |
+| Tier | Database Table | Retention | Content |
+|------|---------------|-----------|---------|
+| **Episodic** | `episodic_memory` | Auto-decay based on half-life | Turn summaries — user+agent exchanges |
+| **Semantic** | `semantic_memory` | Indefinite unless pruned | Injected facts / knowledge / entities |
+| **Reflection** | `reflection_memory` | Consolidated weekly | LLM-extracted behavior patterns |
+| **Graph** | `entity_graph` | Built from semantic extraction | Knowledge graph nodes and edges |
+| **Skills** | `skills` table | Persisted indefinitely | Procedural knowledge from sessions |
 
 ## Storage
 
@@ -34,6 +34,8 @@ retrieve(query, embedder)
 | `episodic_memory` | Row | Turn summaries — user+agent exchanges |
 | `semantic_memory` | Row | Injected facts / knowledge |
 | `reflection_memory` | Row | LLM-extracted behaviour patterns |
+| `entity_graph` | Row | Knowledge graph nodes and edges |
+| `skills` | Row | Procedural knowledge from sessions |
 | `episodic_memory_fts` | FTS5 | Virtual table for keyword search on episodic |
 | `semantic_memory_fts` | FTS5 | Virtual table for keyword search on semantic |
 

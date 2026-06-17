@@ -21,7 +21,7 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "CortexPrism Features — AI Agent Framework Capabilities",
   description:
-    "Explore CortexPrism's full feature set: chat with 12+ LLM providers, 5-tier vector memory, MCP & ESM plugin system, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, workflow engine, and audit trail. All open source.",
+    "Explore CortexPrism's full feature set: chat with 24 LLM providers, 5-tier memory, MCP & ESM plugin system, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, workflow engine, and audit trail. All open source.",
   keywords: [
     "AI agent framework features",
     "LLM orchestration tools",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CortexPrism Features — AI Agent Framework Capabilities",
     description:
-      "12+ LLM providers, 5-tier vector memory, MCP & ESM plugins, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, and workflow automation. 100% open source.",
+      "24 LLM providers, 5-tier memory, MCP & ESM plugins, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, and workflow automation. 100% open source.",
     url: `${SITE_URL}/features`,
   },
 };
@@ -49,7 +49,7 @@ const features = [
     title: "Interactive Chat",
     subtitle: "Multi-Provider LLM Support",
     description:
-      "Chat with 12+ LLM providers through a unified interface. Switch between OpenAI, Anthropic Claude, Google Gemini, Groq, and more without changing your workflow.",
+      "Chat with 24 LLM providers through a unified interface. Switch between OpenAI, Anthropic Claude, Google Gemini, Groq, and more without changing your workflow.",
     benefits: [
       "One interface for all major LLM providers",
       "Provider failover and fallback chains",
@@ -75,17 +75,17 @@ const features = [
   {
     icon: Database,
     title: "5-Tier Memory System",
-    subtitle: "Ephemeral to Reflection",
+    subtitle: "Episodic to Skills",
     description:
-      "A layered memory architecture with five tiers: ephemeral (session context window), episodic (conversation segments), semantic (FTS5 + vector hybrid search), archival (long-term compressed storage), and reflection (per-turn meta-cognition).",
+      "A layered memory architecture with five tiers: episodic (turn summaries with auto-decay), semantic (injected facts with hybrid FTS5 + vector search), reflection (LLM-extracted behavior patterns), graph (knowledge graph entities and relationships), and skills (procedural knowledge from sessions).",
     benefits: [
-      "T1 Ephemeral: Live conversation context, 200k+ token window",
-      "T2 Episodic: Conversation segments with automatic chunking",
-      "T3 Semantic: Hybrid FTS5 full-text + vector similarity search",
-      "T4 Archival: Compressed long-term storage with entity extraction",
-      "T5 Reflection: Per-turn meta-cognition, patterns, and consolidation",
+      "Episodic: Turn summaries with configurable half-life and auto-decay scoring",
+      "Semantic: Injected facts with hybrid FTS5 + cosine vector similarity search",
+      "Reflection: LLM-extracted behavioral patterns with weekly consolidation",
+      "Graph: Knowledge graph nodes and edges built from semantic entity extraction",
+      "Skills: Procedural knowledge extracted from sessions with multi-step tool usage",
     ],
-    example: 'cortex memory search "deployment config" --type semantic',
+    example: 'cortex memory search "deployment config" --semantic',
   },
   {
     icon: Shield,
@@ -117,15 +117,15 @@ const features = [
   },
   {
     icon: Route,
-    title: "Model Router (RouteLLM)",
-    subtitle: "Intelligent Model Selection",
+    title: "Model Router",
+    subtitle: "Cascade & Threshold Strategies",
     description:
-      "RouteLLM integration enables automatic model selection based on task complexity, cost optimization, and provider availability with intelligent failover.",
+      "Two intelligent routing strategies wrapping LLM providers. Cascade tries cheapest providers first and escalates on low confidence. Threshold scores prompt complexity to route between strong and weak models.",
     benefits: [
-      "Automatic model selection by task type",
-      "Cost optimization between providers",
+      "Cascade router: cheapest model first, escalate on low confidence",
+      "Threshold router: RouteLLM-style complexity scoring for prompt routing",
+      "Cost optimization with confidence-based fallback between providers",
       "Graceful failover on provider outages",
-      "Custom routing rules and priorities",
     ],
     example: "cortex chat -m gpt-4o",
   },

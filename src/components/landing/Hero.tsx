@@ -55,7 +55,7 @@ export function Hero({ version }: HeroProps) {
 
           <p className="mt-6 text-lg md:text-xl text-[#9090a8] max-w-2xl mx-auto leading-relaxed">
             A powerful, secure, and extensible runtime for building agentic
-            applications. Chat with 12+ LLM providers, execute code in
+            applications. Chat with 24 LLM providers, execute code in
             sandboxes, manage memory across five tiers, orchestrate workflows,
             and deploy distributed agents — all open source.
           </p>

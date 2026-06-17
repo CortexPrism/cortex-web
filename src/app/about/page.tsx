@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "About CortexPrism — Open-Source AI Agent Runtime",
   description:
-    "CortexPrism is an open-source AI agent runtime built with TypeScript and Deno. Features 12+ LLM providers, 5-tier memory architecture, parallax security, sandboxed code execution, and an extensible MCP plugin marketplace. MIT licensed, privacy-first, no telemetry.",
+    "CortexPrism is an open-source AI agent runtime built with TypeScript and Deno. Features 24 LLM providers, 5-tier memory architecture, parallax security, sandboxed code execution, and an extensible MCP plugin marketplace. MIT licensed, privacy-first, no telemetry.",
   keywords: [
     "about CortexPrism",
     "open source AI agent runtime",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About CortexPrism — Open-Source AI Agent Runtime",
     description:
-      "Open-source AI agent runtime in TypeScript/Deno. 12+ LLM providers, 5-tier memory, parallax security, sandboxed execution, MCP plugin marketplace. MIT licensed. No telemetry, no vendor lock-in.",
+      "Open-source AI agent runtime in TypeScript/Deno. 24 LLM providers, 5-tier memory, parallax security, sandboxed execution, MCP plugin marketplace. MIT licensed. No telemetry, no vendor lock-in.",
     url: `${SITE_URL}/about`,
   },
 };
@@ -45,7 +45,7 @@ export default function AboutPage() {
             CortexPrism is a single-process agentic harness written in TypeScript/Deno. It exposes a CLI, a REST API + WebSocket server, and a web UI. All state is persisted in SQLite databases using WAL mode.
           </p>
           <p>
-            At its core, CortexPrism is an agent loop that orchestrates LLM calls, tool execution, memory operations, and reflection. It supports 12+ LLM providers through a unified interface, with a cascading model router for cost optimization.
+            At its core, CortexPrism is an agent loop that orchestrates LLM calls, tool execution, memory operations, and reflection. It supports 24 LLM providers through a unified interface, with a cascading model router for cost optimization.
           </p>
           <p>
             The system features a 5-tier memory architecture with hybrid FTS5 keyword + vector embedding retrieval, a defense-in-depth security model (Parallax) with encrypted credential vault, sandboxed code execution with auto-fix loops, a Model Quartermaster adaptive prediction engine, a git workspace with agent-powered commit messages, a DSL-based workflow engine, and distributed remote agent execution via hub nodes.
@@ -80,7 +80,7 @@ export default function AboutPage() {
           </div>
           <h3 className="text-lg font-semibold text-[#e2e2ea] mb-2">Provider Freedom</h3>
           <p className="text-sm text-[#9090a8] leading-relaxed">
-            No vendor lock-in. Use any LLM provider — or multiple at once. Switch between Anthropic, OpenAI, Google, local Ollama models, or any of 12+ providers with a single flag.
+            No vendor lock-in. Use any LLM provider — or multiple at once. Switch between Anthropic, OpenAI, Google, local Ollama models, or any of 24 providers with a single flag.
           </p>
         </div>
 

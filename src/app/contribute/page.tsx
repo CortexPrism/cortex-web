@@ -104,10 +104,10 @@ export default function ContributePage() {
                 <span className="text-green-400">cd</span>
                 <span className="text-[#e2e2ea]"> cortex</span>
                 {"\n\n"}
-                <span className="text-[#55556a]"># Install dependencies</span>
+                <span className="text-[#55556a]"># Install dependencies and initialize databases</span>
                 {"\n"}
-                <span className="text-green-400">deno task</span>
-                <span className="text-[#e2e2ea]"> setup</span>
+                <span className="text-green-400">deno run --allow-all</span>
+                <span className="text-[#e2e2ea]"> src/db/migrate.ts</span>
                 {"\n\n"}
                 <span className="text-[#55556a]"># Run tests</span>
                 {"\n"}

@@ -13,7 +13,7 @@ import path from "path";
 export const metadata: Metadata = {
   title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
   description:
-    "Open-source AI agent runtime with 12+ LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. Install with one command and deploy autonomous agents with confidence. MIT licensed.",
+    "Open-source AI agent runtime with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. Install with one command and deploy autonomous agents with confidence. MIT licensed.",
   keywords: [
     "open source AI agent",
     "AI agent runtime",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
     description:
-      "Open-source AI agent runtime: 12+ LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. MIT licensed. One-command install.",
+      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. MIT licensed. One-command install.",
     url: SITE_URL,
   },
 };

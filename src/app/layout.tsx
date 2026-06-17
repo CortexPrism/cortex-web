@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | CortexPrism",
   },
   description:
-    "CortexPrism is an open-source AI agent runtime with 12+ LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise-grade security. Self-host your autonomous agents — MIT licensed.",
+    "CortexPrism is an open-source AI agent runtime with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise-grade security. Self-host your autonomous agents — MIT licensed.",
   keywords: SITE_KEYWORDS,
   authors: [{ name: "CortexPrism", url: SITE_URL }],
   creator: "CortexPrism",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CortexPrism — Open-Source AI Agent Runtime",
     description:
-      "Open-source AI agent runtime: 12+ LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and parallax security. Self-host autonomous agents. MIT licensed.",
+      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and parallax security. Self-host autonomous agents. MIT licensed.",
     type: "website",
     siteName: "CortexPrism",
     locale: "en_US",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     creator: "@CortexPrism",
     title: "CortexPrism — Open-Source AI Agent Runtime",
     description:
-      "Open-source AI agent runtime: 12+ LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and parallax security. MIT licensed.",
+      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and parallax security. MIT licensed.",
     images: [`${SITE_URL}/og-image.png`],
   } as Metadata["twitter"],
   alternates: {

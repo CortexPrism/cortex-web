@@ -17,7 +17,7 @@ const features = [
   {
     icon: MessageSquare,
     title: "Interactive Chat",
-    description: "Chat with 12+ LLM providers including OpenAI, Anthropic, Google, Groq, and more.",
+    description: "Chat with 24 LLM providers including OpenAI, Anthropic, Google, Groq, and more.",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
     glow: "rgba(96,165,250,0.15)",
@@ -33,7 +33,7 @@ const features = [
   {
     icon: Database,
     title: "5-Tier Memory",
-    description: "Ephemeral, episodic, semantic, archival, and reflection tiers with hybrid FTS5 + vector retrieval.",
+    description: "Episodic, semantic, reflection, graph, and skills tiers with hybrid FTS5 + vector retrieval.",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
     glow: "rgba(167,139,250,0.15)",
@@ -57,7 +57,7 @@ const features = [
   {
     icon: Route,
     title: "Model Router",
-    description: "RouteLLM integration for intelligent model selection and failover.",
+    description: "Cascade and threshold model routing for intelligent provider selection and failover.",
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
     glow: "rgba(99,102,241,0.18)",

@@ -2,11 +2,11 @@
 
 **Open-source agentic harness — CLI, API, web UI, and marketplace.**
 
-CortexPrism is a runtime for building, deploying, and managing AI agents. It provides a unified interface to 12+ LLM providers, a 5-tier memory system with hybrid retrieval, sandboxed code execution, defense-in-depth security, and a plugin marketplace — all running locally on your machine.
+CortexPrism is a runtime for building, deploying, and managing AI agents. It provides a unified interface to 24 LLM providers, a 5-tier memory system with hybrid retrieval, sandboxed code execution, defense-in-depth security, and a plugin marketplace — all running locally on your machine.
 
 - **Agent Loop** — Multi-turn reasoning with tool orchestration, memory injection, and reflection
 - **Multi-Provider** — Anthropic, OpenAI, Google, Groq, Mistral, DeepSeek, Ollama, and more
-- **Memory** — 5 tiers from ephemeral to procedural with FTS5 + vector hybrid retrieval
+- **Memory** — 5 tiers: episodic, semantic, reflection, graph, skills with FTS5 + vector hybrid retrieval
 - **Security** — Parallax 3-stage validation gate, encrypted vault, audit logging
 - **Plugins** — Extend via ESM modules, MCP servers, or WebAssembly
 - **Marketplace** — Discover and publish plugins and agent configs
@@ -20,8 +20,7 @@ CortexPrism is a runtime for building, deploying, and managing AI agents. It pro
 ```bash
 git clone https://github.com/CortexPrism/cortex.git
 cd cortex
-deno task setup
-cortex setup
+deno run --allow-all src/main.ts setup
 cortex chat
 ```
 
@@ -32,7 +31,7 @@ Visit [cortexprism.io](https://cortexprism.io) to explore the marketplace and fu
 ## Features
 
 ### Interactive Chat
-Chat with 12+ LLM providers through a unified interface. Switch providers mid-session, configure fallback chains, stream responses.
+Chat with 24 LLM providers through a unified interface. Switch providers mid-session, configure fallback chains, stream responses.
 
 ```
 cortex chat --model claude-sonnet-4-20250514
@@ -46,7 +45,7 @@ cortex chat --tools all
 ```
 
 ### 5-Tier Memory System
-Ephemeral → Working → Semantic → Archival → Procedural. Hybrid FTS5 keyword search + cosine vector similarity with exponential time decay.
+Episodic → Semantic → Reflection → Graph → Skills. Hybrid FTS5 keyword search + cosine vector similarity with exponential time decay.
 
 ```
 cortex memory search --query "deployment config" --tier semantic
@@ -135,7 +134,7 @@ cortex agent create --name code-reviewer --model claude-sonnet-4-20250514
 |-----------|-------------|
 | **Agent Loop** | Core reasoning + tool loop — LLM calls, tool execution, memory, reflection |
 | **Memory System** | 5-tier memory with hybrid FTS5 + vector embedding retrieval |
-| **LLM Layer** | 12+ providers with unified interface and CascadeRouter |
+| **LLM Layer** | 24 providers with unified interface and CascadeRouter |
 | **Tool System** | Extensible registry for file I/O, shell, web, code execution |
 | **Security (Parallax)** | 3-stage policy gate, encrypted vault, audit logging |
 | **Sandbox** | Docker containers with resource limits and auto-fix loop |

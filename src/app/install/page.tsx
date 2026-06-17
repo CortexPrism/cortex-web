@@ -175,8 +175,8 @@ export default function InstallPage() {
                 {"\n\n"}
                 <span className="text-[#55556a]"># 3. Run setup</span>
                 {"\n"}
-                <span className="text-green-400">deno task</span>
-                <span className="text-[#e2e2ea]"> setup</span>
+                <span className="text-green-400">deno run --allow-all</span>
+                <span className="text-[#e2e2ea]"> src/main.ts setup</span>
               </code>
             </pre>
           </div>
