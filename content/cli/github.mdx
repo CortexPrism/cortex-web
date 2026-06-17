@@ -1,0 +1,105 @@
+---
+title: cortex github
+description: GitHub integration — manage pull requests, issues, repositories, branches, and authentication tokens
+---
+
+# `cortex github`
+
+Full GitHub integration for managing pull requests, issues, repositories, and branches directly from the CLI. Requires GitHub authentication via personal access token.
+
+## Usage
+
+```bash
+cortex github <subcommand> [options]
+cortex github token                   # Manage GitHub authentication token
+```
+
+## Subcommands
+
+### `cortex github pr`
+Manage pull requests.
+
+```bash
+cortex github pr list                 # List pull requests
+cortex github pr list --state open    # Filter by state (open, closed, all)
+cortex github pr list --limit 10      # Limit results
+cortex github pr get <number>         # Get pull request details
+cortex github pr create               # Create a new pull request
+cortex github pr create --draft       # Create as draft PR
+cortex github pr create --body "..."  # PR description
+cortex github pr merge <number>       # Merge a pull request
+cortex github pr merge <number> --method squash  # Merge method (merge, squash, rebase)
+cortex github pr close <number>       # Close a pull request
+```
+
+### `cortex github issue`
+Manage issues.
+
+```bash
+cortex github issue list              # List issues
+cortex github issue list --state open # Filter by state
+cortex github issue list --limit 20   # Limit results
+cortex github issue list --labels bug # Filter by labels
+cortex github issue create            # Create a new issue
+cortex github issue create --body "..." # Issue description
+cortex github issue create --labels bug,priority  # Add labels
+cortex github issue create --assignees user1      # Assign users
+cortex github issue close <number>    # Close an issue
+```
+
+### `cortex github repo`
+Manage repositories.
+
+```bash
+cortex github repo list               # List repositories
+cortex github repo list --type all    # Filter by type (all, owner, public, private, member)
+cortex github repo list --limit 10    # Limit results
+cortex github repo get <name>         # Get repository details
+cortex github repo branches <name>    # List branches in a repository
+cortex github repo branches <name> --limit 20  # Limit branch results
+```
+
+### `cortex github token`
+Manage GitHub authentication.
+
+```bash
+cortex github token                   # Set or update GitHub personal access token
+```
+
+## Authentication
+
+GitHub integration requires a personal access token. Set it using:
+
+```bash
+cortex github token
+```
+
+The token is stored in the Cortex vault (AES-256-GCM encrypted). Required scopes:
+- `repo` — Full control of private repositories
+- `read:org` — Read organization and team membership
+- `issues:read/write` — Read and write issues
+
+## Examples
+
+```bash
+# List open pull requests
+cortex github pr list --state open
+
+# Create a draft PR
+cortex github pr create --draft --body "WIP: Refactor auth middleware"
+
+# Merge a PR with squash
+cortex github pr merge 42 --method squash
+
+# List bugs in the current repo
+cortex github issue list --labels bug
+
+# Create a new issue with labels
+cortex github issue create --labels enhancement --body "Add dark mode toggle"
+
+# Browse all repositories
+cortex github repo list --type all
+
+# View branches in a repo
+cortex github repo branches cortex --limit 20
+```

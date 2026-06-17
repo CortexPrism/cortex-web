@@ -92,8 +92,8 @@ cp ~/.cortex/config.json ~/.cortex/config.json.backup
 # Run setup wizard to regenerate
 cortex setup
 
-# Or manually update config:
-cortex config migrate
+# Or manually migrate databases:
+cortex migrate
 ```
 
 ## Plugin Migration
@@ -102,13 +102,13 @@ When upgrading CortexPrism, plugins may need updates:
 
 ```bash
 # Check plugin compatibility
-cortex plugin list --check-compatibility
+cortex plugins list
 
-# Reinstall plugins for new version
-cortex plugin reinstall --all
+# Update all plugins to latest
+cortex plugins update --all
 
 # Update a specific plugin
-cortex plugin update my-plugin
+cortex plugins update my-plugin
 ```
 
 ## Rolling Back
@@ -123,8 +123,8 @@ cp ~/.cortex/data/cortex.db.backup ~/.cortex/data/cortex.db
 git checkout <previous-tag>
 deno task setup
 
-# Reinstall compatible plugins
-cortex plugin reinstall --all
+# Update plugins to latest compatible versions
+cortex plugins update --all
 ```
 
 ## Migrating from Other Tools

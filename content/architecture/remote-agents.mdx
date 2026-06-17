@@ -1,0 +1,108 @@
+---
+title: Remote Agents Architecture
+description: Distributed agent execution layer — hub-based WebSocket node management with capability tiers
+---
+
+# Remote Agents
+
+The remote agent system provides a distributed execution layer where agent nodes connect to a central hub via WebSocket. Nodes register with capability tiers, receive directives, and stream results back.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                      Hub (Central)                         │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │ WebSocket Server (ws-node.ts)                     │    │
+│  │  - Node authentication (token)                    │    │
+│  │  - Heartbeat monitoring (30s interval)            │    │
+│  │  - Directive dispatch                             │    │
+│  │  - Result routing to sessions                     │    │
+│  └──────────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │ Node Registry (node-registry.ts)                  │    │
+│  │  - Token management                               │    │
+│  │  - Node lifecycle tracking                        │    │
+│  │  - Persistence (SQLite)                           │    │
+│  └──────────────────────────────────────────────────┘    │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │ Capability Tiers (capability-tiers.ts)            │    │
+│  │  root | sudo | unprivileged                       │    │
+│  └──────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────┘
+                          │
+            WebSocket (WSS)│
+           ┌──────────────┼──────────────┐
+           ▼              ▼              ▼
+     ┌─────────┐   ┌─────────┐   ┌─────────┐
+     │ Node A  │   │ Node B  │   │ Node C  │
+     │ (root)  │   │ (sudo)  │   │ (unpriv)│
+     └─────────┘   └─────────┘   └─────────┘
+```
+
+## Capability Tiers
+
+### Root (unrestricted)
+- All tools available
+- All filesystem paths (`/`)
+- All sudo commands
+- All network domains
+- Maximum privilege
+
+### Sudo (elevated, scoped)
+- Excludes system paths: `/etc`, `/root`, `/proc`, `/sys`, `/boot`, `/dev`
+- Allowed package managers: `apt`, `npm`, `pip`, `systemctl`, `docker`
+- Blocked destructive: `rm -rf /`, `dd`, `mkfs`, `chmod 777`
+- Scoped tool access
+
+### Unprivileged (sandboxed)
+- Read-only tools only (read, list, info)
+- No shell access
+- Restricted to `/tmp/cortex-sandbox`
+- No sudo commands
+- Minimal attack surface
+
+## Message Protocol
+
+```
+Node → Hub:                    Hub → Node:
+┌─────────────┐               ┌──────────────┐
+│ register    │               │ registered   │
+│ heartbeat   │               │ heartbeat_ack│
+│ result      │               │ directive    │
+│ stream_chunk│               │ cancel       │
+│ disconnect  │               │ config_update│
+└─────────────┘               │ rekey        │
+                               │ error        │
+                               └──────────────┘
+```
+
+## Node Metrics
+
+Each heartbeat carries live system metrics from `/proc`:
+
+```typescript
+interface NodeMetrics {
+  cpuPercent: number;
+  memoryMb: number;
+  diskFreeMb: number;
+  uptimeSeconds: number;
+}
+```
+
+## Session Routing
+
+When a session on the hub dispatches a tool call, the session-router:
+1. Evaluates directive against node capability tiers
+2. Selects eligible nodes
+3. Routes directive to the most appropriate node
+4. Streams results back to the originating session
+
+## Connection Management
+
+- **Heartbeat**: Every 30 seconds
+- **Timeout**: 90 seconds without heartbeat → disconnect
+- **Reconnect**: Exponential backoff (1s, 2s, 4s, 8s, 16s, max 60s)
+- **Token Rotation**: Nodes support `rekey` for credential rotation
+
+See also: [Node CLI](/docs/cli/node), [Security Parallax](/docs/architecture/security-parallax)

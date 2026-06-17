@@ -1,0 +1,31 @@
+---
+title: cortex hooks
+description: Git hooks management — init and disable git hooks in repositories
+---
+
+# `cortex hooks`
+
+Manage git hooks that integrate Cortex agent capabilities into the git workflow. Hooks can be installed into repositories to trigger agent actions on git events.
+
+## Usage
+
+```bash
+cortex hooks <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `init` | Initialize git hooks in a repository |
+| `disable` | Disable git hooks in a repository |
+
+## Examples
+
+```bash
+# Initialize git hooks in the current repository
+cortex hooks init
+
+# Disable git hooks
+cortex hooks disable
+```

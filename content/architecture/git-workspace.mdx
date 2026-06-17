@@ -1,0 +1,58 @@
+---
+title: Git Workspace System
+description: Agent-powered git porcelain with auto-commit, branch management, and diff analysis
+---
+
+# Git Workspace
+
+Cortex provides a full git porcelain interface executed through the agent workspace. Ten subcommands provide complete git version control with agent-powered features like auto-generated commit messages and diff analysis.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Git Workspace                           │
+│                                                           │
+│  CLI (cortex git) ──► git-cmd.ts ──► Git Operations       │
+│                              │                            │
+│                              ▼                            │
+│                     Agent Integration                      │
+│              (commit messages, diff analysis,              │
+│               branch suggestions, PR descriptions)        │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Subcommands
+
+| Command | Description | Agent Integration |
+|---------|-------------|-------------------|
+| `status` | Working tree status | Suggestions for next actions |
+| `log` | Commit history | Analysis of commit patterns |
+| `diff` | Changes between commits | Summarized diff explanations |
+| `add` | Stage files | Intelligent staging suggestions |
+| `commit` | Create commit | Auto-generated commit messages |
+| `push` | Push to remote | PR-ready push workflows |
+| `pull` | Pull from remote | Conflict resolution assistance |
+| `clone` | Clone repository | Automatic setup |
+| `branch` | Branch management | Naming convention enforcement |
+| `remote` | Remote management | Remote URL validation |
+
+## Agent-Powered Features
+
+When invoked with the `--agent` flag, git commands leverage the Cortex agent to:
+
+1. **Commit Messages**: Analyze diffs and generate conventional commit messages (`feat:`, `fix:`, `refactor:`, etc.)
+2. **Diff Analysis**: Summarize changes in natural language for code review
+3. **Branch Naming**: Suggest consistent branch names based on convention
+4. **Conflict Detection**: Identify potential merge conflicts before they occur
+5. **PR Descriptions**: Generate comprehensive pull request descriptions from commit history
+
+## Pipeline Integration
+
+Git operations flow through the Cortex pipeline system, enabling hooks at each stage:
+- Pre-commit: Content safety checks, secret detection
+- Post-commit: Memory consolidation of changes
+- Pre-push: Validation of commit quality
+- Post-clone: Automatic project setup
+
+See also: [GitHub Integration](/docs/architecture/github-integration), [Pipeline System](/docs/architecture/pipeline)

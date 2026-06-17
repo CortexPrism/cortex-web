@@ -1,0 +1,97 @@
+---
+title: Update System Architecture
+description: Binary and source update modes with SHA-256 verification, GPG signatures, channel management, and rollback
+---
+
+# Update System
+
+The Cortex update system provides dual-mode updates (binary and source), SHA-256 verification, optional GPG signature validation, channel management, and atomic rollback support.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Update System                           │
+│                                                           │
+│  ┌──────────────────────────────────────────────────┐    │
+│  │                    Channels                       │    │
+│  │              stable ←→ pre                       │    │
+│  └──────────────────────────────────────────────────┘    │
+│                         │                                  │
+│  ┌──────────────────────┼──────────────────────────┐    │
+│  │                 Update Modes                     │    │
+│  │                                                  │    │
+│  │  Binary Mode          Source Mode                │    │
+│  │  ┌──────────┐         ┌──────────────┐          │    │
+│  │  │ Download │         │ Git pull     │          │    │
+│  │  │ SHA-256  │         │ deno compile │          │    │
+│  │  │ GPG sig  │         │ Install bin  │          │    │
+│  │  │ Replace  │         └──────────────┘          │    │
+│  │  └──────────┘                                    │    │
+│  └──────────────────────────────────────────────────┘    │
+│                         │                                  │
+│  ┌──────────────────────┼──────────────────────────┐    │
+│  │                  Rollback                        │    │
+│  │        Previous binary → restore                 │    │
+│  └──────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Update Modes
+
+### Binary Mode
+1. Check GitHub releases for latest version
+2. Download binary for platform and architecture
+3. Verify SHA-256 checksum against release manifest
+4. Optionally verify GPG signature (if `gpgKeyPath` configured)
+5. Atomically replace current binary with new version
+6. Archive previous binary for rollback
+
+### Source Mode
+1. Pull latest source from git repository
+2. Run `deno compile` to build new binary
+3. Install binary to system path
+4. No signature verification (source is self-built)
+
+## Channels
+
+| Channel | Description | Update Frequency |
+|---------|-------------|-----------------|
+| `stable` | Production-ready releases | Weekly/monthly |
+| `pre` | Pre-release builds | Daily/as-needed |
+
+## Configuration
+
+```json
+{
+  "update": {
+    "channel": "stable",
+    "checkOnStartup": true,
+    "autoUpdate": false,
+    "checkIntervalHours": 24,
+    "githubToken": "ghp_...",
+    "gpgKeyPath": "/path/to/gpg/key"
+  }
+}
+```
+
+### Configuration Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `channel` | Update channel (`stable` or `pre`) | `stable` |
+| `checkOnStartup` | Check for updates on cortex start | `true` |
+| `autoUpdate` | Automatically apply updates | `false` |
+| `checkIntervalHours` | Periodic check interval | `24` |
+| `githubToken` | GitHub token for API rate limits | `""` |
+| `gpgKeyPath` | Path to GPG key for signature verification | `""` |
+
+## Verification
+
+All updates include:
+- **SHA-256**: Checksum comparison against release manifest
+- **GPG Signatures**: Optional detached signature verification
+- **Atomic Replacement**: `rename()` ensures no partial updates
+- **Rollback Safety**: Previous binary preserved for `--rollback`
+
+See also: [Update CLI](/docs/cli/update), [Configuration](/docs/getting-started/configuration)

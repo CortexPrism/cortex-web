@@ -1,0 +1,70 @@
+---
+title: cortex remote
+description: Remote agent management — add, connect, and remove distributed agent nodes
+---
+
+# `cortex remote`
+
+Manage remote agent nodes that connect to the Cortex hub for distributed agent execution. Remote agents register with the hub and execute directives through the global tool registry.
+
+## Usage
+
+```bash
+cortex remote <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `add` | Register a new remote agent |
+| `connect` | Connect a remote agent to the hub |
+| `remove` | Deregister a remote agent |
+
+## Remote Agent Status
+
+| Status | Description |
+|--------|-------------|
+| `connecting` | Establishing WebSocket connection to hub |
+| `connected` | Active connection with heartbeat |
+| `disconnected` | Connection lost, attempting reconnect |
+| `error` | Connection in error state |
+
+## Capability Tiers
+
+Remote agents operate at one of three capability tiers:
+
+| Tier | Access Level |
+|------|-------------|
+| **root** | Full unrestricted access — all tools, all paths, all sudo commands |
+| **sudo** | Elevated but scoped — excludes system paths, allows package management |
+| **unprivileged** | Sandboxed — read-only tools, no shell, restricted to `/tmp/cortex-sandbox` |
+
+## Connection Protocol
+
+Remote agents connect to the hub via WebSocket with:
+- **Heartbeat**: Every 30 seconds with live `/proc` metrics (CPU, memory, disk)
+- **Auto-reconnect**: Exponential backoff on connection loss
+- **Token authentication**: Secure token-based registration
+- **Streaming results**: Tool execution results streamed back in chunks
+
+## Node Metrics
+
+Connected agents report live system metrics:
+- `cpuPercent` — Current CPU utilization
+- `memoryMb` — Memory usage in MB
+- `diskFreeMb` — Available disk space
+- `uptimeSeconds` — Agent uptime
+
+## Examples
+
+```bash
+# Register a new remote agent
+cortex remote add
+
+# Connect a remote agent to the hub
+cortex remote connect --id agent-001 --token <token> --endpoint https://hub.example.com
+
+# Remove a remote agent
+cortex remote remove <agent-id>
+```

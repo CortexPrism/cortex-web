@@ -1,0 +1,50 @@
+---
+title: cortex projects
+description: Project management — create and delete Cortex projects with agent assignment
+---
+
+# `cortex projects`
+
+Manage Cortex projects with persistent configuration. Each project creates a `cortex-project.json` file that stores the project's agent assignment, tools, and metadata.
+
+## Usage
+
+```bash
+cortex projects <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `create` | Create a new project |
+| `delete` | Delete a project |
+
+## Project Configuration
+
+Each project stores a `cortex-project.json` file with:
+
+```json
+{
+  "name": "my-project",
+  "path": "/home/user/projects/my-project",
+  "agentId": "agent-001",
+  "memoryDb": "project-memory.db",
+  "tools": ["read", "write", "shell", "search"],
+  "description": "Project description"
+}
+```
+
+## Active Project Detection
+
+Cortex automatically detects the active project based on the current working directory. When a `cortex-project.json` is found in the directory tree, the project's agent and configuration are loaded automatically.
+
+## Examples
+
+```bash
+# Create a new project
+cortex projects create
+
+# Delete a project
+cortex projects delete my-project
+```

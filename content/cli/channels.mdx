@@ -1,0 +1,71 @@
+---
+title: cortex channels
+description: Communication channels — start and stop Discord integration for agent interaction
+---
+
+# `cortex channels`
+
+Manage communication channels that connect Cortex agents to external messaging platforms. Currently supports Discord as a channel provider.
+
+## Usage
+
+```bash
+cortex channels <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `start` | Start a communication channel |
+| `stop` | Stop a communication channel |
+
+## Channel Architecture
+
+The channel system uses a plugin-based architecture where each messaging platform (Discord, etc.) implements the `ChannelPlugin` interface. Channels are bound to specific agents, routing incoming messages to the agent and sending agent responses back.
+
+### Supported Channel Targets
+| Target Type | Description |
+|-------------|-------------|
+| `dm` | Direct message with a user |
+| `group` | Group message / multi-user chat |
+| `channel` | Discord server channel |
+| `thread` | Thread within a channel |
+
+### Message Features
+- Rich embeds with fields and footers
+- File attachment support
+- Message edits and deletions
+- Typing indicator support
+- Reaction handling
+
+## Discord Channel
+
+The Discord integration connects via Gateway WebSocket with heartbeat keep-alive. Messages are processed through prefix-based handling.
+
+```bash
+# Start Discord channel
+cortex channels start
+
+# Stop Discord channel
+cortex channels stop
+```
+
+## Channel Events
+
+Channels emit events that flow through the system:
+- `message` — New incoming message
+- `reaction` — Reaction added/removed
+- `edit` — Message edited
+- `delete` — Message deleted
+- `typing` — User started typing
+
+## Examples
+
+```bash
+# Start the Discord channel integration
+cortex channels start
+
+# Stop all active channels
+cortex channels stop
+```

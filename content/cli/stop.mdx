@@ -1,0 +1,49 @@
+---
+title: cortex stop
+description: Stop the Cortex server, daemon processes, or both
+---
+
+# `cortex stop`
+
+Stop the Cortex HTTP server, background daemon processes, or both.
+
+## Usage
+
+```bash
+cortex stop                          # Stop server + daemons
+cortex stop --server-only            # Stop only the HTTP server
+cortex stop --daemon-only            # Stop only the daemon processes
+cortex stop -p 3000                  # Stop server on a specific port
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--port, -p` | Port of the server to stop (default: 3000) |
+| `--server-only` | Stop only the HTTP server, keep daemons running |
+| `--daemon-only` | Stop only daemon processes, keep server running |
+| `--help` | Show help for this command |
+
+## Process Shutdown
+
+On stop, Cortex performs a graceful shutdown:
+1. `SIGTERM` sent to the target process
+2. 5-second grace period for clean shutdown
+3. `SIGKILL` if process hasn't exited
+
+## Examples
+
+```bash
+# Stop everything
+cortex stop
+
+# Stop only the server
+cortex stop --server-only
+
+# Stop only daemons
+cortex stop --daemon-only
+
+# Stop server on custom port
+cortex stop -p 8080
+```

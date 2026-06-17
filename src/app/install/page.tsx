@@ -5,12 +5,12 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Install CortexPrism — One-Command Setup",
   description:
-    "Install CortexPrism on Linux, macOS, or WSL with a single command. Includes Deno runtime setup, repository clone, and database initialization. Docker support available.",
+    "Install CortexPrism on Linux, macOS, or Windows with a single command. Includes Deno runtime setup, repository clone, and database initialization. Docker support available.",
   alternates: { canonical: `${SITE_URL}/install` },
   openGraph: {
     title: "Install CortexPrism — One-Command Setup for AI Agent Harness",
     description:
-      "curl -fsSL https://cortexprism.io/install.sh | bash — one command to get the agentic harness running. Full manual installation and Docker instructions included.",
+      "curl -fsSL https://cortexprism.io/install.sh | bash or iwr https://cortexprism.io/install.ps1 -useb | iex — one command to get the agentic harness running. Full manual installation and Docker instructions included.",
     url: `${SITE_URL}/install`,
   },
 };
@@ -23,35 +23,54 @@ export default function InstallPage() {
           Install <span className="gradient-text">CortexPrism</span>
         </h1>
         <p className="mt-4 text-lg text-[#9090a8]">
-          One command to get started on Linux, macOS, or WSL.
+          One command to get started on Linux, macOS, or Windows.
         </p>
       </div>
 
-      <div className="glass-card p-8 mb-10">
-        <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Quick Install</h2>
-        <p className="text-sm text-[#9090a8] mb-4">
-          Run this in your terminal to install the latest version:
-        </p>
-        <div className="glass-card p-4 mb-4">
-          <pre className="text-sm font-mono">
-            <code>
-              <span className="text-[#55556a]">$ </span>
-              <span className="text-green-400">curl -fsSL https://cortexprism.io/install.sh</span>
-              <span className="text-[#e2e2ea]"> | bash</span>
-            </code>
-          </pre>
+      <div className="grid md:grid-cols-3 gap-6 mb-10">
+        <div className="glass-card p-6">
+          <h3 className="text-sm font-semibold text-[#e2e2ea] mb-3">
+            macOS
+          </h3>
+          <div className="glass-card p-3">
+            <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+              <code>
+                <span className="text-[#55556a]">$ </span>
+                <span className="text-green-400">curl -fsSL https://cortexprism.io/install.sh</span>
+                <span className="text-[#e2e2ea]"> | bash</span>
+              </code>
+            </pre>
+          </div>
         </div>
-        <p className="text-xs text-[#55556a]">
-          Or with a shorter URL (requires DNS setup):
-        </p>
-        <div className="glass-card p-4">
-          <pre className="text-sm font-mono">
-            <code>
-              <span className="text-[#55556a]">$ </span>
-              <span className="text-green-400">curl -fsSL https://sh.cortexprism.io/</span>
-              <span className="text-[#e2e2ea]"> | bash</span>
-            </code>
-          </pre>
+
+        <div className="glass-card p-6">
+          <h3 className="text-sm font-semibold text-[#e2e2ea] mb-3">
+            Linux / WSL
+          </h3>
+          <div className="glass-card p-3">
+            <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+              <code>
+                <span className="text-[#55556a]">$ </span>
+                <span className="text-green-400">curl -fsSL https://cortexprism.io/install.sh</span>
+                <span className="text-[#e2e2ea]"> | bash</span>
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        <div className="glass-card p-6">
+          <h3 className="text-sm font-semibold text-[#e2e2ea] mb-3">
+            Windows (PowerShell)
+          </h3>
+          <div className="glass-card p-3">
+            <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+              <code>
+                <span className="text-[#55556a]">PS&gt; </span>
+                <span className="text-green-400">iwr https://cortexprism.io/install.ps1</span>
+                <span className="text-[#e2e2ea]"> -useb | iex</span>
+              </code>
+            </pre>
+          </div>
         </div>
       </div>
 
@@ -62,7 +81,7 @@ export default function InstallPage() {
           </div>
           <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">Prerequisites</h3>
           <ul className="text-sm text-[#9090a8] space-y-1">
-            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Linux, macOS, or WSL2</li>
+            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Linux, macOS, or Windows</li>
             <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Git</li>
             <li className="flex items-start gap-2"><span className="text-green-400">◆</span>curl or wget</li>
             <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Docker (optional)</li>
@@ -101,33 +120,55 @@ export default function InstallPage() {
         <p className="text-sm text-[#9090a8] mb-4">
           If you prefer to install manually, or the quick install doesn&apos;t work for your setup:
         </p>
-        <div className="glass-card p-4">
-          <pre className="text-sm font-mono">
-            <code>
-              <span className="text-[#55556a]"># 1. Install Deno</span>
-              {"\n"}
-              <span className="text-green-400">curl -fsSL https://deno.land/install.sh</span>
-              <span className="text-[#e2e2ea]"> | sh</span>
-              {"\n\n"}
-              <span className="text-[#55556a]"># 2. Clone the repo</span>
-              {"\n"}
-              <span className="text-green-400">git clone</span>
-              <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
-              {"\n"}
-              <span className="text-green-400">cd</span>
-              <span className="text-[#e2e2ea]"> cortex</span>
-              {"\n\n"}
-              <span className="text-[#55556a]"># 3. Run setup</span>
-              {"\n"}
-              <span className="text-green-400">deno task</span>
-              <span className="text-[#e2e2ea]"> setup</span>
-              {"\n\n"}
-              <span className="text-[#55556a]"># 4. Start chatting</span>
-              {"\n"}
-              <span className="text-green-400">./cortex</span>
-              <span className="text-[#e2e2ea]"> chat</span>
-            </code>
-          </pre>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="glass-card p-4">
+            <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">macOS / Linux</h3>
+            <pre className="text-sm font-mono">
+              <code>
+                <span className="text-[#55556a]"># 1. Install Deno</span>
+                {"\n"}
+                <span className="text-green-400">curl -fsSL https://deno.land/install.sh</span>
+                <span className="text-[#e2e2ea]"> | sh</span>
+                {"\n\n"}
+                <span className="text-[#55556a]"># 2. Clone the repo</span>
+                {"\n"}
+                <span className="text-green-400">git clone</span>
+                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
+                {"\n"}
+                <span className="text-green-400">cd</span>
+                <span className="text-[#e2e2ea]"> cortex</span>
+                {"\n\n"}
+                <span className="text-[#55556a]"># 3. Run setup</span>
+                {"\n"}
+                <span className="text-green-400">deno task</span>
+                <span className="text-[#e2e2ea]"> setup</span>
+              </code>
+            </pre>
+          </div>
+          <div className="glass-card p-4">
+            <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">Windows (PowerShell)</h3>
+            <pre className="text-sm font-mono">
+              <code>
+                <span className="text-[#55556a]"># 1. Install Deno</span>
+                {"\n"}
+                <span className="text-green-400">iwr https://deno.land/install.ps1</span>
+                <span className="text-[#e2e2ea]"> -useb | iex</span>
+                {"\n\n"}
+                <span className="text-[#55556a]"># 2. Clone the repo</span>
+                {"\n"}
+                <span className="text-green-400">git clone</span>
+                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
+                {"\n"}
+                <span className="text-green-400">cd</span>
+                <span className="text-[#e2e2ea]"> cortex</span>
+                {"\n\n"}
+                <span className="text-[#55556a]"># 3. Run setup</span>
+                {"\n"}
+                <span className="text-green-400">deno run --allow-all</span>
+                <span className="text-[#e2e2ea]"> src/main.ts setup</span>
+              </code>
+            </pre>
+          </div>
         </div>
       </div>
 

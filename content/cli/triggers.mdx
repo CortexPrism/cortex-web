@@ -1,0 +1,127 @@
+---
+title: cortex triggers
+description: Event-driven trigger system — file watchers, webhooks, and git hook integration
+---
+
+# `cortex triggers`
+
+An event-driven trigger system that responds to external events by launching agent tasks. Supports three trigger sources: file system watchers, HTTP webhooks, and git hooks.
+
+## Usage
+
+```bash
+cortex triggers <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `add` | Add a new trigger configuration |
+| `remove` | Remove a trigger configuration |
+| `install-hooks` | Install git hooks into a repository |
+| `uninstall-hooks` | Remove git hooks from a repository |
+
+## Trigger Sources
+
+### File Watcher
+Watch filesystem paths for changes and trigger agent tasks.
+
+```yaml
+source: watcher
+paths:
+  - "src/**/*.ts"
+  - "config/*.yaml"
+patterns:
+  - "*.ts"
+  - "*.json"
+events:
+  - create
+  - modify
+  - delete
+debounceMs: 500
+```
+
+### Webhooks
+Receive HTTP POST requests from external services with HMAC signature verification.
+
+```yaml
+source: webhook
+path: "/hooks/github"
+secretEnv: "GITHUB_WEBHOOK_SECRET"
+providers:
+  - github
+  - gitlab
+  - generic
+events:
+  - push
+  - pull_request
+  - issues
+```
+
+### Git Hooks
+Install shell scripts into `.git/hooks/` that POST to the webhook endpoint.
+
+```yaml
+source: git_hook
+repoPath: "/home/user/project"
+hooks:
+  - pre-commit
+  - post-commit
+  - pre-push
+branches:
+  - main
+  - develop
+```
+
+## Trigger Actions
+
+Each trigger can be configured with an action:
+
+```yaml
+action:
+  type: agent_turn
+  agent: code-reviewer
+  promptTemplate: "Review the changes in {{ changed_files }}"
+  timeoutSeconds: 300
+```
+
+Template variables available in prompts:
+- `{{ event_type }}` — The event that fired
+- `{{ changed_files }}` — List of changed files
+- `{{ provider }}` — Webhook provider name
+- `{{ branch }}` — Git branch name
+
+## Rate Limiting
+
+Triggers support configurable rate limiting:
+
+```yaml
+rateLimit:
+  count: 10
+  perSeconds: 60
+  cooldownSeconds: 30
+```
+
+## Webhook Security
+
+Webhooks support HMAC-SHA256 signature verification for GitHub, GitLab, and generic providers. IP allowlisting can be configured for additional security.
+
+## Examples
+
+```bash
+# Add a file watcher trigger
+cortex triggers add
+
+# Add a webhook trigger
+cortex triggers add
+
+# Install git hooks in a repository
+cortex triggers install-hooks /path/to/repo
+
+# Remove git hooks
+cortex triggers uninstall-hooks /path/to/repo
+
+# Remove a trigger
+cortex triggers remove <trigger-id>
+```

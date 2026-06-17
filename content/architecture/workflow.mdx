@@ -1,0 +1,93 @@
+---
+title: Workflow Engine Architecture
+description: DSL-based workflow engine with sequential steps, branching, parallel execution, and human-in-the-loop approval
+---
+
+# Workflow Engine
+
+A domain-specific language (DSL) based workflow engine for defining and executing multi-step agent tasks. Supports sequential execution, conditional branching, parallel processing, loop constructs, and human approval gates.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   Workflow Engine                          │
+│                                                           │
+│  Workflow DSL ──► Engine ──► Execute                      │
+│                      │                                    │
+│                      ▼                                    │
+│  ┌──────────────────────────────────────┐               │
+│  │            Workflow Nodes             │               │
+│  │  step │ branch │ parallel │ goto │ wait│              │
+│  └──────────────────────────────────────┘               │
+│                      │                                    │
+│                      ▼                                    │
+│  ┌──────────────────────────────────────┐               │
+│  │         Lifecycle Hooks               │               │
+│  │  onStepStart → execute → onStepEnd   │               │
+│  └──────────────────────────────────────┘               │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Node Types
+
+| Node | Behavior |
+|------|----------|
+| **step** | Sequential execution of a single task |
+| **branch** | Conditional if/then/else routing |
+| **parallel** | Concurrent execution via `Promise.allSettled` |
+| **goto** | Jump to a labeled step (loops, retries) |
+| **wait** | Pause execution, await human `approve()` call |
+
+## Fluent Builder API
+
+Workflows are defined using a fluent builder pattern:
+
+```typescript
+const workflow = new Workflow("deploy-and-verify")
+  .step("build", async (ctx) => {
+    ctx.set("built", true);
+  })
+  .step("test", async (ctx) => {
+    ctx.set("testsPassed", true);
+  })
+  .branch("quality-gate", (ctx) => ctx.testsPassed)
+    .then("deploy-staging", async (ctx) => { /* ... */ })
+    .else("notify-failure", async (ctx) => { /* ... */ })
+  .waitForApproval("production-approval", "Deploy to production?")
+  .step("deploy-prod", async (ctx) => { /* ... */ })
+  .step("verify-prod", async (ctx) => { /* ... */ });
+
+const result = await workflow.execute(initialContext);
+```
+
+## Context System
+
+Each workflow carries a `WorkflowContext` — a key-value data store that flows through all steps, enabling state sharing between nodes.
+
+## Result Structure
+
+```typescript
+interface WorkflowResult {
+  success: boolean;
+  error?: string;
+  durationMs: number;
+  stepsCompleted: number;
+  stepsTotal: number;
+}
+```
+
+## Built-in Workflows
+
+Cortex ships with a `health-check` workflow:
+- Step 1: Check disk space (`df`)
+- Step 2: Check memory (`free`)
+- Step 3: Aggregate and report
+
+## Approval Gates
+
+Human-in-the-loop approval pauses workflow execution. Approvals are resumable:
+- CLI: `cortex workflow approve <workflow-id>`
+- API: Programmatic approval via the REST endpoint
+
+See also: [Trigger System](/docs/architecture/triggers), [Agent Loop](/docs/architecture/agent-loop)

@@ -1,0 +1,69 @@
+---
+title: cortex workflow
+description: Workflow engine — DSL-based workflow execution with steps, branching, parallel execution, and human approval gates
+---
+
+# `cortex workflow`
+
+A DSL-based workflow engine for defining and executing multi-step agent tasks. Supports sequential steps, conditional branching, parallel execution, goto jumps, and human-in-the-loop approval waits.
+
+## Usage
+
+```bash
+cortex workflow <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `run` | Execute a workflow |
+| `approve` | Approve a paused workflow step |
+
+## Workflow Nodes
+
+| Node Type | Description |
+|-----------|-------------|
+| `step` | Sequential execution step |
+| `branch` | Conditional branching (if/then/else) |
+| `parallel` | Parallel execution of multiple steps |
+| `goto` | Jump to a specific step (loops) |
+| `wait` | Pause execution awaiting human approval |
+
+## Fluent API
+
+Workflows are built using a fluent builder pattern:
+
+```typescript
+Workflow.create("deploy")
+  .step("build", async (ctx) => { ... })
+  .step("test", async (ctx) => { ... })
+  .branch("check", (ctx) => ctx.testsPassed)
+    .then("deploy", async (ctx) => { ... })
+    .else("rollback", async (ctx) => { ... })
+  .waitForApproval("confirm", "Deploy to production?")
+  .execute(context)
+```
+
+## Lifecycle Callbacks
+
+Each step supports lifecycle hooks:
+- `onStepStart` — Called before step execution
+- `onStepEnd` — Called after step execution completes
+
+## Built-in Workflows
+
+Cortex ships with a `health-check` workflow that runs system diagnostics:
+- Disk space check (`df`)
+- Memory check (`free`)
+- Returns system health report
+
+## Examples
+
+```bash
+# Run a workflow
+cortex workflow run
+
+# Approve a waiting workflow step
+cortex workflow approve <workflow-id>
+```

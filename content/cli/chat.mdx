@@ -6,13 +6,13 @@ Start an interactive streaming chat session with any supported LLM provider. Thi
 
 ```bash
 cortex chat [options]
-cortex chat --model gpt-4o           # Override model
-cortex chat --resume sess_abc123     # Resume an existing session
-cortex chat -s sess_abc123           # Resume (short flag)
-cortex chat --no-stream              # Disable streaming output
-cortex chat --provider anthropic     # Select provider
-cortex chat --tools all              # Enable all tools
-cortex chat --router cost-optimized  # Use model router
+cortex chat -m gpt-4o                 # Override model
+cortex chat -s sess_abc123            # Resume an existing session
+cortex chat --resume sess_abc123      # Resume (long flag)
+cortex chat --no-stream               # Disable streaming output
+cortex chat -p anthropic              # Select provider
+cortex chat -a code-reviewer          # Use a specific agent
+cortex chat --list-agents             # List available agents
 ```
 
 ## Options
@@ -21,10 +21,10 @@ cortex chat --router cost-optimized  # Use model router
 |--------|-------------|
 | `--model, -m` | Override the default model for this session |
 | `--provider, -p` | Select a specific provider |
+| `--agent, -a` | Use a specific agent configuration |
 | `--resume, -s` | Resume an existing session by ID |
 | `--no-stream` | Disable streaming output (print complete response at once) |
-| `--tools` | Enable tool access (`all` or comma-separated list) |
-| `--router` | Use the model router with a specific strategy |
+| `--list-agents` | List all available agents |
 | `--help` | Show help for this command |
 
 ## Slash Commands
@@ -34,10 +34,9 @@ Inside the chat session, the following slash commands are available:
 | Command | Description |
 |---------|-------------|
 | `/exit` | Quit the session |
+| `/quit` | Quit the session |
 | `/help` | Show available slash commands |
-| `/clear` | Clear the terminal screen |
-| `/model <name>` | Switch models mid-session |
-| `/tokens` | Show token usage for current session |
+| `/soul` | Access soul/persona management |
 
 ## Tool Integration
 
@@ -74,14 +73,14 @@ User types message
 cortex chat
 
 # Use a specific model
-cortex chat --model claude-sonnet-4-20250514
+cortex chat -m claude-sonnet-4-5
 
 # Resume a previous session
-cortex chat --resume sess_a1b2c3d4
+cortex chat -s sess_a1b2c3d4
 
-# Use the cost-optimized model router
-cortex chat --router cost-optimized
+# Use a specific agent
+cortex chat -a code-reviewer
 
-# Chat with all tools enabled
-cortex chat --tools all
+# Chat without streaming
+cortex chat --no-stream
 ```

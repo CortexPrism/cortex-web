@@ -1,0 +1,72 @@
+---
+title: MCP Server Architecture
+description: Cortex as a Model Context Protocol server exposing tools, memory, and agents via stdio transport
+---
+
+# MCP Server
+
+Cortex implements a Model Context Protocol (MCP) server, enabling any MCP-compatible client (editors, IDEs, other AI applications) to use Cortex as their agentic backend.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                     MCP Server                             │
+│                                                           │
+│  MCP Client (IDE/Editor)                                   │
+│         │                                                  │
+│         ▼ stdio (JSON-RPC)                                 │
+│  ┌──────────────────────────────────────────────┐        │
+│  │           MCP Server (mcp/server.ts)          │        │
+│  │                                               │        │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐      │        │
+│  │  │  Tools  │  │ Memory  │  │ Sessions│      │        │
+│  │  └─────────┘  └─────────┘  └─────────┘      │        │
+│  └──────────────────────────────────────────────┘        │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Transport
+
+The MCP server uses **stdio transport** — standard input/output for process-level integration. This is the most common MCP transport pattern and enables direct embedding in editors and IDEs that support MCP.
+
+## Exposed Capabilities
+
+Via MCP, clients can access:
+
+| Capability | MCP Mapping |
+|------------|-------------|
+| **Tools** | MCP tools — file I/O, shell execution, web search, code execution |
+| **Memory** | MCP resources — search, retrieve, and inject memory entries |
+| **Agents** | MCP prompts — agent-specific system prompts and templates |
+| **Sessions** | MCP sampling — create and resume chat sessions |
+
+## Protocol
+
+The MCP server implements the standard Model Context Protocol with:
+- **JSON-RPC 2.0** message format
+- **Initialize/Capability negotiation**
+- **Tool listing and execution**
+- **Resource listing and reading**
+- **Prompt listing and retrieval**
+
+## Integration Examples
+
+### VS Code / Cursor
+Configure your MCP settings to launch Cortex:
+
+```json
+{
+  "mcpServers": {
+    "cortex": {
+      "command": "cortex",
+      "args": ["mcp", "stdio"]
+    }
+  }
+}
+```
+
+### Claude Desktop
+Add Cortex as an MCP server in Claude Desktop settings to use Cortex tools directly from Claude conversations.
+
+See also: [MCP CLI](/docs/cli/mcp), [Plugin System](/docs/architecture/plugin-system)

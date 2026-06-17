@@ -181,21 +181,12 @@ cortex run script.py --sandbox-only  # Fails if Docker unavailable
 
 ## Audit Logging (Cortex Lens)
 
-All security events are logged to the Lens database:
+All security events are logged to the Lens database and are accessible via the web UI:
 
-```bash
-# View recent audit events
-cortex lens tail
-
-# Search audit log
-cortex lens search "tool:shell"
-
-# Export audit log
-cortex lens export --format json > audit-export.json
-
-# Check for policy violations
-cortex lens search "action:deny"
-```
+1. Start the server: `cortex serve`
+2. Open the Lens tab at `http://localhost:3000` to view the full activity audit timeline
+3. Filter by session, tool calls, or policy decisions
+4. Export data via the REST API at the `/api/lens/recent` endpoint
 
 ## Operational Security Checklist
 
@@ -219,10 +210,7 @@ If you suspect a security incident:
    cortex daemon stop
    cortex serve -s
    ```
-2. **Audit**: Export and review Lens audit log
-   ```bash
-   cortex lens export --format json > incident-$(date +%s).json
-   ```
+2. **Audit**: Review Lens audit log via the web UI at `http://localhost:3000`
 3. **Contain**: Review and tighten policy rules
 4. **Analyze**: Check vault access logs and plugin activity
 5. **Recover**: Restore from clean backup if needed

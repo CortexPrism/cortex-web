@@ -38,7 +38,7 @@ export default function AboutPage() {
             At its core, CortexPrism is an agent loop that orchestrates LLM calls, tool execution, memory operations, and reflection. It supports 12+ LLM providers through a unified interface, with a cascading model router for cost optimization.
           </p>
           <p>
-            The system features a 5-tier memory architecture with hybrid FTS5 keyword + vector embedding retrieval, a defense-in-depth security model (Parallax) with encrypted credential vault, and sandboxed code execution with auto-fix loops.
+            The system features a 5-tier memory architecture with hybrid FTS5 keyword + vector embedding retrieval, a defense-in-depth security model (Parallax) with encrypted credential vault, sandboxed code execution with auto-fix loops, a Model Quartermaster adaptive prediction engine, a git workspace with agent-powered commit messages, a DSL-based workflow engine, and distributed remote agent execution via hub nodes.
           </p>
         </div>
       </div>

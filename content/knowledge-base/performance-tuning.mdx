@@ -62,33 +62,31 @@ Memory search uses hybrid FTS5 + vector embedding retrieval:
 Limit which tiers are searched:
 
 ```bash
-# Search only fast tiers
-cortex memory search "query" --tiers episodic,semantic
+# Search only episodic memories
+cortex memory search "query" --type episodic
 
-# Exclude slow reflection tier
-cortex memory search "query" --tiers working,episodic,semantic
+# Search only semantic memories
+cortex memory search "query" --type semantic
+
+# Search all tiers (default)
+cortex memory search "query" --type all
 ```
 
 ### Pruning
 
-Regularly prune old or low-value memories:
+Pruning is configured via `~/.cortex/config.json` under `memory.pruning`. Enable pruning, set `maxEntries`, and configure `retentionDays`:
 
-```bash
-# Auto-prune on startup (config)
-{
-  "memory": {
-    "pruning": {
-      "enabled": true,
-      "maxEntries": 10000,
-      "retentionDays": 90
-    }
+```json
+"memory": {
+  "pruning": {
+    "enabled": true,
+    "maxEntries": 10000,
+    "retentionDays": 90
   }
 }
-
-# Manual prune
-cortex memory prune --keep 5000
-cortex memory prune --older-than 30d
 ```
+
+There is no manual CLI prune command — pruning runs automatically based on the configuration.
 
 ## Database Performance
 
@@ -98,12 +96,9 @@ CortexPrism uses SQLite with WAL (Write-Ahead Logging) mode by default for concu
 
 ### Vacuum
 
-Periodically vacuum databases to reclaim space:
+Periodically vacuum databases to reclaim space. Vacuum is handled automatically during periodic maintenance, but manual vacuum is available:
 
 ```bash
-# Vacuum all databases
-cortex setup --vacuum
-
 # Manual vacuum for specific db
 sqlite3 ~/.cortex/data/cortex.db "VACUUM;"
 ```
@@ -152,11 +147,9 @@ For production: use WASM or Docker for security
 
 ### Concurrent Sessions
 
-```bash
-# Increase max concurrent sessions
-cortex serve --max-sessions 50
+Configure session limits in your `~/.cortex/config.json`:
 
-# Or in config:
+```json
 {
   "server": {
     "maxSessions": 50,
@@ -181,28 +174,33 @@ WebSocket is recommended for interactive sessions; REST for batch processing.
 
 ## Profiling
 
-Enable performance profiling:
+Performance data is available through the web UI Lens tab and the observability metrics endpoint:
 
-```bash
-cortex chat --profile
-```
+- Start the server: `cortex serve`
+- Open the Lens tab at `http://localhost:3000` for full session activity timelines
+- Access Prometheus-compatible metrics at `http://localhost:3000/metrics`
 
-Output includes:
+Metrics include:
 - LLM call latency per provider
 - Tool execution time
 - Memory retrieval time
 - Total agent loop time
+- Token usage and cost tracking
 
 ## Benchmarking
 
-```bash
-# Run built-in benchmarks
-cortex benchmark chat --rounds 10
-cortex benchmark memory --queries 100
-cortex benchmark sandbox --iterations 50
+Use `cortex eval` to benchmark agent performance across 8 task categories:
 
-# Compare providers
-cortex benchmark providers --rounds 5
+```bash
+# Run evaluation suites
+cortex eval -s code_generation
+cortex eval -s bug_fix -m claude-sonnet-4-5
+
+# Compare against a baseline
+cortex eval -s refactoring -b baseline-run-001
+
+# Save current results as new baseline
+cortex eval -s code_review --save-baseline
 ```
 
 ## Production Tuning Checklist

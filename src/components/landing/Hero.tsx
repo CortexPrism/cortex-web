@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Github, Terminal } from "lucide-react";
+import { InstallCommand } from "./InstallCommand";
 
 interface HeroProps {
   version: string;
@@ -55,7 +56,8 @@ export function Hero({ version }: HeroProps) {
           <p className="mt-6 text-lg md:text-xl text-[#9090a8] max-w-2xl mx-auto leading-relaxed">
             A powerful, secure, and extensible runtime for building agentic
             applications. Chat with 12+ LLM providers, execute code in
-            sandboxes, manage memory, and orchestrate complex workflows.
+            sandboxes, manage memory across five tiers, orchestrate workflows,
+            and deploy distributed agents — all open source.
           </p>
 
           {/* CTAs */}
@@ -84,25 +86,7 @@ export function Hero({ version }: HeroProps) {
             </a>
           </div>
 
-          {/* One-line install */}
-          <div className="mt-10 max-w-xl mx-auto">
-            <div className="relative rounded-xl p-px bg-gradient-to-r from-indigo-500/30 via-purple-500/20 to-indigo-500/10">
-              <div className="bg-[#0d0d14] rounded-[11px] px-4 py-3 flex items-center gap-3">
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-red-500/70" />
-                  <div className="w-2 h-2 rounded-full bg-yellow-500/70" />
-                  <div className="w-2 h-2 rounded-full bg-green-500/70" />
-                </div>
-                <pre className="flex-1 text-sm font-mono text-left select-all">
-                  <code>
-                    <span className="text-[#55556a]">$ </span>
-                    <span className="text-green-400">curl -fsSL https://cortexprism.io/install.sh</span>
-                    <span className="text-[#e2e2ea]"> | bash</span>
-                  </code>
-                </pre>
-              </div>
-            </div>
-          </div>
+          <InstallCommand />
         </div>
 
         {/* Terminal demo */}
@@ -125,25 +109,25 @@ export function Hero({ version }: HeroProps) {
                   <code>
                     <span className="text-[#55556a]">$ </span>
                     <span className="text-green-400">cortex</span>
-                    <span className="text-[#e2e2ea]"> chat --model claude-sonnet-4-20250514</span>
+                    <span className="text-[#e2e2ea]"> chat -m claude-sonnet-4-5</span>
                     {"\n"}
-                    <span className="text-indigo-300/60 text-xs">  ✦ Connected to Anthropic · claude-sonnet-4 · context: 200k</span>
+                    <span className="text-indigo-300/60 text-xs">  ✦ Connected to Anthropic · claude-sonnet-4-5 · context: 200k</span>
                     {"\n\n"}
                     <span className="text-[#55556a]">$ </span>
                     <span className="text-green-400">cortex</span>
-                    <span className="text-[#e2e2ea]"> memory search --query &apos;project context&apos;</span>
+                    <span className="text-[#e2e2ea]"> memory search &apos;project architecture&apos; --type semantic</span>
                     {"\n"}
-                    <span className="text-indigo-300/60 text-xs">  ✦ Found 12 semantic memories · 3 procedural · 1 archival</span>
+                    <span className="text-indigo-300/60 text-xs">  ✦ Found 12 semantic memories · 3 episodic · 1 reflection note</span>
                     {"\n\n"}
                     <span className="text-[#55556a]">$ </span>
                     <span className="text-green-400">cortex</span>
-                    <span className="text-[#e2e2ea]"> run --script &apos;analyze-data.py&apos; --sandbox python</span>
+                    <span className="text-[#e2e2ea]"> run analyze-data.py -l python</span>
                     {"\n"}
-                    <span className="text-indigo-300/60 text-xs">  ✦ Sandbox ready · executing in isolated container</span>
+                    <span className="text-indigo-300/60 text-xs">  ✦ Running in sandbox · Python 3.12 isolated container</span>
                     {"\n\n"}
                     <span className="text-[#55556a]">$ </span>
                     <span className="text-green-400">cortex</span>
-                    <span className="text-[#e2e2ea]"> plugin install marketplace:python-executor</span>
+                    <span className="text-[#e2e2ea]"> plugins install marketplace:cortexprism.io/plugins/python-executor</span>
                     {"\n"}
                     <span className="text-green-300/70 text-xs">  ✔ Installed python-executor v2.1.0 · 4 tools registered</span>
                     {"\n"}

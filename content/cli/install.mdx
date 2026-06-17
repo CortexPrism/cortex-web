@@ -1,0 +1,38 @@
+---
+title: cortex install
+description: Install Cortex as a system service with daemon auto-start
+---
+
+# `cortex install`
+
+Install Cortex as a system service, enabling automatic startup and daemon management.
+
+## Usage
+
+```bash
+cortex install [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--port, -p` | Port for the HTTP server (default: 3000) |
+| `--host, -H` | Host to bind to (default: 127.0.0.1) |
+| `--daemon-only` | Install only the daemon service |
+| `--server-only` | Install only the HTTP server service |
+| `--no-start` | Install without starting the services |
+| `--help` | Show help for this command |
+
+## Examples
+
+```bash
+# Install Cortex as a system service
+cortex install
+
+# Install on custom port
+cortex install -p 8080
+
+# Install without starting
+cortex install --no-start
+```

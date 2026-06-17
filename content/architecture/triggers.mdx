@@ -1,0 +1,92 @@
+---
+title: Trigger System Architecture
+description: Event-driven trigger system — file watchers, webhooks, and git hooks that launch agent tasks
+---
+
+# Trigger System
+
+The trigger system provides an event-driven architecture that responds to external events by launching agent tasks. Three trigger sources support file system changes, HTTP webhooks, and git hook events.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Trigger System                          │
+│                                                           │
+│  Sources:                                                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │ Webhook  │  │ Watcher  │  │ Git Hook │              │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘              │
+│       │             │             │                       │
+│       ▼             ▼             ▼                       │
+│  ┌────────────────────────────────────────┐              │
+│  │         Trigger Manager                │              │
+│  │  (rate limiting, templates, routing)   │              │
+│  └─────────────────┬──────────────────────┘              │
+│                    │                                      │
+│                    ▼                                      │
+│  ┌────────────────────────────────────────┐              │
+│  │         Agent Job Creation             │              │
+│  │  (prompt template → agent turn/job)    │              │
+│  └────────────────────────────────────────┘              │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Trigger Sources
+
+### Webhooks
+- HTTP POST endpoints with configurable paths
+- HMAC-SHA256 signature verification
+- Provider support: GitHub, GitLab, generic
+- IP allowlisting for additional security
+- Event filtering by webhook event type
+
+### File Watchers
+- Filesystem monitoring via `Deno.FsWatcher`
+- Configurable paths and glob patterns
+- Events: `create`, `modify`, `delete`
+- Debounce to prevent duplicate triggers (configurable ms)
+
+### Git Hooks
+- Auto-installs shell scripts into `.git/hooks/`
+- Supported hooks: `pre-commit`, `post-commit`, `pre-push`, `post-merge`
+- Branch filtering for targeted triggers
+- POSTs to local webhook endpoint
+
+## Prompt Templates
+
+Triggers use template variables for dynamic prompts:
+
+```yaml
+promptTemplate: |
+  {{ event_type }} on {{ branch }}
+  Changed files: {{ changed_files }}
+  Review the changes and suggest improvements.
+```
+
+Available variables:
+- `{{ event_type }}` — The triggering event
+- `{{ changed_files }}` — Modified file paths
+- `{{ provider }}` — Webhook provider (github/gitlab/generic)
+- `{{ branch }}` — Git branch name
+- `{{ repo }}` — Repository name
+
+## Rate Limiting
+
+Prevents trigger storms with configurable limits:
+
+```yaml
+rateLimit:
+  count: 10        # Max triggers
+  perSeconds: 60   # Per time window
+  cooldownSeconds: 30  # Cooldown after limit hit
+```
+
+## Security
+
+- **HMAC-SHA256**: Webhook payloads verified against secret
+- **IP Allowlisting**: Restrict webhook sources by IP/CIDR
+- **Template Sanitization**: All template variables are escaped
+- **Timeout**: Agent jobs are capped at configurable timeout (default: 300s)
+
+See also: [Hooks CLI](/docs/cli/hooks), [Workflow Engine](/docs/architecture/workflow)

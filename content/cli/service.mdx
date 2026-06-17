@@ -1,0 +1,85 @@
+---
+title: cortex service
+description: Micro-service management — create, update, start, stop, and manage agent-powered micro-services
+---
+
+# `cortex service`
+
+Manage Cortex micro-services — persistent agent-powered services that run on specific ports with health checks and automatic restart capabilities.
+
+## Usage
+
+```bash
+cortex service <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all services |
+| `show` | Show service details and runtime status |
+| `create` | Create a new micro-service |
+| `update` | Update an existing service |
+| `delete` | Delete a service |
+| `start` | Start a service |
+| `stop` | Stop a running service |
+
+## Create Options
+
+| Option | Description |
+|--------|-------------|
+| `--description, -d` | Service description |
+| `--agent, -a` | Agent to use for this service |
+| `--port, -p` | Port to listen on |
+| `--model, -m` | LLM model |
+| `--provider` | LLM provider |
+| `--tools` | Comma-separated tool list |
+| `--auto-start` | Auto-start service on Cortex startup |
+| `--max-restarts` | Maximum restart attempts before giving up |
+| `--health-interval` | Health check interval in seconds |
+| `--system-prompt` | Custom system prompt |
+
+## Update Options
+
+| Option | Description |
+|--------|-------------|
+| `--name, -n` | New service name |
+| `--description, -d` | Updated description |
+| `--agent, -a` | Change agent |
+| `--port, -p` | Change port |
+| `--model, -m` | Change model |
+| `--provider` | Change provider |
+| `--tools` | Update tool list |
+| `--auto-start` | Toggle auto-start |
+| `--max-restarts` | Update max restarts |
+| `--health-interval` | Update health check interval |
+| `--system-prompt` | Update system prompt |
+
+## Examples
+
+```bash
+# Create a REST API service
+cortex service create api-server -a code-reviewer -p 3001 --auto-start
+
+# Create with custom model
+cortex service create docs-bot -a writer --model gpt-4o -p 3002
+
+# List all services
+cortex service list
+
+# Show service details
+cortex service show api-server
+
+# Start a service
+cortex service start api-server
+
+# Stop a service
+cortex service stop api-server
+
+# Update a service
+cortex service update api-server --port 8080 --auto-start
+
+# Delete a service
+cortex service delete old-service
+```

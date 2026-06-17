@@ -1,0 +1,37 @@
+---
+title: cortex start
+description: Start the Cortex HTTP server and/or background daemon processes
+---
+
+# `cortex start`
+
+Start the Cortex HTTP server and background daemon processes.
+
+## Usage
+
+```bash
+cortex start [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--port, -p` | Port for the HTTP server (default: 3000) |
+| `--host, -H` | Host to bind to (default: 127.0.0.1) |
+| `--daemon-only` | Start only the daemon processes |
+| `--server-only` | Start only the HTTP server |
+| `--help` | Show help for this command |
+
+## Examples
+
+```bash
+# Start Cortex
+cortex start
+
+# Start on custom port
+cortex start -p 8080 -H 0.0.0.0
+
+# Start only the server
+cortex start --server-only
+```

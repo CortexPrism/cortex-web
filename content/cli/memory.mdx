@@ -5,9 +5,11 @@ Search and manage the 5-tier memory system. CortexPrism uses a hybrid retrieval 
 ## Usage
 
 ```bash
-cortex memory search "<query>"       # Keyword + vector search (hybrid)
-cortex memory search "<query>" --semantic  # Vector-only search
+cortex memory search "<query>"       # Search all memory types (hybrid return)
+cortex memory search "<query>" --type semantic  # Semantic-only search
+cortex memory search "<query>" --type episodic  # Episodic-only search
 cortex memory add "<fact>"           # Add a semantic fact
+cortex memory add "<fact>" --category project --importance 0.9  # Categorized memory
 ```
 
 ## Subcommands
@@ -21,18 +23,21 @@ cortex memory add "<fact>"           # Add a semantic fact
 
 | Option | Description |
 |--------|-------------|
-| `--semantic` | Use vector-only search (requires embedding provider) |
-| `--tier` | Filter results by memory tier |
-| `--limit` | Maximum results to return (default: 10) |
+| `--type` | Filter results by memory type: `episodic`, `semantic`, or `all` (default: `all`) |
+| `--limit, -n` | Maximum results to return (default: 8) |
+| `--category` | Category filter for `add` subcommand |
+| `--importance` | Importance value for `add` subcommand (0.0–1.0, default: 0.5) |
 | `--help` | Show help for this command |
 
 ## Memory Tiers
 
 | Tier | Persistence | Content |
 |------|-------------|---------|
+| Ephemeral (T1) | Session | Current conversation context window |
 | Episodic (T2) | Session | Turn summaries of user+agent exchanges |
 | Semantic (T3) | Long-term | Injected facts and knowledge |
-| Reflection (T5) | Permanent | LLM-extracted behavior patterns |
+| Archival (T4) | Permanent | Compressed historical data, entities |
+| Reflection (T5) | Permanent | LLM-extracted behavior patterns, per-turn meta-cognition |
 
 ## Retrieval Algorithm
 
@@ -55,12 +60,18 @@ Query
 ## Examples
 
 ```bash
-# Hybrid search (keyword + vector)
+# Hybrid search (all memory types)
 cortex memory search "project deployment config"
 
-# Vector-only semantic search
-cortex memory search "deployment config" --semantic
+# Semantic-only search
+cortex memory search "deployment config" --type semantic
+
+# Episodic-only search
+cortex memory search "deployment" --type episodic
 
 # Add a fact to semantic memory
 cortex memory add "CortexPrism uses SQLite WAL mode for all databases"
+
+# Add a categorized fact with high importance
+cortex memory add "critical bug" --category bugs --importance 0.9
 ```

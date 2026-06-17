@@ -1,0 +1,95 @@
+---
+title: Observability Architecture
+description: In-process metrics and distributed tracing with Prometheus-compatible registry and OTLP export
+---
+
+# Observability
+
+Cortex includes an in-process observability layer with a Prometheus-compatible metrics registry and a distributed tracing system supporting multiple backends and OTLP export.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Observability                           │
+│                                                           │
+│  Metrics Registry                    Tracing System       │
+│  ┌────────────────────┐              ┌──────────────┐    │
+│  │ Counters           │              │ Span Creation │    │
+│  │ Gauges             │              │ Attributes    │    │
+│  │ Histograms         │              │ Status Codes  │    │
+│  └────────┬───────────┘              └──────┬───────┘    │
+│           │                                 │             │
+│           ▼                                 ▼             │
+│  ┌────────────────────┐              ┌──────────────┐    │
+│  │ /metrics endpoint  │              │ Backends:     │    │
+│  │ (Prometheus text)  │              │  - lens       │    │
+│  └────────────────────┘              │  - stdout     │    │
+│                                       │  - otlp       │    │
+│                                       │  - none       │    │
+│                                       └──────────────┘    │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Metrics Registry
+
+In-process Prometheus-compatible registry with three metric types:
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Counter** | Monotonically increasing count | Agent turns, tool calls, errors |
+| **Gauge** | Point-in-time value | CPU %, memory MB, uptime seconds |
+| **Histogram** | Distribution of values | Turn duration, token I/O, cost per turn |
+
+### Pre-Registered Metrics
+
+| Metric | Type | Labels |
+|--------|------|--------|
+| `agent_turns_total` | Counter | provider, model |
+| `agent_turn_duration_seconds` | Histogram | provider, model |
+| `token_input_total` | Counter | provider, model |
+| `token_output_total` | Counter | provider, model |
+| `cost_usd_total` | Counter | provider, model |
+| `tool_calls_total` | Counter | tool, status |
+| `errors_total` | Counter | type |
+| `validator_intents_total` | Counter | status (approved/rejected) |
+| `scheduler_jobs_total` | Counter | status |
+| `memory_consolidations_total` | Counter | tier |
+| `cpu_percent` | Gauge | — |
+| `memory_mb` | Gauge | — |
+| `uptime_seconds` | Gauge | — |
+| `qm_predictions_total` | Counter | confidence_level |
+| `qm_accuracy` | Gauge | signal |
+| `mqm_weights` | Gauge | signal |
+
+## Distributed Tracing
+
+The tracing system creates spans throughout the agent lifecycle:
+
+| Span Name | Parent | Attributes |
+|-----------|--------|------------|
+| `agent_turn` | root | session_id, turn_id, model |
+| `memory_retrieval` | agent_turn | tier, result_count, duration_ms |
+| `llm_call` | agent_turn | provider, model, tokens_in, tokens_out |
+| `tool_execution` | agent_turn | tool_name, approved, duration_ms |
+| `reflection` | agent_turn | patterns_found |
+| `quartermaster_predict` | agent_turn | confidence, signal_scores |
+
+### Backend Configuration
+
+```json
+{
+  "tracing": {
+    "backend": "otlp",
+    "otlpEndpoint": "https://collector.example.com:4318/v1/traces"
+  }
+}
+```
+
+Supported backends:
+- **lens**: Store traces in lens.db audit log (default)
+- **stdout**: Print spans to stdout for debugging
+- **otlp**: Export to OpenTelemetry collector
+- **none**: Disable tracing entirely
+
+See also: [Databases](/docs/architecture/databases), [Quartermaster](/docs/architecture/quartermaster)

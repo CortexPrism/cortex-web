@@ -1,0 +1,66 @@
+---
+title: cortex desktop
+description: Desktop automation — cross-platform GUI interaction with screenshots, clicks, typing, and clipboard management
+---
+
+# `cortex desktop`
+
+Cross-platform desktop automation that provides agent tools for GUI interaction. Supports screenshots, mouse actions, keyboard input, and clipboard management across Linux, macOS, and Windows.
+
+## Usage
+
+```bash
+cortex desktop <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `dockerfile` | Generate a Dockerfile for containerized desktop automation |
+| `entrypoint` | Generate an entrypoint script for the desktop container |
+| `screenshot` | Capture a screenshot (PNG or JPEG) |
+| `click` | Mouse click at specified coordinates |
+| `type` | Type text at the current focus |
+| `clipboard` | Read or write clipboard contents |
+
+## Platform Backends
+
+| Platform | Backend |
+|----------|---------|
+| **Linux** | `xdotool` (mouse/keyboard), `import` (screenshots), `xclip` (clipboard) |
+| **macOS** | AppleScript + `screencapture` |
+| **Windows** | PowerShell + Win32 APIs (`Add-Type` for GDI) |
+
+## Desktop Actions
+
+| Action | Description |
+|--------|-------------|
+| `screenshot` | Capture screen (PNG/JPEG format) |
+| `click` | Single mouse click |
+| `dblclick` | Double mouse click |
+| `type` | Type text string |
+| `keypress` | Press a key with optional modifiers |
+| `drag` | Mouse drag from point to point |
+| `get_clipboard` | Read clipboard text |
+| `set_clipboard` | Write text to clipboard |
+| `wait` | Wait specified milliseconds |
+| `move` | Move mouse to coordinates |
+| `scroll` | Scroll mouse wheel |
+
+## Containerized Execution
+
+Desktop automation can run in Docker containers using the generated Dockerfile and entrypoint scripts. This provides isolation and reproducibility for GUI automation tasks.
+
+## Examples
+
+```bash
+# Capture a screenshot
+cortex desktop screenshot
+
+# Generate Dockerfile for containerized desktop automation
+cortex desktop dockerfile
+
+# Generate entrypoint script
+cortex desktop entrypoint
+```

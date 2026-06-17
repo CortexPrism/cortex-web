@@ -17,7 +17,7 @@ Override with:
   "version": 1,
   "defaultProvider": "anthropic",
   "providers": {
-    "anthropic":  { "kind": "anthropic",  "model": "claude-sonnet-4-20250514",          "apiKey": "sk-..." },
+    "anthropic":  { "kind": "anthropic",  "model": "claude-sonnet-4-5",                "apiKey": "sk-..." },
     "openai":     { "kind": "openai",     "model": "gpt-4o",                            "apiKey": "sk-..." },
     "google":     { "kind": "google",     "model": "gemini-2.0-flash",                  "apiKey": "..." },
     "mistral":    { "kind": "mistral",    "model": "mistral-large-latest",              "apiKey": "..." },
@@ -38,15 +38,64 @@ Override with:
   },
   "router": {
     "enabled": false,
+    "strategy": "cascade",
     "confidenceThreshold": 0.7,
     "cascade": [
       { "provider": "ollama", "model": "llama3.2:3b" },
       { "provider": "ollama", "model": "llama3.1:8b" },
-      { "provider": "anthropic", "model": "claude-sonnet-4-20250514" }
+      { "provider": "anthropic", "model": "claude-sonnet-4-5" }
     ]
+  },
+  "update": {
+    "channel": "stable",
+    "checkOnStartup": true,
+    "autoUpdate": false,
+    "checkIntervalHours": 24,
+    "githubToken": "",
+    "gpgKeyPath": ""
   }
 }
 ```
+
+## Router Configuration
+
+### Strategy
+
+| Value | Description |
+|-------|-------------|
+| `cascade` | Try providers in order, falling through each level |
+| `threshold` | Route based on complexity scoring threshold |
+
+The `cascade` strategy attempts each provider in sequence: if the first provider fails or returns low confidence, the router falls through to the next. The `threshold` strategy evaluates task complexity and routes directly to the appropriate provider tier.
+
+### Confidence Threshold
+
+Controls how strictly the router evaluates LLM responses before cascading to the next provider. Higher values (0.8+) enforce stricter quality gates; lower values (0.5) cascade less aggressively.
+
+## Update Configuration
+
+The `update` section controls Cortex's self-update behavior:
+
+| Field | Type | Description | Default |
+|-------|------|-------------|---------|
+| `channel` | `string` | Update channel: `stable` or `pre` | `stable` |
+| `checkOnStartup` | `boolean` | Check for updates on startup | `true` |
+| `autoUpdate` | `boolean` | Automatically apply updates | `false` |
+| `checkIntervalHours` | `number` | Periodic check interval | `24` |
+| `githubToken` | `string` | GitHub token for API rate limits | `""` |
+| `gpgKeyPath` | `string` | Path to GPG key for signature verification | `""` |
+
+### Update Channels
+
+| Channel | Description |
+|---------|-------------|
+| `stable` | Production-ready releases with full testing |
+| `pre` | Pre-release builds with latest features |
+
+### Binary vs Source Mode
+
+- **Binary mode**: Downloads pre-built binaries with SHA-256 verification and optional GPG signature validation
+- **Source mode**: Pulls latest source and rebuilds (when running from source or binary unavailable)
 
 ## Environment Variables
 

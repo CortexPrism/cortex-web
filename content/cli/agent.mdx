@@ -1,0 +1,85 @@
+---
+title: cortex agent
+description: Agent configuration management — create, update, delete, select, inspect, and import agent profiles
+---
+
+# `cortex agent`
+
+Manage agent configurations that define how Cortex interacts with LLMs. Each agent has a model, provider, system prompt, tools, temperature, and personality (soul).
+
+## Usage
+
+```bash
+cortex agent <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all agent configurations |
+| `show` | Show details for an agent |
+| `create` | Create a new agent |
+| `update` | Update an existing agent |
+| `delete` | Delete an agent |
+| `select` | Select the active agent |
+| `inspect` | Inspect agent configuration in detail |
+| `import` | Import an agent configuration |
+
+## Create Options
+
+| Option | Description |
+|--------|-------------|
+| `--description, -d` | Agent description |
+| `--provider, -p` | LLM provider to use |
+| `--model, -m` | Model name |
+| `--temperature, -t` | Response temperature (0.0–2.0) |
+| `--soul` | Soul/persona to apply |
+| `--system-prompt` | Custom system prompt |
+| `--tools` | Comma-separated tool allow-list |
+| `--tags` | Comma-separated tags |
+
+## Update Options
+
+| Option | Description |
+|--------|-------------|
+| `--name, -n` | New name for the agent |
+| `--description, -d` | Updated description |
+| `--provider, -p` | Change provider |
+| `--model, -m` | Change model |
+| `--temperature, -t` | Adjust temperature |
+| `--soul` | Change soul/persona |
+| `--system-prompt` | Update system prompt |
+| `--tools` | Update tool allow-list |
+| `--tags` | Update tags |
+
+## Examples
+
+```bash
+# Create a code reviewer agent
+cortex agent create code-reviewer -m claude-sonnet-4-5 -d "Reviews pull requests" --tools read,write,shell
+
+# Create with specific provider
+cortex agent create data-analyst -p anthropic -m claude-sonnet-4-5 -t 0.7
+
+# List all agents
+cortex agent list
+
+# Show agent details
+cortex agent show code-reviewer
+
+# Update an agent
+cortex agent update code-reviewer --tools read,shell,search,web
+
+# Select the active agent
+cortex agent select code-reviewer
+
+# Delete an agent
+cortex agent delete old-agent
+
+# Inspect agent
+cortex agent inspect code-reviewer
+
+# Import an agent config
+cortex agent import
+```

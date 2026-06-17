@@ -1,0 +1,48 @@
+---
+title: cortex mcp
+description: MCP server management — serve as an MCP server with stdio transport
+---
+
+# `cortex mcp`
+
+Run Cortex as a Model Context Protocol (MCP) server, enabling AI applications to use Cortex tools and agents through the MCP protocol standard.
+
+## Usage
+
+```bash
+cortex mcp <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `serve` | Start Cortex as an MCP server |
+| `stdio` | Run MCP server over standard I/O transport |
+
+## MCP Integration
+
+Cortex implements an MCP server that exposes Cortex capabilities (tools, memory, agents, sessions) to any MCP-compatible client. This allows editors, IDEs, and other AI applications to use Cortex as their agentic backend.
+
+### Transport
+- **stdio**: Standard input/output transport for process-level integration
+- The MCP server handles JSON-RPC messages according to the Model Context Protocol specification
+
+## Available Tools via MCP
+
+When running as an MCP server, Cortex exposes:
+- File operations (read, write, list)
+- Shell command execution (with approval gates)
+- Memory search and retrieval
+- Agent conversation management
+- Session persistence and resume
+
+## Examples
+
+```bash
+# Start MCP server over stdio
+cortex mcp stdio
+
+# Start MCP server
+cortex mcp serve
+```

@@ -1,0 +1,40 @@
+---
+title: cortex import
+description: Data import — import data from other sources into Cortex
+---
+
+# `cortex import`
+
+Import data from external sources into Cortex, including sessions from other AI platforms.
+
+## Usage
+
+```bash
+cortex import <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `openclaw` | Import sessions from OpenClaw |
+| `json` | Import data from JSON format |
+
+## Options
+
+| Option | Subcommand | Description |
+|--------|------------|-------------|
+| `--dry-run` | `openclaw` | Preview import without writing data |
+
+## Examples
+
+```bash
+# Import from OpenClaw
+cortex import openclaw
+
+# Preview OpenClaw import
+cortex import openclaw --dry-run
+
+# Import from JSON
+cortex import json
+```

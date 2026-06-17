@@ -7,6 +7,10 @@ import {
   Code2,
   Route,
   Puzzle,
+  GitBranch,
+  Workflow,
+  BrainCircuit,
+  Search,
 } from "lucide-react";
 
 const features = [
@@ -29,7 +33,7 @@ const features = [
   {
     icon: Database,
     title: "5-Tier Memory",
-    description: "Ephemeral, working, semantic, archival, and procedural memory layers.",
+    description: "Ephemeral, episodic, semantic, archival, and reflection tiers with hybrid FTS5 + vector retrieval.",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
     glow: "rgba(167,139,250,0.15)",
@@ -73,6 +77,38 @@ const features = [
     color: "text-pink-400",
     bg: "bg-pink-500/10",
     glow: "rgba(244,114,182,0.15)",
+  },
+  {
+    icon: GitBranch,
+    title: "Git Workspace",
+    description: "Full git porcelain with agent-powered commits, diffs, and branch management.",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
+    glow: "rgba(251,146,60,0.15)",
+  },
+  {
+    icon: BrainCircuit,
+    title: "Model Quartermaster",
+    description: "Adaptive 5-signal tool prediction engine with reinforcement learning.",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10",
+    glow: "rgba(167,139,250,0.15)",
+  },
+  {
+    icon: Workflow,
+    title: "Workflow Engine",
+    description: "DSL-based workflows with steps, branching, parallel execution, and approval gates.",
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
+    glow: "rgba(45,212,191,0.15)",
+  },
+  {
+    icon: Search,
+    title: "Cortex Lens Audit",
+    description: "Immutable event log tracking every LLM call, tool execution, and policy decision.",
+    color: "text-sky-400",
+    bg: "bg-sky-500/10",
+    glow: "rgba(56,189,248,0.15)",
   },
 ];
 

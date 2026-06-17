@@ -1,0 +1,250 @@
+---
+title: Git Workspace Guide
+description: A practical guide to Cortex's agent-powered git porcelain — auto-commit, natural language diffs, branch management, and PR workflows
+---
+
+# Git Workspace Guide
+
+Cortex provides a full git porcelain interface with agent-powered features that make version control faster and more intuitive. Instead of writing commit messages manually or deciphering raw diffs, you can let the Cortex agent analyze your changes and generate meaningful summaries.
+
+## Prerequisites
+
+Cortex wraps native git, so you need git installed on your system and a repository to work with (or clone one via Cortex).
+
+## Cloning a Repository
+
+Start a new project or contribute to an existing one by cloning repos directly through Cortex:
+
+```bash
+# Clone the default branch
+cortex git clone https://github.com/user/repo.git
+
+# Clone a specific branch
+cortex git clone https://github.com/user/repo.git --branch develop
+```
+
+After cloning, Cortex automatically runs setup steps including dependency detection and project initialization. Your working directory is now fully ready for development.
+
+## Inspecting Changes
+
+### View Current State
+
+```bash
+# Standard git status
+cortex git status
+
+# Agent-powered status with next-action suggestions
+cortex git status --agent
+```
+
+The `--agent` flag surfaces recommendations like "You have 3 modified files — consider grouping the CSS changes into a separate commit" or "Unstaged files detected: `src/auth.ts` may conflict with pending changes on `main`."
+
+### Understanding Diffs
+
+Rather than parsing raw diff output, let the agent summarize changes in natural language:
+
+```bash
+# Full working tree diff summary
+cortex git diff --agent
+
+# Summary for a specific file
+cortex git diff --file src/auth.ts --agent
+
+# Statistics-only view
+cortex git diff --stat
+```
+
+The agent reads the diff hunks and produces summaries like:
+
+> **auth.ts**: Replaced 3 callback-based middleware functions with async/await equivalents. Added input validation via Zod. No breaking API changes.
+
+This makes code review and self-review dramatically faster — you understand the intent of changes without scrolling through every line of a diff.
+
+## Committing Changes
+
+### Auto-Generated Commit Messages
+
+The agent generates conventional commit messages by analyzing your staged diffs:
+
+```bash
+# Stage a specific file
+cortex git add src/components/Button.tsx
+
+# Commit with agent-generated message
+cortex git commit --agent
+```
+
+The agent produces messages following the [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+feat(ui): add loading skeleton variant to Button component
+refactor(auth): extract JWT validation into shared middleware
+fix(api): handle null response body in error interceptor
+```
+
+If you want to stage everything and commit in one step:
+
+```bash
+cortex git commit --all --agent
+```
+
+### Write Your Own Message
+
+You can still write messages manually when needed:
+
+```bash
+cortex git add --all
+cortex git commit
+# The agent will prompt for a message interactively
+```
+
+## Branch Management
+
+### Creating Feature Branches
+
+```bash
+# List existing branches
+cortex git branch
+
+# Create a new branch
+cortex git branch --create feature/payment-integration
+
+# Switch to an existing branch
+cortex git branch --checkout main
+
+# Agent-powered branch naming suggestions
+cortex git branch --agent
+```
+
+With `--agent`, Cortex analyzes your staged changes and suggests branch names that match your team's conventions:
+
+> Suggested branch names based on changes to `src/billing/invoice.ts`:
+> 1. `feature/invoice-generation`
+> 2. `feat/billing-invoice`
+> 3. `feature/invoice-pdf-export`
+
+### Typical Feature Branch Flow
+
+A complete workflow from idea to merge:
+
+```bash
+# 1. Create and switch to a feature branch
+cortex git branch --create feature/user-onboarding
+
+# 2. Make your code changes...
+
+# 3. Review what changed
+cortex git diff --agent
+
+# 4. Stage and commit with auto-generated message
+cortex git add --all
+cortex git commit --agent
+
+# 5. Push to remote
+cortex git push --remote origin --branch feature/user-onboarding
+```
+
+## Pushing and Pulling
+
+```bash
+# Push current branch to default remote
+cortex git push
+
+# Push to a specific remote and branch
+cortex git push --remote origin --branch feature/new-dashboard
+
+# Pull latest changes
+cortex git pull
+
+# Agent-powered pull with conflict preview
+cortex git pull --agent
+```
+
+The `--agent` flag on pull performs pre-flight conflict detection — it analyzes the incoming changes and warns you before you start resolving conflicts.
+
+## Conflict Resolution
+
+When a merge or pull produces conflicts, the agent helps you understand and resolve them:
+
+```bash
+# Pull with conflict analysis
+cortex git pull --agent
+```
+
+The agent surfaces context like:
+
+> **Conflict in `src/utils/helpers.ts`**: Both branches modified the `formatCurrency` function. Branch `main` added locale support; your branch refactored the return type. Suggested resolution: apply the locale changes from main into your refactored function.
+
+After resolving conflicts manually:
+
+```bash
+# Stage resolved files
+cortex git add src/utils/helpers.ts
+
+# Commit the merge resolution
+cortex git commit --agent
+```
+
+### Conflict Resolution Tips
+
+1. **Use `cortex git diff --agent` on conflicted files** to understand what each side changed before editing.
+2. **Pull from main frequently** during long-running feature branches to avoid large conflict surfaces.
+3. **Let the agent suggest resolution strategies** — it has context about both sides of the merge.
+4. **Test after resolution** — run your tests before pushing the merge commit.
+
+## PR Preparation Workflow
+
+Before opening a pull request, use Cortex to prepare clean, review-ready commits:
+
+```bash
+# 1. Review the full diff between your branch and main
+cortex git diff --agent
+
+# 2. Inspect your commit history
+cortex git log --limit 10 --agent
+
+# 3. Re-order or squash commits if needed (using native git)
+git rebase -i HEAD~5
+
+# 4. Confirm everything is pushed
+cortex git push --remote origin --branch feature/my-feature
+
+# 5. Create the PR via Cortex's GitHub integration
+cortex github pr create --body "feat: add user onboarding flow"
+```
+
+The agent can also generate a PR description from your commit history when using `cortex github pr create` — see the [GitHub Integration Guide](/docs/knowledge-base/github-integration-guide) for details.
+
+## Viewing History
+
+```bash
+# Standard commit log
+cortex git log
+
+# Limit output
+cortex git log --limit 20
+
+# Agent-powered analysis of commit patterns
+cortex git log --agent
+```
+
+With `--agent`, the log analysis identifies trends: "3 of the last 5 commits touched `src/api/` — this module is the most active area of the codebase" or "Average commit size has increased 40% this week — consider smaller, more focused commits."
+
+## Agent-Powered Features Summary
+
+| Feature | Command Flag | What It Does |
+|---------|-------------|--------------|
+| Commit messages | `commit --agent` | Generates conventional commits from diffs |
+| Diff summaries | `diff --agent` | Natural language explanation of changes |
+| Status insights | `status --agent` | Next-action suggestions |
+| Log analysis | `log --agent` | Commit pattern analysis and trends |
+| Branch naming | `branch --agent` | Suggests branch names from changes |
+| Pull preview | `pull --agent` | Pre-flight conflict detection |
+| Staging help | `add --agent` | Intelligent staging suggestions |
+| Push workflows | `push --agent` | PR-ready push with description prep |
+
+## Next Steps
+
+- Set up the [GitHub Integration](/docs/knowledge-base/github-integration-guide) to create PRs and manage issues from the CLI.
+- Learn about the [Git Workspace architecture](/docs/architecture/git-workspace) for pipeline hooks and event flow.
+- Review the full [`cortex git` CLI reference](/docs/cli/git) for all subcommands and options.

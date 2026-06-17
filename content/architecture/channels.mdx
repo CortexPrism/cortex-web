@@ -1,0 +1,92 @@
+---
+title: Communication Channels Architecture
+description: Multi-channel communication plugin system connecting Cortex agents to external messaging platforms
+---
+
+# Communication Channels
+
+The channels system provides a plugin-based architecture for connecting Cortex agents to external messaging platforms. Each channel binds an agent to a specific platform, routing messages bidirectionally.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   Channel System                           │
+│                                                           │
+│  Channel Manager ──► Plugin Registry                       │
+│       │                    │                              │
+│       ▼                    ▼                              │
+│  Discord Adapter     [Future: Slack, Teams, Telegram]     │
+│       │                                                   │
+│       ▼                                                   │
+│  Gateway WebSocket ←→ Discord API                         │
+│       │                                                   │
+│       ▼                                                   │
+│  Agent (bound per channel)                                │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Channel Plugin Interface
+
+Each platform implements the `ChannelPlugin` interface:
+
+```typescript
+interface ChannelPlugin {
+  connect(config: ChannelConfig): Promise<void>;
+  disconnect(): Promise<void>;
+  onEvent(handler: (event: ChannelEvent) => void): void;
+  send(message: OutboundMessage): Promise<void>;
+  edit(messageId: string, content: string): Promise<void>;
+  react(messageId: string, emoji: string): Promise<void>;
+  delete(messageId: string): Promise<void>;
+  typing(channelId: string): Promise<void>;
+  upload(channelId: string, file: Attachment): Promise<void>;
+}
+```
+
+## Message Types
+
+| Target | Description |
+|--------|-------------|
+| `dm` | Direct message with a user |
+| `group` | Group/multi-user chat |
+| `channel` | Server channel |
+| `thread` | Thread within a channel |
+
+## Discord Implementation
+
+The Discord adapter (`channels/discord.ts`) connects via Gateway WebSocket:
+
+1. **Authentication**: Bot token-based connection
+2. **Heartbeat**: Keep-alive pings at Discord's required interval
+3. **Message Handling**: Prefix-based command parsing (`!cortex`)
+4. **Rich Embeds**: Support for embedded messages with fields, footers, and colors
+5. **Reaction Handling**: Respond to emoji reactions on messages
+
+## Event Flow
+
+```
+User sends message in Discord
+  → Gateway WebSocket receives MESSAGE_CREATE
+  → ChannelPlugin.onEvent fires
+  → Channel manager routes to bound agent
+  → Agent processes message (LLM + tools pipeline)
+  → Agent response sent back via ChannelPlugin.send
+  → Message appears in Discord channel
+```
+
+## Configuration
+
+```json
+{
+  "channels": {
+    "discord": {
+      "token": "<bot-token>",
+      "prefix": "!cortex",
+      "agent": "default-agent"
+    }
+  }
+}
+```
+
+See also: [Discord Bot](/docs/cli/discord), [Triggers System](/docs/architecture/triggers)

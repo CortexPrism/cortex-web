@@ -1,0 +1,108 @@
+---
+title: cortex plugins
+description: Plugin management — install, enable, disable, remove, update, verify, validate, and manage plugin permissions
+---
+
+# `cortex plugins`
+
+Manage the Cortex plugin system. Install, enable, disable, update, verify integrity, and manage permissions for ESM, MCP, and WASM plugins.
+
+## Usage
+
+```bash
+cortex plugins <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List installed plugins |
+| `install` | Install a plugin |
+| `enable` | Enable a disabled plugin |
+| `disable` | Disable a plugin without removing |
+| `remove` | Uninstall a plugin |
+| `verify` | Verify plugin integrity |
+| `permissions` | View or set plugin permissions |
+| `update` | Update plugins to latest version |
+| `validate` | Validate plugin configuration |
+
+## Plugin Types
+
+| Type | Description |
+|------|-------------|
+| **ESM** | ECMAScript modules loaded into the Cortex runtime |
+| **MCP** | Model Context Protocol server plugins |
+| **WASM** | WebAssembly plugins running in sandboxed environment |
+
+## Install Sources
+
+```bash
+# Install from marketplace
+cortex plugins install marketplace:cortexprism.io/plugins/python-executor
+
+# Install from GitHub
+cortex plugins install github:user/repo
+
+# Install from local path
+cortex plugins install ./my-plugin
+
+# Install from npm
+cortex plugins install npm:@scope/plugin-name
+```
+
+## Plugin Permissions
+
+Manage what plugins can access:
+
+```bash
+# View plugin permissions
+cortex plugins permissions <plugin-name>
+
+# Set permissions
+cortex plugins permissions <plugin-name> -s read,write,shell
+```
+
+## Update Options
+
+| Option | Description |
+|--------|-------------|
+| `--all, -a` | Update all installed plugins |
+| `--check, -c` | Check for updates without applying |
+
+## Example
+
+| Option | Command | Description |
+|--------|---------|-------------|
+| `--fix` | `validate` | Auto-fix validation issues |
+
+## Examples
+
+```bash
+# Install from marketplace
+cortex plugins install marketplace:cortexprism.io/plugins/python-executor
+
+# List all installed plugins
+cortex plugins list
+
+# Update all plugins
+cortex plugins update --all
+
+# Check for updates
+cortex plugins update -c
+
+# Disable a plugin
+cortex plugins disable python-executor
+
+# Enable a plugin
+cortex plugins enable python-executor
+
+# Verify plugin integrity
+cortex plugins verify python-executor
+
+# Remove a plugin
+cortex plugins remove python-executor
+
+# Validate plugin config
+cortex plugins validate python-executor
+```

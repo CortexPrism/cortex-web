@@ -23,22 +23,44 @@ cortex <command> [options]
 | Command | Description |
 |---------|-------------|
 | [`cortex chat`](/docs/cli/chat) | Interactive streaming chat session with LLM providers |
-| [`cortex serve`](/docs/cli/serve) | Start the HTTP + WebSocket server with web UI |
-| [`cortex daemon`](/docs/cli/daemon) | Manage background daemon processes (validator, executor, scheduler) |
-| [`cortex stop`](/docs/cli/daemon) | Stop server, daemons, or both |
-| [`cortex run`](/docs/cli/run) | Execute code files in sandboxed or direct subprocess mode |
+| [`cortex setup`](/docs/cli/setup) | First-run setup wizard |
+| [`cortex sessions`](/docs/cli/sessions) | List and manage chat sessions |
+| [`cortex jobs`](/docs/cli/jobs) | Manage scheduled cron jobs |
 | [`cortex memory`](/docs/cli/memory) | Search and manage the 5-tier memory system |
+| [`cortex run`](/docs/cli/run) | Execute code files in sandboxed or direct subprocess mode |
+| [`cortex serve`](/docs/cli/serve) | Start the HTTP + WebSocket server with web UI |
 | [`cortex reflect`](/docs/cli/reflect) | Inspect and consolidate reflection patterns |
 | [`cortex vault`](/docs/cli/vault) | Encrypted credential vault (AES-256-GCM) |
 | [`cortex policy`](/docs/cli/policy) | Security policy rule management |
-| [`cortex jobs`](/docs/cli/jobs) | Manage scheduled cron jobs |
-| [`cortex sessions`](/docs/cli/sessions) | List and manage chat sessions |
-| [`cortex setup`](/docs/cli/setup) | First-run setup wizard |
 | [`cortex migrate`](/docs/cli/setup) | Initialize or migrate all databases |
-| `cortex soul` | Agent soul/persona management |
-| `cortex discord` | Discord bot integration |
-| `cortex plugins` | Plugin management |
-| `cortex marketplace` | Marketplace interaction |
-| `cortex import` | Import data from other sources |
-| `cortex agent` | Agent configuration management |
-| `cortex service` | Micro-service mode management |
+| [`cortex daemon`](/docs/cli/daemon) | Manage background daemon processes (validator, executor, scheduler) |
+| [`cortex soul`](/docs/cli/soul) | Agent soul/persona management |
+| [`cortex discord`](/docs/cli/discord) | Discord bot integration |
+| [`cortex plugins`](/docs/cli/plugins) | Plugin management (install, enable, disable, remove, update, verify) |
+| [`cortex marketplace`](/docs/cli/marketplace) | Marketplace interaction (list, categories, stats, install) |
+| [`cortex import`](/docs/cli/import) | Import data from other sources (openclaw, json) |
+| [`cortex agent`](/docs/cli/agent) | Agent configuration management (create, update, delete, select, inspect) |
+| [`cortex service`](/docs/cli/service) | Micro-service mode management (list, create, start, stop) |
+| [`cortex stop`](/docs/cli/stop) | Stop server, daemons, or both |
+| [`cortex update`](/docs/cli/update) | Check, apply, or rollback Cortex updates with channel support |
+| [`cortex git`](/docs/cli/git) | Full git porcelain via agent workspace (status, log, diff, commit, push, clone) |
+| [`cortex github`](/docs/cli/github) | GitHub integration (PRs, issues, repos, branches) |
+| [`cortex hooks`](/docs/cli/hooks) | Git hooks management |
+| [`cortex triggers`](/docs/cli/triggers) | File watchers, webhooks, and git hook event triggers |
+| [`cortex channels`](/docs/cli/channels) | Communication channels (Discord integration) |
+| [`cortex mcp`](/docs/cli/mcp) | MCP server management (serve, stdio transport) |
+| [`cortex remote`](/docs/cli/remote) | Remote agent management (add, connect, remove) |
+| [`cortex tui`](/docs/cli/tui) | Terminal UI |
+| [`cortex projects`](/docs/cli/projects) | Project management (create, delete) |
+| [`cortex workflow`](/docs/cli/workflow) | Workflow engine (run, approve) |
+| [`cortex desktop`](/docs/cli/desktop) | Desktop app automation (screenshot, click, type, clipboard) |
+| [`cortex node`](/docs/cli/node) | Hub node management (register, list, connect) |
+| [`cortex eval`](/docs/cli/eval) | Evaluation framework for benchmarking agent performance |
+| [`cortex models`](/docs/cli/models) | Model management (list, show, set, available) |
+| [`cortex qm`](/docs/cli/qm) | Model Quartermaster (patterns, weights, stats, decisions, dashboard) |
+| [`cortex mqm`](/docs/cli/qm) | Model Quartermaster (model-level: stats, decisions, weights, accuracy) |
+| [`cortex install`](/docs/cli/install) | Install Cortex as a system service |
+| [`cortex uninstall`](/docs/cli/uninstall) | Uninstall Cortex system service |
+| [`cortex start`](/docs/cli/start) | Start Cortex server and daemon |
+| [`cortex restart`](/docs/cli/restart) | Restart Cortex server and daemon |
+| [`cortex voice`](/docs/cli/voice) | Voice mode management (enable, disable, set-voice, set-speed) |

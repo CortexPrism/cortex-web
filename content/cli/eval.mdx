@@ -1,0 +1,71 @@
+---
+title: cortex eval
+description: Evaluation framework — benchmark agent performance with suites, scoring, and regression detection
+---
+
+# `cortex eval`
+
+A comprehensive evaluation framework for benchmarking agent performance. Run suites of tasks across 8 task categories with pattern matching, file verification, and tool sequence validation. Supports regression detection against baseline runs.
+
+## Usage
+
+```bash
+cortex eval [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--suite, -s` | Evaluation suite to run |
+| `--baseline, -b` | Baseline run for regression comparison |
+| `--model, -m` | Model to use for evaluation |
+| `--save-baseline` | Save current results as baseline for future comparison |
+| `--help` | Show help for this command |
+
+## Task Categories
+
+| Category | Description |
+|----------|-------------|
+| `code_generation` | Generate code from natural language prompts |
+| `bug_fix` | Fix bugs in provided code |
+| `refactoring` | Refactor code for improved structure |
+| `code_review` | Review code and provide feedback |
+| `shell_command` | Generate and execute correct shell commands |
+| `file_operation` | Perform file system operations |
+| `search_retrieval` | Search and retrieve information |
+| `tool_use_sequence` | Execute multi-step tool sequences |
+
+## Scoring Methods
+
+| Method | Description |
+|--------|-------------|
+| **Regex patterns** | Match response against expected patterns |
+| **Contains/not_contains** | Check for presence or absence of strings |
+| **Fuzzy matching** | Approximate string matching for tolerance |
+| **File content verification** | Verify file contents after execution |
+| **Exit code checking** | Validate command exit codes |
+| **Tool sequence validation** | Verify correct tool call ordering |
+
+## Regression Detection
+
+Compare current evaluation runs against previous baselines:
+- `RegressionCheck.previousScore` — Score from baseline run
+- `RegressionCheck.degraded` — Flag if performance dropped
+- Per-category pass/fail and average score breakdowns
+
+## Examples
+
+```bash
+# Run an evaluation suite
+cortex eval -s code-generation
+
+# Run with a specific model
+cortex eval -s bug-fix -m claude-sonnet-4-5
+
+# Compare against a baseline
+cortex eval -s refactoring -b baseline-run-001
+
+# Save current results as new baseline
+cortex eval -s code-review --save-baseline
+```

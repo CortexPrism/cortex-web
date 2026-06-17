@@ -4,15 +4,38 @@ Detailed installation guide for CortexPrism.
 
 ## System Requirements
 
-- **OS**: Linux, macOS, or Windows (via WSL2)
+- **OS**: Linux, macOS, or Windows (native or WSL2)
 - **Runtime**: Deno v2.0 or later
 - **Memory**: 4GB RAM minimum (8GB+ recommended)
 - **Storage**: 500MB for base installation (more for plugin data)
 
+## Quick Install
+
+### macOS & Linux
+
+```bash
+curl -fsSL https://cortexprism.io/install.sh | bash
+```
+
+### Windows (PowerShell)
+
+```powershell
+iwr -Uri https://cortexprism.io/install.ps1 -OutFile install.ps1
+.\install.ps1
+```
+
+Windows users can also use Git Bash or WSL2 with the macOS/Linux command above.
+
 ## Install Deno
 
 ```bash
+# macOS / Linux
 curl -fsSL https://deno.land/install.sh | sh
+```
+
+```powershell
+# Windows (PowerShell)
+iwr https://deno.land/install.ps1 -useb | iex
 ```
 
 Or use your package manager:
@@ -23,7 +46,9 @@ brew install deno
 
 # Linux (apt/curl)
 curl -fsSL https://deno.land/install.sh | sh
+```
 
+```powershell
 # Windows (Scoop)
 scoop install deno
 
@@ -34,9 +59,17 @@ winget install DenoLand.Deno
 ## Clone and Setup
 
 ```bash
+# macOS / Linux
 git clone https://github.com/CortexPrism/cortex.git
 cd cortex
 deno task setup
+```
+
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/CortexPrism/cortex.git
+cd cortex
+deno run --allow-all src/main.ts setup
 ```
 
 The setup command runs database migrations and creates the initial config file.

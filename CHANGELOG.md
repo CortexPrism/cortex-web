@@ -2,6 +2,40 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.7.0] — 2026-06-17
+
+### Added
+- 28 new CLI documentation pages covering all 42 registered Cortex commands:
+  - New: `update`, `git`, `github`, `hooks`, `triggers`, `channels`, `mcp`, `remote`, `tui`, `projects`, `workflow`, `desktop`, `eval`, `qm`, `node`, `models`, `stop`, `soul`, `discord`, `plugins`, `marketplace`, `import`, `agent`, `service`, `voice`, `install`, `uninstall`, `start`, `restart`
+- 10 new architecture documentation pages:
+  - `quartermaster`, `git-workspace`, `github-integration`, `channels`, `triggers`, `workflow`, `observability`, `remote-agents`, `update-system`, `mcp-server`, `pipeline`
+- 3 new Knowledge Base articles:
+  - `git-workspace-guide`, `github-integration-guide`, `model-quartermaster`
+- FeatureGrid expanded from 8 to 12 cards on landing page (Git Workspace, Model Quartermaster, Workflow Engine, Cortex Lens Audit)
+- Features page expanded from 11 to 15 feature sections with verified command examples
+- `router.strategy` field documented in configuration page (`cascade` / `threshold`)
+- `update` section documented in configuration page (channel, checkOnStartup, autoUpdate, checkIntervalHours, githubToken, gpgKeyPath)
+- Multi-platform install page with macOS, Linux/WSL, and Windows (PowerShell) tabs
+
+### Changed
+- CLI Reference index expanded from 19 to 41 commands with documentation links
+- Sidebar redesigned: CLI section 12→40 links, Architecture section 8→19 links
+- Web UI dashboard tabs updated in serve docs from 4 to 17 tabs matching source
+
+### Fixed
+- Memory tier names corrected across all pages — "working"/"procedural" replaced with actual tiers (Ephemeral→Episodic→Semantic→Archival→Reflection)
+- 11 command examples in features page fixed to match verified CLI syntax
+- Hero terminal demo updated with correct model names, memory flags, and run syntax
+- `--tier` flag corrected to `--type` in memory docs; `--limit` default fixed (10→8)
+- `--importance` flag documented as numeric (0.0–1.0) instead of string
+- Removed all references to non-existent commands (`cortex benchmark`, `cortex lens tail/search/export`, `cortex config migrate`, `cortex plugin reinstall`, `cortex chat --profile`, `/model` slash command)
+- `cortex plugin` corrected to `cortex plugins` (plural) in troubleshooting and migration guides
+- Outdated flag references removed: `--tools`, `--router`, `--schedule`/`--task`, `--sandbox`/`--script`
+- `install.sh` now backs up and restores `config.json` on git pull failure instead of silently destroying user data
+- Sidebar navigation URLs aligned with index.mdx command table
+- Sidebar `max-h` raised to 2000px to prevent content clipping with expanded sections
+- Orphaned `restart.mdx` and `uninstall.mdx` now reachable via sidebar links
+
 ## [0.6.0] — 2026-06-16
 
 ### Added

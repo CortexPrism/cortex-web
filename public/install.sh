@@ -29,8 +29,8 @@ detect_os() {
 
 detect_arch() {
   case "$(uname -m)" in
-    x86_64|amd64) echo "x86_64" ;;
-    aarch64|arm64) echo "aarch64" ;;
+    x86_64|amd64|AMD64) echo "x86_64" ;;
+    aarch64|arm64|ARM64) echo "aarch64" ;;
     *)             echo "unknown" ;;
   esac
 }
@@ -77,10 +77,21 @@ install_cortex() {
     header "Updating CortexPrism in ${install_dir}"
     cd "$install_dir"
     git pull --ff-only origin "$BRANCH" 2>/dev/null || {
-      warn "  Git pull failed, re-cloning..."
+      warn "  Git pull failed, backing up config and re-cloning..."
       cd "$HOME"
+      # Backup config if it exists
+      if [[ -f "$install_dir/config.json" ]]; then
+        cp "$install_dir/config.json" /tmp/cortex-config-backup.json 2>/dev/null && \
+        info "  ✓ Config backed up to /tmp/cortex-config-backup.json"
+      fi
       rm -rf "$install_dir"
       git clone --depth 1 -b "$BRANCH" "https://github.com/${REPO}.git" "$install_dir"
+      # Restore backed-up config
+      if [[ -f /tmp/cortex-config-backup.json ]]; then
+        mkdir -p "$install_dir"
+        cp /tmp/cortex-config-backup.json "$install_dir/config.json" 2>/dev/null && \
+        info "  ✓ Config restored from backup"
+      fi
     }
   else
     header "Downloading CortexPrism"
@@ -105,19 +116,30 @@ install_cortex() {
 
 create_wrapper() {
   local install_dir="${CORTEX_DIR:-$HOME/.cortex}"
+  local os
+  os=$(detect_os)
   local bin_dir="${DENO_INSTALL:-$HOME/.deno}/bin"
   local wrapper="$bin_dir/cortex"
 
   header "Creating cortex command"
   mkdir -p "$bin_dir"
 
-  printf '#!/bin/sh\nexec deno run --allow-all "%s/src/main.ts" "$@"\n' "$install_dir" > "$wrapper"
-  chmod +x "$wrapper"
-  info "  ✓ cortex command created at $wrapper"
+  if [[ "$os" == "windows" ]]; then
+    printf '#!/bin/sh\nexec deno run --allow-all "%s/src/main.ts" "$@"\n' "$install_dir" > "$wrapper"
+    chmod +x "$wrapper"
+    printf '@echo off\r\ndeno run --allow-all "%s\\src\\main.ts" %%*\r\n' "$install_dir" > "$wrapper.bat"
+    info "  ✓ cortex command created at $wrapper and $wrapper.bat"
+  else
+    printf '#!/bin/sh\nexec deno run --allow-all "%s/src/main.ts" "$@"\n' "$install_dir" > "$wrapper"
+    chmod +x "$wrapper"
+    info "  ✓ cortex command created at $wrapper"
+  fi
 }
 
 print_next_steps() {
   local install_dir="${CORTEX_DIR:-$HOME/.cortex}"
+  local os
+  os=$(detect_os)
 
   printf "\n"
   printf "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
@@ -125,11 +147,29 @@ print_next_steps() {
   printf "${BOLD}${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
   printf "\n"
 
-  if [[ ":$PATH:" != *":$HOME/.deno/bin:"* ]]; then
-    printf "${YELLOW}  Add Deno to your PATH:${NC}\n"
-    printf "    echo 'export PATH=\"\$HOME/.deno/bin:\$PATH\"' >> ~/.bashrc\n"
-    printf "    source ~/.bashrc\n"
-    printf "\n"
+  if [[ "$os" == "windows" ]]; then
+    if [[ ":$PATH:" != *":$HOME/.deno/bin:"* ]]; then
+      printf "${YELLOW}  Add Deno to your PATH:${NC}\n"
+      printf "    echo 'export PATH=\"\$HOME/.deno/bin:\$PATH\"' >> ~/.bashrc\n"
+      printf "    source ~/.bashrc\n"
+      printf "\n"
+    fi
+  elif [[ "$os" == "macos" ]]; then
+    local shell_config="$HOME/.zshrc"
+    [[ "$SHELL" == */bash* ]] && shell_config="$HOME/.bash_profile"
+    if [[ ":$PATH:" != *":$HOME/.deno/bin:"* ]]; then
+      printf "${YELLOW}  Add Deno to your PATH:${NC}\n"
+      printf "    echo 'export PATH=\"\$HOME/.deno/bin:\$PATH\"' >> %s\n" "$shell_config"
+      printf "    source %s\n" "$shell_config"
+      printf "\n"
+    fi
+  else
+    if [[ ":$PATH:" != *":$HOME/.deno/bin:"* ]]; then
+      printf "${YELLOW}  Add Deno to your PATH:${NC}\n"
+      printf "    echo 'export PATH=\"\$HOME/.deno/bin:\$PATH\"' >> ~/.bashrc\n"
+      printf "    source ~/.bashrc\n"
+      printf "\n"
+    fi
   fi
 
   printf "${BOLD}Quick start:${NC}\n"
@@ -149,6 +189,55 @@ print_next_steps() {
   printf "${DIM}Config:       ~/.cortex/config.json${NC}\n"
 }
 
+ensure_git() {
+  if command -v git &>/dev/null; then
+    info "  ✓ Git found"
+    return 0
+  fi
+
+  local os
+  os=$(detect_os)
+
+  header "Installing Git"
+
+  case "$os" in
+    macos)
+      xcode-select --install 2>/dev/null || true
+      ;;
+    linux)
+      if command -v apt-get &>/dev/null; then
+        sudo apt-get update -qq && sudo apt-get install -y -qq git
+      elif command -v dnf &>/dev/null; then
+        sudo dnf install -y git
+      elif command -v yum &>/dev/null; then
+        sudo yum install -y git
+      elif command -v pacman &>/dev/null; then
+        sudo pacman -S --noconfirm git
+      elif command -v apk &>/dev/null; then
+        apk add git
+      else
+        error "Git is required. Please install: https://git-scm.com/downloads"
+      fi
+      ;;
+    windows)
+      if command -v winget &>/dev/null; then
+        winget install --id Git.Git -e --source winget
+      elif command -v choco &>/dev/null; then
+        choco install git
+      elif command -v scoop &>/dev/null; then
+        scoop install git
+      else
+        error "Git for Windows is required. Install from https://git-scm.com/download/win"
+      fi
+      ;;
+  esac
+
+  if ! command -v git &>/dev/null; then
+    error "Git installation failed. Please install manually and re-run this installer."
+  fi
+  info "  ✓ Git installed"
+}
+
 main() {
   printf "\n"
   printf "${BOLD}${CYAN}  ╔══════════════════════════════════════╗${NC}\n"
@@ -161,28 +250,7 @@ main() {
   os=$(detect_os)
   info "  System:  $(uname -s) $(uname -m)"
 
-  if [[ "$os" == "windows" ]]; then
-    warn "  Windows detected — use Git Bash, WSL, or run:"
-    warn "  git clone https://github.com/${REPO}.git && cd cortex && deno run --allow-all src/main.ts setup"
-    exit 0
-  fi
-
-  if ! command -v git &>/dev/null; then
-    if [[ "$os" == "macos" ]]; then
-      header "Installing Git"
-      xcode-select --install 2>/dev/null || true
-    elif command -v apt-get &>/dev/null; then
-      header "Installing Git"
-      sudo apt-get update -qq && sudo apt-get install -y -qq git
-    elif command -v brew &>/dev/null; then
-      header "Installing Git"
-      brew install git
-    else
-      error "Git is required. Please install: https://git-scm.com/downloads"
-    fi
-  fi
-  info "  ✓ Git found"
-
+  ensure_git
   ensure_deno
   install_cortex
   create_wrapper

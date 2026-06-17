@@ -1,0 +1,63 @@
+---
+title: cortex soul
+description: Agent soul/persona management — init, edit, apply templates, and validate soul configurations
+---
+
+# `cortex soul`
+
+Manage agent souls (personas) that define the personality, tone, and behavior of Cortex agents. Souls provide consistent character traits, communication styles, and behavioral patterns.
+
+## Usage
+
+```bash
+cortex soul <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `init` | Initialize a new soul configuration |
+| `show` | Display current soul configuration |
+| `edit` | Edit a soul configuration |
+| `note` | Add a personality note to a soul |
+| `templates` | List available soul templates |
+| `apply-template` | Apply a predefined soul template |
+| `validate` | Validate a soul configuration |
+
+## Options
+
+| Option | Subcommand | Description |
+|--------|------------|-------------|
+| `--force` | `init` | Overwrite existing soul configuration |
+
+## Soul Templates
+
+Prebuilt soul templates provide starting points for agent personalities:
+- Professional assistant
+- Code reviewer
+- Creative writer
+- Technical support
+- Data analyst
+
+## Examples
+
+```bash
+# Initialize a new soul
+cortex soul init
+
+# View current soul
+cortex soul show
+
+# List available templates
+cortex soul templates
+
+# Apply a template
+cortex soul apply-template "code-reviewer"
+
+# Add a personality note
+cortex soul note
+
+# Validate soul configuration
+cortex soul validate
+```

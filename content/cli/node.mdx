@@ -1,0 +1,89 @@
+---
+title: cortex node
+description: Hub node management — register, list, connect, and manage distributed agent nodes
+---
+
+# `cortex node`
+
+Manage nodes in the Cortex hub — a distributed agent execution layer where remote nodes connect to a central hub via WebSocket. Nodes register with capability tiers and execute directives from the hub.
+
+## Usage
+
+```bash
+cortex node <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `register` | Register a new node with the hub |
+| `list` | List all registered nodes |
+| `show` | Show details for a specific node |
+| `deregister` | Remove a node from the hub |
+| `rekey` | Rotate a node's authentication token |
+| `connect` | Connect as a node to a hub |
+
+## Node Status
+
+| Status | Description |
+|--------|-------------|
+| `connecting` | Establishing WebSocket connection |
+| `connected` | Active with heartbeat |
+| `disconnected` | Connection lost |
+| `error` | Connection in error state |
+| `deregistered` | Node removed from hub |
+
+## Capability Tiers
+
+| Tier | Access Level |
+|------|-------------|
+| **root** | Full unrestricted — all tools, all paths (`/`), all sudo commands, all domains |
+| **sudo** | Elevated scoped — excludes `/etc`, `/root`, `/proc`, `/sys`; allows apt/npm/pip |
+| **unprivileged** | Sandboxed — read-only tools, no shell, restricted to `/tmp/cortex-sandbox` |
+
+## Connect Options
+
+| Option | Description |
+|--------|-------------|
+| `--id` | Node identifier |
+| `--token` | Authentication token |
+| `--endpoint` | Hub WebSocket endpoint URL |
+| `--tier` | Capability tier (root, sudo, unprivileged) |
+| `--group` | Node group for routing |
+| `--name` | Human-readable node name |
+| `--reconnect-ms` | Reconnect interval in milliseconds |
+| `--heartbeat-ms` | Heartbeat interval in milliseconds |
+| `--timeout-ms` | Connection timeout in milliseconds |
+
+## Protocol
+
+Nodes communicate with the hub via a message protocol:
+- **register** — Node announces itself to hub
+- **heartbeat** — Periodic health check with live metrics
+- **directive** — Hub sends execution directive
+- **result** — Node returns execution result
+- **stream_chunk** — Streaming result chunks
+- **cancel** — Hub cancels in-flight directive
+
+## Examples
+
+```bash
+# Register a new node
+cortex node register
+
+# List all nodes
+cortex node list
+
+# Show node details
+cortex node show node-001
+
+# Connect as a node to a hub
+cortex node connect --token <token> --endpoint https://hub.example.com --tier sudo
+
+# Rotate node token
+cortex node rekey node-001
+
+# Remove a node
+cortex node deregister node-001
+```

@@ -1,0 +1,76 @@
+---
+title: cortex marketplace
+description: Marketplace interaction — list, search, browse categories, view stats, and install plugins and agents
+---
+
+# `cortex marketplace`
+
+Browse and install plugins and agent configurations from the CortexPrism marketplace directly from the CLI.
+
+## Usage
+
+```bash
+cortex marketplace <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list plugins` | List available plugins with filtering |
+| `list agents` | List available agent configurations |
+| `categories` | Browse marketplace categories |
+| `stats` | Show marketplace statistics |
+| `install` | Install a plugin or agent |
+
+## Plugin Listing Options
+
+| Option | Description |
+|--------|-------------|
+| `--search, -s` | Search by keyword |
+| `--kind, -k` | Filter by plugin kind (`esm`, `mcp`, `wasm`) |
+| `--category, -c` | Filter by category |
+| `--limit, -l` | Limit number of results |
+
+## Agent Listing Options
+
+| Option | Description |
+|--------|-------------|
+| `--search, -s` | Search by keyword |
+| `--provider, -p` | Filter by provider |
+| `--category, -c` | Filter by category |
+| `--limit, -l` | Limit number of results |
+
+## Install Options
+
+| Option | Description |
+|--------|-------------|
+| `--yes, -y` | Skip confirmation prompt |
+
+## Examples
+
+```bash
+# List all plugins
+cortex marketplace list plugins
+
+# Search for Python plugins
+cortex marketplace list plugins -s python
+
+# Filter by MCP plugins
+cortex marketplace list plugins -k mcp
+
+# Browse categories
+cortex marketplace categories
+
+# View marketplace stats
+cortex marketplace stats
+
+# Install a plugin
+cortex marketplace install python-executor -y
+
+# List agent configs
+cortex marketplace list agents -s code-review
+
+# Filter agents by provider
+cortex marketplace list agents -p anthropic
+```

@@ -1,0 +1,39 @@
+---
+title: cortex models
+description: Model management — list, show, set, and browse available LLM models
+---
+
+# `cortex models`
+
+Manage LLM models used by Cortex. View available models, inspect model details, set default models, and browse all models supported by configured providers.
+
+## Usage
+
+```bash
+cortex models <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List configured models |
+| `show` | Show details for a specific model |
+| `set` | Set the default model |
+| `available` | List all available models across providers |
+
+## Examples
+
+```bash
+# List configured models
+cortex models list
+
+# Show details for a model
+cortex models show claude-sonnet-4-5
+
+# Set the default model
+cortex models set gpt-4o
+
+# Browse all available models
+cortex models available
+```

@@ -1,0 +1,65 @@
+---
+title: GitHub Integration Architecture
+description: GitHub PR, issue, and repository management integrated with the Cortex agent system
+---
+
+# GitHub Integration
+
+Cortex provides deep GitHub integration for managing pull requests, issues, and repositories directly from the CLI, with agent-powered automation for code review and project management.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                  GitHub Integration                        │
+│                                                           │
+│  CLI (cortex github) ──► github-cmd.ts ──► GitHub API     │
+│                              │                            │
+│                              ▼                            │
+│                     Subsystem Integration                  │
+│           (Vault for tokens, Agent for reviews,            │
+│            Git workspace for branch/repo context)         │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Subcommand Tree
+
+### Pull Requests
+| Command | Description |
+|---------|-------------|
+| `pr list` | List pull requests (filterable by state, limit) |
+| `pr get` | Get pull request details |
+| `pr create` | Create a pull request (with draft and body options) |
+| `pr merge` | Merge a pull request (merge, squash, rebase) |
+| `pr close` | Close a pull request |
+
+### Issues
+| Command | Description |
+|---------|-------------|
+| `issue list` | List issues (filterable by state, labels, limit) |
+| `issue create` | Create an issue (with body, labels, assignees) |
+| `issue close` | Close an issue |
+
+### Repositories
+| Command | Description |
+|---------|-------------|
+| `repo list` | List repositories (filterable by type, limit) |
+| `repo get` | Get repository details |
+| `repo branches` | List branches in a repository |
+
+## Authentication
+
+GitHub tokens are stored encrypted in the Cortex vault (AES-256-GCM). Required scopes:
+- `repo` — Repository access
+- `read:org` — Organization membership
+- `issues:read/write` — Issue management
+
+## Agent Integration
+
+GitHub commands can trigger agent workflows:
+- **PR Creation**: Agent generates PR title and description from branch diff
+- **Code Review**: Agent reviews PRs and submits inline comments
+- **Issue Triage**: Agent categorizes and labels incoming issues
+- **Release Notes**: Agent generates release notes from merged PRs
+
+See also: [Git Workspace](/docs/architecture/git-workspace), [Workflow Engine](/docs/architecture/workflow)

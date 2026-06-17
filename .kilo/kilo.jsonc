@@ -5,6 +5,7 @@
     "vectorStore": "qdrant",
     "qdrant": {
       "url": "http://10.10.20.31:6333/"
-    }
+    },
+    "model": "openai/text-embedding-3-large"
   }
 }

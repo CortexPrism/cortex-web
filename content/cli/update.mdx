@@ -1,0 +1,87 @@
+---
+title: cortex update
+description: Check, apply, and rollback Cortex updates with channel support and SHA-256 verification
+---
+
+# `cortex update`
+
+Manage Cortex updates including checking for new versions, applying updates, rolling back, and configuring update channels. Supports both binary and source update modes.
+
+## Usage
+
+```bash
+cortex update --check                 # Check for available updates
+cortex update --force                 # Apply latest update
+cortex update --channel stable        # Switch to stable channel
+cortex update --rollback              # Rollback to previous version
+cortex update --status                # Show current version and channel info
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--check` | Check for available updates without applying |
+| `--channel` | Set update channel (`stable`, `pre`) |
+| `--rollback` | Rollback to the previous installed version |
+| `--status` | Display current version, channel, and update state |
+| `--force` | Force apply update even if already on latest |
+| `--help` | Show help for this command |
+
+## Update Channels
+
+| Channel | Description |
+|---------|-------------|
+| `stable` | Production-ready releases with full testing |
+| `pre` | Pre-release builds with latest features |
+
+## Update Modes
+
+### Binary Mode
+Downloads pre-built binaries with SHA-256 verification and optional GPG signature validation. The binary is downloaded to `~/.cortex/updates/` and atomically replaced.
+
+### Source Mode
+Pulls the latest source from the Cortex repository and rebuilds. Used when running from source or when binary mode is unavailable for the platform.
+
+## Configuration
+
+The update system can be configured in the `~/.cortex/config.json` file:
+
+```json
+{
+  "update": {
+    "channel": "stable",
+    "checkOnStartup": true,
+    "autoUpdate": false,
+    "checkIntervalHours": 24,
+    "githubToken": "ghp_...",
+    "gpgKeyPath": "/path/to/gpg/key"
+  }
+}
+```
+
+## Verification
+
+All updates are verified using:
+- **SHA-256**: Binary hash comparison against the release manifest
+- **GPG Signatures**: Optional GPG signature verification when `gpgKeyPath` is configured
+- **Atomic Replacement**: Updates are applied atomically to prevent corruption
+
+## Examples
+
+```bash
+# Check if an update is available
+cortex update --check
+
+# Apply the latest stable update
+cortex update --force
+
+# Switch to pre-release channel
+cortex update --channel pre
+
+# Rollback to previous version
+cortex update --rollback
+
+# View current version and channel
+cortex update --status
+```

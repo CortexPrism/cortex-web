@@ -1,0 +1,98 @@
+---
+title: Pipeline System Architecture
+description: 12-stage hook-based processing pipeline for the agent turn lifecycle
+---
+
+# Pipeline System
+
+The pipeline system provides a hook-based processing framework that wraps every stage of the agent turn lifecycle. Core and plugin hooks execute at 12 distinct pipeline stages with configurable priority, timeout protection, and rich modification capabilities.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Pipeline System                         │
+│                                                           │
+│  12 Pipeline Stages (in order):                            │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
+│  │pre-assess│→│post-assess│→│pre-reason │→ ...            │
+│  └──────────┘  └──────────┘  └──────────┘               │
+│       │              │              │                      │
+│       ▼              ▼              ▼                      │
+│  ┌────────────────────────────────────────────┐          │
+│  │          Registered Hooks (prioritized)     │          │
+│  │  Core Hooks + Plugin Hooks                  │          │
+│  └────────────────────────────────────────────┘          │
+└──────────────────────────────────────────────────────────┘
+```
+
+## 12 Pipeline Stages
+
+| Stage | When | Purpose |
+|-------|------|---------|
+| `pre-assess` | Before assessment | Pre-filter, context preparation |
+| `post-assess` | After assessment | Validate assessment output |
+| `pre-reason` | Before reasoning | Modify reasoning context |
+| `post-reason` | After reasoning | Validate reasoning output |
+| `pre-tool` | Before tool execution | Tool call filtering |
+| `post-tool` | After tool execution | Tool result processing |
+| `pre-llm` | Before LLM call | Modify LLM request |
+| `post-llm` | After LLM call | Process LLM response |
+| `pre-reflect` | Before reflection | Modify reflection context |
+| `post-reflect` | After reflection | Process reflection output |
+| `pre-output` | Before final output | Modify user-facing response |
+| `post-output` | After final output | Post-response side effects |
+
+## Hook Interface
+
+```typescript
+interface PipelineHook {
+  name: string;
+  stages: PipelineStage[];
+  priority: number;
+  async: boolean;
+  disableable: boolean;
+  run(ctx: PipelineContext): Promise<HookResult>;
+}
+
+interface HookResult {
+  abort?: boolean;
+  modifyInput?: string;
+  modifyLLMResponse?: string;
+  modifyOutput?: string;
+  injectMessages?: Message[];
+  sideEffects?: SideEffect[];
+}
+```
+
+## Built-in Core Hooks
+
+| Hook | Stage | Description |
+|------|-------|-------------|
+| **Content Safety** | pre-llm | Prompt injection detection, PII redaction |
+| **Output Truncation** | post-llm | Truncate responses at 8K tokens |
+| **Summarization** | pre-llm | Auto-compact context at 80K tokens |
+| **Loop Detection** | post-tool | Detect >5 same-file edits, escalate |
+| **Token Budget** | pre-llm | Enforce per-turn token limits |
+| **Reflection Injection** | pre-llm | Inject reflection patterns into context |
+| **MQM Routing** | pre-llm | Route model selection via Quartermaster |
+| **Validation** | pre-tool | Run custom validation plugins |
+
+## Hook Registration
+
+Hooks can be registered by:
+- Core system on startup
+- Plugins via the plugin manager
+- Custom scripts via the hooks API
+
+Each hook has a priority (0–100) determining execution order within a stage. Hooks have timeout protection (5s sync, 15s async) to prevent pipeline stalls.
+
+## Pipeline Context
+
+Hooks receive a read-only `PipelineContext` with:
+- `sessionId`, `turnId` — Current session/turn identifiers
+- `tokensUsed`, `costUsd` — Current consumption metrics
+- `toolCallsMade` — Count of tool calls this turn
+- `setState(key, value)` — Mutate pipeline state
+
+See also: [Agent Loop](/docs/architecture/agent-loop), [Plugin System](/docs/architecture/plugin-system)

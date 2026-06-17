@@ -1,0 +1,274 @@
+---
+title: Model Quartermaster Guide
+description: A practical guide to the Model Quartermaster — understanding tool predictions, interpreting signals, monitoring accuracy, and optimizing the reinforcement learning engine
+---
+
+# Model Quartermaster Guide
+
+The Model Quartermaster (QM/MQM) is an adaptive prediction engine that learns which tool your agent should call next. It observes every tool call across your sessions, computes five different prediction signals, and fuses them into an actionable suggestion — automate, suggest, or defer.
+
+Over time, the Quartermaster's predictions improve through reinforcement learning, making your agent faster and more autonomous.
+
+## What the Quartermaster Does
+
+Every time your agent needs to decide which tool to call, the Quartermaster runs five independent prediction signals against the current context. It fuses their outputs into a weighted score and makes one of three decisions:
+
+| Confidence | Action | Behavior |
+|------------|--------|----------|
+| ≥ 90% | **Automate** | Execute the tool automatically (safe tools only) |
+| 60–89% | **Suggest** | Recommend the tool to the agent |
+| < 60% | **Defer** | Let the agent decide entirely |
+
+**Safety note**: Unsafe tools (shell execution, file writes, network access) are **never** auto-executed, regardless of confidence. The highest action for unsafe tools is "Suggest."
+
+## Before Predictions Begin
+
+The Quartermaster requires **50 observations** before entering active prediction mode. Before that threshold, it operates in learning-only mode — collecting data, computing signal baselines, and building context fingerprints — but not making predictions.
+
+You can check your observation count at any time:
+
+```bash
+cortex qm stats
+```
+
+Look for the `observations` field. If it's under 50, keep using Cortex normally and the Quartermaster will activate automatically once enough data is collected.
+
+## Viewing Predictions
+
+### The Dashboard
+
+The richest view of Quartermaster activity is the dashboard:
+
+```bash
+# Session-level dashboard (specific session)
+cortex qm dashboard -s sess_abc123
+
+# Model-level dashboard (aggregated across all sessions)
+cortex mqm dashboard
+```
+
+The dashboard displays:
+
+- **Accuracy bars per signal**: How often each signal's prediction was correct
+- **Current signal weights**: Visual representation of how much each signal contributes
+- **Top tools by prediction accuracy**: Which tools the QM predicts best
+- **Confidence distribution histogram**: How often the QM hits each confidence band
+- **Session and model-level trends**: Accuracy over time
+
+### Prediction Decisions
+
+See the raw history of what the QM predicted and whether it was right:
+
+```bash
+# Session-level decisions
+cortex qm decisions -s sess_abc123
+
+# Limit output
+cortex qm decisions -s sess_abc123 --limit 20
+
+# Model-level decisions
+cortex mqm decisions --limit 50
+```
+
+Each decision entry shows:
+- The tool that was predicted
+- The actual tool called
+- Whether the prediction was correct
+- The confidence score
+- Which signal contributed most to the prediction
+
+## The Five Prediction Signals
+
+Each signal looks at tool call patterns from a different angle. The Quartermaster weights them dynamically based on historical accuracy.
+
+### 1. Trajectory Signal
+
+**What it tracks**: Historical sequences of tool calls. If the agent typically calls `read_file` → `grep` → `edit_file` in that order, the trajectory signal learns this pattern.
+
+**Weight**: Dynamic (EMA), adjusted up or down based on correctness.
+
+**When it's strongest**: Repetitive workflows like fixing lint errors, refactoring code, or running test suites — anything with a predictable sequence of tool calls.
+
+### 2. Episodic Signal
+
+**What it tracks**: Similarity between the current conversation context and past conversations. It generates 12-feature fingerprints from the conversation (tool distribution, message length, token composition, task category indicators) and performs cosine similarity matching.
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: Tasks similar to ones you've done before — deploying the same project, debugging similar error types, following established patterns.
+
+### 3. Tool Stats Signal
+
+**What it tracks**: Pure statistical success/failure rates per tool. If `bash` succeeds 95% of the time and `webfetch` fails 40% of the time (due to network issues), this signal biases toward reliable tools.
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: In environments where tool reliability varies significantly — flaky network connections, resource-constrained machines, or tools with known limitations.
+
+### 4. Task Context Signal
+
+**What it tracks**: The type, complexity, and requirements of the current task. A "fix this TypeScript error" task calls for different tools than "deploy to production."
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: When the task type is unambiguous — clear bug reports, specific feature requests, well-scoped refactoring tasks.
+
+### 5. Reflection Signal
+
+**What it tracks**: Per-turn reflection feedback. After each agent action, the agent reflects on whether the right tool was used. This signal incorporates that meta-cognitive feedback.
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: When the agent is actively reflecting on its decisions — during complex multi-step tasks where the agent evaluates its own tool choices.
+
+## Viewing and Understanding Weights
+
+```bash
+# Current signal weights for a session
+cortex qm weights
+
+# Model-level weights (aggregated)
+cortex mqm weights
+```
+
+Example output:
+
+```
+Signal Weights (session sess_abc123):
+  Trajectory:    0.32  ████████████████░░░░░░
+  Episodic:      0.28  ██████████████░░░░░░░░
+  Tool Stats:    0.18  █████████░░░░░░░░░░░░░
+  Task Context:  0.14  ███████░░░░░░░░░░░░░░░
+  Reflection:    0.08  ████░░░░░░░░░░░░░░░░░░
+```
+
+Higher weights mean the signal has been more accurate historically. In this example, the trajectory signal is the strongest predictor — this session involves repetitive, pattern-driven work. The reflection signal is weakest — the agent hasn't been generating much reflective feedback.
+
+## Monitoring Accuracy
+
+```bash
+# Session accuracy
+cortex qm accuracy -s sess_abc123
+
+# Model-level accuracy over the last 24 hours
+cortex mqm accuracy -h 24
+
+# Model-level accuracy over the last week
+cortex mqm accuracy -h 168
+```
+
+Accuracy is measured as the percentage of predictions that matched the actual tool the agent called. A healthy Quartermaster typically reaches **65–85% accuracy** after sufficient training.
+
+### Interpreting Accuracy Numbers
+
+| Accuracy | Interpretation | Action |
+|----------|---------------|--------|
+| > 85% | Excellent — QM is well-trained | No action needed |
+| 65–85% | Good — typical for a trained QM | Continue collecting observations |
+| 40–65% | Moderate — still learning or noisy signals | Check for varied task types; let it collect more data |
+| < 40% | Low — insufficient data or reset needed | Make sure you have > 50 observations; consider resetting |
+
+## When to Reset
+
+Reset clears the Quartermaster's learned state and starts fresh. Use it when:
+
+- **You've changed workflows significantly**: The patterns the QM learned for frontend development won't apply to infrastructure work.
+- **Accuracy is stuck below 40%**: Sometimes the learning gets stuck in a local minimum.
+- **You're setting up a new project**: A clean slate for a new codebase is often better than carrying over patterns from an unrelated project.
+
+```bash
+# Reset for a specific session
+cortex qm reset -s sess_abc123
+
+# Reset all session-level data (keeps model-level data)
+cortex qm reset-all
+
+# Reset model-level data (aggregate across all sessions)
+cortex mqm reset
+
+# Nuclear option: reset everything
+cortex mqm reset-all
+```
+
+**Warning**: `cortex mqm reset-all` wipes all learned patterns and returns to learning-only mode. You'll need another 50 observations before predictions resume.
+
+## How Reinforcement Learning Improves Predictions
+
+After every prediction, the Quartermaster evaluates whether it was correct:
+
+- **Correct prediction**: The contributing signal weights increase (EMA α = 0.15).
+- **Incorrect prediction**: The contributing signal weights decrease faster (EMA α = 0.25).
+
+The asymmetry means the Quartermaster is **pessimistic by design** — it's quicker to lose confidence in a signal than to gain it. This prevents over-confidence on sparse data.
+
+### Convergence
+
+Weights typically stabilize after **200–500 observations**. During the first 50 observations (learning-only mode), the QM builds baselines but doesn't predict. Observations 50–200 are the active exploration phase where predictions start but weights fluctuate significantly. After ~200 observations, weights converge and predictions become stable.
+
+### The 90% Confidence Threshold
+
+The 90% threshold for auto-execution is deliberately high. The Quartermaster must be nearly certain before it acts without the agent's confirmation:
+
+- **Below 90%**: The tool is suggested or deferred — the agent (or you) still makes the final call.
+- **90% or above, safe tool**: The tool auto-executes. Read-only tools like `read_file`, `grep`, and `glob` can auto-execute at this level.
+- **90% or above, unsafe tool**: The tool is still only suggested. Write, execute, and network tools never auto-execute.
+
+This threshold provides a safety buffer — even if the Quartermaster is "confident," the agent retains control over any destructive operation.
+
+## CLI Quick Reference
+
+| Command | What It Shows |
+|---------|---------------|
+| `cortex qm dashboard -s <id>` | Session dashboard with accuracy, weights, top tools |
+| `cortex mqm dashboard` | Model-level dashboard across all sessions |
+| `cortex qm decisions -s <id>` | History of predictions and outcomes |
+| `cortex qm weights` | Current signal weights for a session |
+| `cortex mqm weights` | Aggregated signal weights across all sessions |
+| `cortex qm accuracy -s <id>` | Prediction accuracy for a session |
+| `cortex mqm accuracy -h 24` | Accuracy over the last N hours |
+| `cortex qm patterns --limit 20` | Learned tool-call sequence patterns |
+| `cortex qm stats` | Tool usage statistics and observation count |
+| `cortex qm trace <turn>` | Step-by-step prediction chain for a turn |
+| `cortex qm reset -s <id>` | Reset session-level state |
+| `cortex qm reset-all` | Reset all session-level data |
+| `cortex mqm reset` | Reset model-level state |
+| `cortex mqm reset-all` | Reset everything (back to learning mode) |
+
+## Practical Example
+
+Here's what the Quartermaster looks like in practice during a typical session:
+
+```bash
+# 1. Start working — QM is in learning mode (< 50 observations)
+cortex qm stats
+# Observations: 23 | Mode: learning
+
+# 2. After a while, check again
+cortex qm stats
+# Observations: 67 | Mode: active | Accuracy: 72%
+
+# 3. View the dashboard to understand prediction quality
+cortex qm dashboard -s sess_abc123
+# Shows: Trajectory signal is strongest (0.34 weight)
+#        Episodic signal has improved 12% this session
+#        Top predicted tools: read_file (89%), grep (82%), edit_file (76%)
+
+# 4. Check what decisions are being made
+cortex qm decisions -s sess_abc123 --limit 5
+# Tool: read_file | Predicted: read_file | Correct: yes | Confidence: 93%
+# Tool: grep       | Predicted: grep       | Correct: yes | Confidence: 88%
+# Tool: bash       | Predicted: bash       | Correct: no  | Confidence: 45%
+# Tool: edit_file  | Predicted: edit_file  | Correct: yes | Confidence: 91%
+# Tool: read_file  | Predicted: read_file  | Correct: yes | Confidence: 95%
+
+# 5. After switching to a very different project, reset
+cortex qm reset -s sess_abc123
+cortex qm stats
+# Observations: 0 | Mode: learning
+```
+
+## Next Steps
+
+- Learn about the [Quartermaster architecture](/docs/architecture/quartermaster) for the system design and pipeline integration.
+- Review the full [`cortex qm` CLI reference](/docs/cli/qm) for all subcommands and options.
+- Explore the [Model Router](/docs/architecture/model-router) for how provider selection complements tool prediction.

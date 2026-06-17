@@ -1,0 +1,32 @@
+---
+title: cortex uninstall
+description: Uninstall Cortex system service
+---
+
+# `cortex uninstall`
+
+Remove Cortex system service and daemon configurations.
+
+## Usage
+
+```bash
+cortex uninstall [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--daemon-only` | Uninstall only the daemon service |
+| `--server-only` | Uninstall only the HTTP server service |
+| `--help` | Show help for this command |
+
+## Examples
+
+```bash
+# Uninstall Cortex
+cortex uninstall
+
+# Uninstall only daemon
+cortex uninstall --daemon-only
+```

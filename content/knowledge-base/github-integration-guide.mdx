@@ -1,0 +1,334 @@
+---
+title: GitHub Integration Guide
+description: A guide to Cortex's GitHub integration — PR management, issue tracking, repo browsing, and agent-powered code review from the CLI
+---
+
+# GitHub Integration Guide
+
+Cortex brings GitHub workflows into your terminal with agent-powered automation for pull requests, issues, repositories, and code review. You can stay in your CLI and let the Cortex agent handle the boilerplate.
+
+## Authentication
+
+Before you can use any GitHub commands, you need to set your personal access token:
+
+```bash
+cortex github token
+```
+
+You'll be prompted to enter your GitHub personal access token. The token is stored encrypted in the Cortex vault (AES-256-GCM), not in plaintext.
+
+### Required Token Scopes
+
+| Scope | Purpose |
+|-------|---------|
+| `repo` | Full control of repositories (read/write for PRs, branches) |
+| `read:org` | Read organization and team membership |
+| `issues:read/write` | Read and write issues |
+
+Generate a token at [github.com/settings/tokens](https://github.com/settings/tokens) with these scopes. The token never appears in your shell history or config files — it's stored securely in the vault.
+
+### Verifying Your Token
+
+```bash
+# This should succeed if your token is valid
+cortex github repo list --limit 5
+```
+
+## Pull Requests
+
+### Listing PRs
+
+```bash
+# All open PRs in the current repo
+cortex github pr list
+
+# Filter by state
+cortex github pr list --state closed
+
+# Limit results (default is 30)
+cortex github pr list --state open --limit 10
+```
+
+The list shows PR number, title, author, state, and branch information for each entry.
+
+### Viewing PR Details
+
+```bash
+# Get full details for a specific PR
+cortex github pr get 42
+```
+
+This returns the PR description, diff stats, review status, labels, and mergeability status.
+
+### Creating a PR
+
+```bash
+# Basic PR creation (agent generates title from branch/commits)
+cortex github pr create
+
+# Draft PR (not ready for review)
+cortex github pr create --draft
+
+# With a custom description
+cortex github pr create --body "Refactors the auth middleware to use async/await and adds Zod validation"
+
+# Full example
+cortex github pr create \
+  --draft \
+  --body "WIP: Migrates payment processing to the new Stripe SDK. Still needs error handling for currency conversion edge cases."
+```
+
+When you run `cortex github pr create` without a body, the Cortex agent generates the PR title and description by analyzing your branch diff and commit messages:
+
+```
+Generated PR description:
+---
+title: feat(billing): add invoice PDF generation with customizable templates
+---
+body:
+## Summary
+- Added `PdfGenerator` class supporting HTML-to-PDF via Puppeteer
+- Created 3 default invoice templates (standard, detailed, minimal)
+- Added `/api/invoices/:id/pdf` endpoint
+- Template customization via JSON config
+
+## Testing
+- Unit tests for `PdfGenerator` (coverage: 92%)
+- Integration test for the PDF endpoint with fixture data
+
+## Screenshots
+<!-- Agent suggests adding screenshots if UI changes detected -->
+```
+
+### Merging PRs
+
+Cortex supports all three GitHub merge methods:
+
+```bash
+# Standard merge (creates a merge commit)
+cortex github pr merge 42
+
+# Squash and merge (all commits squashed into one)
+cortex github pr merge 42 --method squash
+
+# Rebase and merge (rebase commits onto base branch)
+cortex github pr merge 42 --method rebase
+```
+
+Choose the method based on your team's workflow:
+
+| Method | Best For | Result |
+|--------|----------|--------|
+| `merge` | Teams that want full commit history preserved | Creates a merge commit |
+| `squash` | Teams that prefer a clean, linear history | Combines all PR commits into one |
+| `rebase` | Teams that want linear history without merge commits | Re-applies commits on top of base branch |
+
+### Closing PRs
+
+```bash
+cortex github pr close 42
+```
+
+Closing does not delete the branch — use `cortex git branch` for branch cleanup.
+
+## Issues
+
+### Listing Issues
+
+```bash
+# All open issues
+cortex github issue list
+
+# Filter by state
+cortex github issue list --state closed
+
+# Filter by labels (comma-separated)
+cortex github issue list --labels bug
+cortex github issue list --labels bug,high-priority
+
+# Combine filters
+cortex github issue list --state open --labels enhancement --limit 20
+```
+
+### Creating Issues
+
+```bash
+# Create a simple issue
+cortex github issue create
+
+# With a description
+cortex github issue create --body "Add dark mode toggle to the settings panel"
+
+# With labels and assignees
+cortex github issue create \
+  --body "SQLite WAL checkpoint is blocking writes under high concurrency" \
+  --labels bug,performance \
+  --assignees user1
+```
+
+### Closing Issues
+
+```bash
+# Close by number
+cortex github issue close 128
+```
+
+Consider adding a closing comment via the GitHub web UI to explain the resolution.
+
+## Repository Browsing
+
+### Listing Repositories
+
+```bash
+# All repos you have access to
+cortex github repo list
+
+# Filter by ownership type
+cortex github repo list --type owner     # Your repos
+cortex github repo list --type member    # Org repos you're a member of
+cortex github repo list --type all       # Everything accessible
+
+# Limit results
+cortex github repo list --type all --limit 20
+```
+
+### Getting Repository Details
+
+```bash
+cortex github repo get cortex
+```
+
+Returns the repo description, star count, language stats, default branch, open issues count, and license.
+
+### Listing Branches
+
+```bash
+# All branches in a repo
+cortex github repo branches cortex
+
+# Limit results
+cortex github repo branches cortex --limit 20
+```
+
+Useful for seeing what feature branches exist before starting new work, or checking if a branch name is already taken.
+
+## Agent-Powered Code Review
+
+The Cortex agent can review pull requests and submit inline comments. While the review workflow is initiated through the CLI, the agent leverages the full Cortex context — including the PR diff, commit history, and related issues — to provide meaningful feedback.
+
+### Review Workflow
+
+```bash
+# 1. Check what PRs need review
+cortex github pr list --state open
+
+# 2. Review a specific PR (agent reads the diff and comments)
+#    The agent analyzes: code style, potential bugs, security issues,
+#    consistency with codebase patterns, test coverage gaps
+
+# 3. After the agent produces its review, submit it via the GitHub UI
+#    or extend the agent's feedback with your own observations
+```
+
+The agent reviews for:
+
+- **Code style violations**: Inconsistencies with project conventions
+- **Potential bugs**: Null references, race conditions, logic errors
+- **Security concerns**: Unsanitized inputs, exposed secrets, missing auth checks
+- **Pattern consistency**: Using established abstractions vs. ad-hoc solutions
+- **Test coverage**: Untested edge cases and missing integration tests
+
+## Common Workflows
+
+### Complete Feature Workflow
+
+```bash
+# 1. Create a feature branch
+cortex git branch --create feature/user-profile
+
+# 2. Make changes, then commit
+cortex git add --all
+cortex git commit --agent
+
+# 3. Push the branch
+cortex git push --remote origin --branch feature/user-profile
+
+# 4. Create the PR
+cortex github pr create --body "Adds user profile page with avatar upload"
+
+# 5. After review, merge
+cortex github pr merge 99 --method squash
+```
+
+### Bug Fix Workflow
+
+```bash
+# 1. Check if an issue already exists
+cortex github issue list --labels bug
+
+# 2. Create an issue if needed
+cortex github issue create \
+  --body "Login button unresponsive on Safari 17.4" \
+  --labels bug,browser
+
+# 3. Create a fix branch
+cortex git branch --create fix/safari-login-button
+
+# 4. Fix, commit, push, create PR
+cortex git add --all
+cortex git commit --agent
+cortex git push --remote origin --branch fix/safari-login-button
+cortex github pr create --body "Fixes #42: Safari 17.4 login button event handling"
+
+# 5. After merge, close the issue
+cortex github issue close 42
+```
+
+### Sprint Planning Workflow
+
+```bash
+# 1. Create placeholder issues for sprint items
+cortex github issue create \
+  --body "Add rate limiting to the public API endpoints" \
+  --labels enhancement,sprint-14 \
+  --assignees user2
+
+cortex github issue create \
+  --body "Migrate remaining class components to functional components" \
+  --labels refactor,sprint-14
+
+# 2. Review what's in the sprint
+cortex github issue list --labels sprint-14 --state open
+
+# 3. Check repository activity
+cortex github repo branches my-project --limit 20
+```
+
+## Troubleshooting
+
+### "Token not set" error
+
+Run `cortex github token` and paste your personal access token. Make sure the token has the required scopes (`repo`, `read:org`, `issues:read/write`).
+
+### "Not Found" when accessing a repo
+
+- Verify the repo name is spelled correctly (use `cortex github repo list` to see exact names).
+- Confirm your token has access to the repo (private repos require the `repo` scope).
+- For organization repos, ensure your token has the `read:org` scope.
+
+### Token stored in plaintext
+
+If you suspect your token is not encrypted, verify the vault is configured:
+
+```bash
+export CORTEX_VAULT_KEY="your-strong-passphrase"
+cortex vault list
+```
+
+The vault must be initialized before `cortex github token` can encrypt the token. If the vault key is not set, Cortex falls back to storing the token in a permissions-restricted file.
+
+## Next Steps
+
+- Combine with the [Git Workspace Guide](/docs/knowledge-base/git-workspace-guide) for a complete git + GitHub workflow.
+- Learn about the [GitHub Integration architecture](/docs/architecture/github-integration) for the underlying system design.
+- Review the full [`cortex github` CLI reference](/docs/cli/github) for all subcommands and options.

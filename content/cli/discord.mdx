@@ -1,0 +1,57 @@
+---
+title: cortex discord
+description: Discord bot integration — run a Discord bot powered by Cortex agents
+---
+
+# `cortex discord`
+
+Run a Discord bot that connects Cortex agents to Discord servers. The bot responds to messages using Cortex agents, providing AI-powered chat directly in Discord channels.
+
+## Usage
+
+```bash
+cortex discord [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--token, -t` | Discord bot token |
+| `--prefix` | Command prefix for bot messages (default: `!cortex`) |
+| `--model, -m` | Model to use for Discord responses |
+| `--help` | Show help for this command |
+
+## Setup
+
+1. Create a Discord application at https://discord.com/developers
+2. Add a bot to your application
+3. Copy the bot token
+4. Invite the bot to your server with appropriate permissions
+
+## Configuration
+
+Discord configuration can also be set in `~/.cortex/config.json`:
+
+```json
+{
+  "discord": {
+    "token": "<bot-token>",
+    "prefix": "!cortex",
+    "model": "claude-sonnet-4-5"
+  }
+}
+```
+
+## Examples
+
+```bash
+# Start the Discord bot
+cortex discord -t <your-bot-token>
+
+# Start with custom prefix
+cortex discord -t <token> --prefix "!agent"
+
+# Start with specific model
+cortex discord -t <token> -m gpt-4o
+```

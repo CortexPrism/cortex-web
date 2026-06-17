@@ -43,6 +43,21 @@ CortexPrism is a single-process agentic harness written in TypeScript/Deno. It e
 | **Daemon Supervisor** | Background process manager for validator, executor, and scheduler daemons with auto-restart |
 | **HTTP Server** | Built-in web server with REST API, WebSocket streaming, and web UI dashboard |
 | **Scheduler** | SQLite-persisted cron job scheduler with retry |
+| **Model Quartermaster** | Adaptive 5-signal tool-prediction engine with reinforcement learning and context fingerprinting |
+| **Git Workspace** | Agent-powered git porcelain with auto-commit messages, diff analysis, and branch management |
+| **GitHub Integration** | PR, issue, and repository management with agent-powered code review and triage |
+| **Pipeline System** | 12-stage hook-based processing pipeline for the agent turn lifecycle |
+| **Trigger System** | File watchers, webhooks, and git hooks that launch agent tasks on external events |
+| **Workflow Engine** | DSL-based workflow execution with steps, branches, parallel execution, and approval gates |
+| **Communication Channels** | Plugin-based messaging platform integration (Discord, extensible) |
+| **Remote Agents** | Distributed node execution via WebSocket hub with capability-based security tiers |
+| **MCP Server** | Model Context Protocol server exposing Cortex tools and agents to MCP clients |
+| **Update System** | Dual-mode updates (binary/source) with SHA-256 verification and rollback |
+| **Observability** | Prometheus-compatible metrics registry and distributed tracing with OTLP export |
+| **Desktop Automation** | Cross-platform GUI automation (screenshots, clicks, typing, clipboard) for Linux, macOS, Windows |
+| **Evaluation Framework** | Agent benchmarking with 8 task categories, pattern scoring, and regression detection |
+| **Hub Node System** | Distributed hub with WebSocket-based node registry, capability tiers, and session routing |
+| **Lens Audit Log** | Immutable event log for all system actions — LLM calls, tool execution, policy decisions |
 
 ## Data Flow
 
@@ -61,3 +76,14 @@ CortexPrism is a single-process agentic harness written in TypeScript/Deno. It e
 - [Daemon Supervisor](/docs/architecture/daemon-supervisor) — Background process management
 - [Plugin System](/docs/architecture/plugin-system) — Plugin architecture
 - [Databases](/docs/architecture/databases) — SQLite database schemas
+- [Quartermaster](/docs/architecture/quartermaster) — Model Quartermaster prediction engine
+- [Git Workspace](/docs/architecture/git-workspace) — Agent-powered git porcelain
+- [GitHub Integration](/docs/architecture/github-integration) — PR/issue/repo management
+- [Pipeline System](/docs/architecture/pipeline) — 12-stage hook-based pipeline
+- [Channels](/docs/architecture/channels) — Communication channel plugins
+- [Triggers](/docs/architecture/triggers) — Event-driven trigger system
+- [Workflow Engine](/docs/architecture/workflow) — DSL-based workflow execution
+- [Remote Agents](/docs/architecture/remote-agents) — Distributed agent nodes
+- [MCP Server](/docs/architecture/mcp-server) — Model Context Protocol server
+- [Update System](/docs/architecture/update-system) — Binary/source updates and rollback
+- [Observability](/docs/architecture/observability) — Metrics and tracing

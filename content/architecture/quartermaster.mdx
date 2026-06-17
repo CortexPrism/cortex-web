@@ -1,0 +1,82 @@
+---
+title: Quartermaster System
+description: Model Quartermaster — adaptive 5-signal tool prediction engine with reinforcement learning
+---
+
+# Model Quartermaster
+
+The Model Quartermaster (QM/MQM) is an adaptive tool-prediction engine that observes tool calls across sessions, computes weighted signal scores, and predicts which tool the agent should call next.
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                   Quartermaster System                     │
+│                                                           │
+│  Tool Observations ──► 5 Signal Computers ──► Fusion      │
+│  (trajectory, episodic, toolStats, taskContext, reflection)│
+│                              │                            │
+│                              ▼                            │
+│                     Weighted Prediction                    │
+│                     (automate | suggest | defer)          │
+│                              │                            │
+│                              ▼                            │
+│  Correct? ──► Reinforcement Learning (EMA weight update)  │
+└──────────────────────────────────────────────────────────┘
+```
+
+## Five Prediction Signals
+
+| Signal | Source | Weight |
+|--------|--------|--------|
+| **Trajectory** | Historical tool call sequence patterns | Dynamic (EMA) |
+| **Episodic** | Similar conversation context cosine matching | Dynamic (EMA) |
+| **Tool Stats** | Statistical success/failure rates per tool | Dynamic (EMA) |
+| **Task Context** | Current task type, complexity, required tools | Dynamic (EMA) |
+| **Reflection** | Per-turn reflection feedback integration | Dynamic (EMA) |
+
+## Prediction Confidence Levels
+
+| Confidence | Action | Safe Tools | Unsafe Tools |
+|------------|--------|------------|--------------|
+| ≥ 90% | **Automate** | Auto-execute | Suggest |
+| 60–89% | **Suggest** | Suggest | Suggest |
+| < 60% | **Defer** | Defer | Defer |
+
+Safe tools are read-only, non-destructive operations. Unsafe tools (shell exec, file write, network) are never auto-executed.
+
+## Active Mode Threshold
+
+The Quartermaster requires **50 observations** before entering active prediction mode. Before this threshold, it operates in learning-only mode — collecting data, computing signal baselines, but not making predictions.
+
+## Reinforcement Learning
+
+After each prediction, correctness is evaluated:
+- **Reward (EMA α = 0.15)**: Correct signal weights increase
+- **Punishment (EMA α = 0.25)**: Incorrect weights decrease faster
+- **Convergence**: Weights stabilize after ~200–500 observations
+
+## Context Fingerprinting
+
+The `contexts.ts` module generates 12-feature fingerprints from conversation context for cosine similarity matching of similar situations. Features include tool distribution, message length, token composition, and task category indicators.
+
+## Database Schema
+
+The Quartermaster persists state in SQLite tables:
+- `qm_patterns` — Learned prediction patterns
+- `qm_decisions` — Historical predictions and outcomes
+- `qm_session_state` — Per-session quartermaster state
+- `qm_tool_stats` — Aggregated tool statistics
+- `qm_weights` — Current signal weight values
+
+## Observability
+
+The Quartermaster emits:
+- **Lens events**: Every prediction, decision evaluation, weight update, and pattern learned
+- **Prometheus metrics**: Prediction accuracy, confidence distribution, signal weights, mode changes
+
+## CLI Interface
+
+See [`cortex qm`](/docs/cli/qm) and [`cortex mqm`](/docs/cli/qm) for the command-line interface.
+
+See also: [Model Router](/docs/architecture/model-router)

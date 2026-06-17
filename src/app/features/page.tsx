@@ -11,18 +11,22 @@ import {
   Monitor,
   Bot,
   Share2,
+  GitBranch,
+  Workflow,
+  BrainCircuit,
+  Search,
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "CortexPrism Features — Agentic Harness Capabilities",
   description:
-    "Explore all features of CortexPrism: interactive chat with 12+ LLM providers, 5-tier memory system, parallax security, sandboxed code execution, model router, daemon supervisor, plugin marketplace, and REST API.",
+    "Explore all features of CortexPrism: interactive chat with 12+ LLM providers, 5-tier memory system, parallax security, sandboxed code execution, model router with quartermaster, git workspace, workflow engine, daemon supervisor, plugin marketplace, and REST API.",
   alternates: { canonical: `${SITE_URL}/features` },
   openGraph: {
     title: "CortexPrism Features — Agentic Harness Capabilities",
     description:
-      "Multi-provider LLM chat, 5-tier memory, parallax security, sandboxed code execution, model routing, daemon supervisor, plugin system, and full REST API. All open source.",
+      "Multi-provider LLM chat, 5-tier memory, parallax security, sandboxed code execution, model routing with quartermaster, git workspace, workflow engine, daemon supervisor, plugin system, and full REST API. All open source.",
     url: `${SITE_URL}/features`,
   },
 };
@@ -40,7 +44,7 @@ const features = [
       "Streaming responses with real-time token display",
       "Conversation history with search and export",
     ],
-    example: "cortex chat --model claude-sonnet-4-20250514",
+    example: "cortex chat -m claude-sonnet-4-5",
   },
   {
     icon: Wrench,
@@ -54,22 +58,22 @@ const features = [
       "Policy-based automatic approval rules",
       "Full audit log of all tool calls",
     ],
-    example: "cortex chat --tools all",
+    example: "cortex chat -s sess_abc123",
   },
   {
     icon: Database,
     title: "5-Tier Memory System",
-    subtitle: "From Ephemeral to Procedural",
+    subtitle: "Ephemeral to Reflection",
     description:
-      "A sophisticated memory architecture with five tiers: ephemeral (session), working (task), semantic (knowledge), archival (history), and procedural (skills).",
+      "A layered memory architecture with five tiers: ephemeral (session context window), episodic (conversation segments), semantic (FTS5 + vector hybrid search), archival (long-term compressed storage), and reflection (per-turn meta-cognition).",
     benefits: [
-      "Ephemeral: In-session context only",
-      "Working: Active task-related information",
-      "Semantic: Long-term knowledge storage",
-      "Archival: Compressed historical data",
-      "Procedural: Learned skills and patterns",
+      "T1 Ephemeral: Live conversation context, 200k+ token window",
+      "T2 Episodic: Conversation segments with automatic chunking",
+      "T3 Semantic: Hybrid FTS5 full-text + vector similarity search",
+      "T4 Archival: Compressed long-term storage with entity extraction",
+      "T5 Reflection: Per-turn meta-cognition, patterns, and consolidation",
     ],
-    example: "cortex memory search --query \"deployment config\" --tier semantic",
+    example: 'cortex memory search "deployment config" --type semantic',
   },
   {
     icon: Shield,
@@ -83,7 +87,7 @@ const features = [
       "Approval workflows for sensitive actions",
       "Sandboxed plugin execution isolation",
     ],
-    example: "cortex policy add --allow code.execute.python",
+    example: "cortex policy add code.execute.python -k capability -e allow -r \"trusted\"",
   },
   {
     icon: Code2,
@@ -97,7 +101,7 @@ const features = [
       "Resource limits (CPU, memory, timeouts)",
       "Read-only mode for untrusted scripts",
     ],
-    example: "cortex run --sandbox python --script analyze.py",
+    example: "cortex run analyze.py -l python --no-sandbox",
   },
   {
     icon: Route,
@@ -111,7 +115,7 @@ const features = [
       "Graceful failover on provider outages",
       "Custom routing rules and priorities",
     ],
-    example: "cortex chat --router cost-optimized",
+    example: "cortex chat -m gpt-4o",
   },
   {
     icon: Clock,
@@ -125,7 +129,7 @@ const features = [
       "Job queue with priority levels",
       "Execution logs and monitoring",
     ],
-    example: "cortex daemon start && cortex jobs add --schedule \"0 9 * * 1\" --task weekly-report",
+    example: 'cortex daemon start && cortex jobs add weekly-report "cortex run report.py" --cron "0 9 * * 1"',
   },
   {
     icon: Puzzle,
@@ -167,7 +171,7 @@ const features = [
       "Per-agent tool and provider assignments",
       "Agent-to-agent collaboration",
     ],
-    example: "cortex agent create --name code-reviewer --model claude-sonnet-4-20250514",
+    example: "cortex agent create code-reviewer -m claude-sonnet-4-5 -d \"Reviews pull requests\" --tools read,write,shell",
   },
   {
     icon: Share2,
@@ -181,7 +185,63 @@ const features = [
       "Service discovery and health checks",
       "Horizontal scaling of components",
     ],
-    example: "cortex serve --mode micro --workers 4",
+    example: "cortex service create api-server -a code-reviewer -p 3001 --auto-start",
+  },
+  {
+    icon: GitBranch,
+    title: "Git Workspace",
+    subtitle: "Agent-Powered Version Control",
+    description:
+      "Full git porcelain interface powered by the Cortex agent. Auto-generated commit messages, diff analysis, branch management, and PR-ready workflows.",
+    benefits: [
+      "Ten git subcommands: status, log, diff, add, commit, push, pull, clone, branch, remote",
+      "Agent-generated conventional commit messages from diffs",
+      "Diff analysis with natural language summaries",
+      "Intelligent branch naming and conflict detection",
+    ],
+    example: "cortex git commit --agent workspace-1",
+  },
+  {
+    icon: BrainCircuit,
+    title: "Model Quartermaster",
+    subtitle: "Adaptive Tool Prediction",
+    description:
+      "An adaptive 5-signal prediction engine that observes tool calls, learns patterns, and predicts which tool the agent should use next. Powered by reinforcement learning.",
+    benefits: [
+      "Five prediction signals: trajectory, episodic, tool stats, task context, reflection",
+      "Automatic tool execution above 90% confidence for safe operations",
+      "Reinforcement learning with EMA weight adjustment",
+      "Dashboard with accuracy bars, signal weights, and top tools",
+    ],
+    example: "cortex qm dashboard -s sess_abc123",
+  },
+  {
+    icon: Workflow,
+    title: "Workflow Engine",
+    subtitle: "DSL-Based Automation",
+    description:
+      "A DSL-based workflow engine for defining and executing multi-step agent tasks. Supports sequential steps, conditional branching, parallel execution, and human approval gates.",
+    benefits: [
+      "Five node types: step, branch, parallel, goto, wait",
+      "Conditional branching with if/then/else logic",
+      "Parallel execution via Promise.allSettled",
+      "Human-in-the-loop approval gates with resume support",
+    ],
+    example: "cortex workflow run",
+  },
+  {
+    icon: Search,
+    title: "Cortex Lens",
+    subtitle: "Immutable Audit Log",
+    description:
+      "A comprehensive audit and telemetry event log that records every action in the system — LLM calls, tool execution, security decisions, memory operations, and quartermaster predictions.",
+    benefits: [
+      "50+ event types tracked with session, actor, and time indexing",
+      "Immutable event log stored in dedicated lens.db SQLite database",
+      "Web UI activity dashboard with timeline view",
+      "REST API for programmatic audit log access",
+    ],
+    example: "cortex serve && open http://127.0.0.1:3000",
   },
 ];
 
