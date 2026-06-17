@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 import { createAuditLog } from "@/lib/audit";
 import { notifySubmissionAction } from "@/lib/submissions";
+import { submitOnApproval } from "@/lib/indexnow";
 
 export async function GET(request: NextRequest) {
   const user = getAuthUser(request);
@@ -90,6 +91,10 @@ export async function PUT(request: NextRequest) {
     });
 
     await notifySubmissionAction("agent", agent, action, notes);
+
+    if (action === "approved") {
+      submitOnApproval("agent", agent.slug).catch(() => {});
+    }
 
     return Response.json({ agent });
   } catch {

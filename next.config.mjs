@@ -4,6 +4,14 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/indexnow-key.txt",
+        destination: "/api/indexnow/key",
+      },
+    ];
+  },
   async headers() {
     return [
       {

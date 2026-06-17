@@ -25,3 +25,8 @@ export async function getGitHubToken(): Promise<string | null> {
   if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN;
   return getSetting("github_token");
 }
+
+export async function getIndexNowKey(): Promise<string | null> {
+  if (process.env.INDEXNOW_API_KEY) return process.env.INDEXNOW_API_KEY;
+  return getSetting("indexnow_api_key");
+}

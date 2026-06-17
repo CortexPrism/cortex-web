@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Save, Key, CheckCircle, XCircle, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Save, Key, CheckCircle, XCircle, Eye, EyeOff, ExternalLink, Globe, Send } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 
 export default function AdminSettingsPage() {
@@ -11,6 +11,10 @@ export default function AdminSettingsPage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showToken, setShowToken] = useState(false);
   const [tokenValue, setTokenValue] = useState("");
+  const [indexnowKey, setIndexnowKey] = useState("");
+  const [showIndexnowKey, setShowIndexnowKey] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<string | null>(null);
 
   const authHeaders = () => {
     const t = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -26,6 +30,7 @@ export default function AdminSettingsPage() {
         if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
         setSettings(data.settings || {});
         setTokenValue(data.settings?.github_token || "");
+        setIndexnowKey(data.settings?.indexnow_api_key || "");
         setLoading(false);
       })
       .catch((e) => { setMessage({ type: "error", text: "Failed to load: " + e.message }); setLoading(false); });
@@ -52,6 +57,67 @@ export default function AdminSettingsPage() {
     }
     setSaving(false);
     setTimeout(() => setMessage(null), 4000);
+  };
+
+  const saveIndexnowKey = async () => {
+    const headers = authHeaders();
+    if (!headers.authorization) return;
+    setSaving(true);
+    setMessage(null);
+    const res = await fetch("/api/admin/indexnow", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...headers },
+      body: JSON.stringify({ key: indexnowKey }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setSettings(prev => ({ ...prev, indexnow_api_key: indexnowKey }));
+      setMessage({ type: "success", text: "IndexNow API key saved" });
+    } else if (res.status === 403) {
+      setMessage({ type: "error", text: "Session expired — log out and log back in, then try again" });
+    } else {
+      setMessage({ type: "error", text: data.error || `Failed (HTTP ${res.status})` });
+    }
+    setSaving(false);
+    setTimeout(() => setMessage(null), 4000);
+  };
+
+  const deleteIndexnowKey = async () => {
+    const headers = authHeaders();
+    if (!headers.authorization) return;
+    setSaving(true);
+    setMessage(null);
+    const res = await fetch("/api/admin/indexnow", { method: "DELETE", headers });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setIndexnowKey("");
+      setSettings(prev => ({ ...prev, indexnow_api_key: null }));
+      setMessage({ type: "success", text: "IndexNow API key removed" });
+    } else {
+      setMessage({ type: "error", text: data.error || `Failed (HTTP ${res.status})` });
+    }
+    setSaving(false);
+    setTimeout(() => setMessage(null), 4000);
+  };
+
+  const triggerIndexNow = async () => {
+    const headers = authHeaders();
+    if (!headers.authorization) return;
+    setSubmitting(true);
+    setSubmitResult(null);
+    try {
+      const res = await fetch("/api/indexnow/submit", { method: "POST", headers });
+      const data = await res.json();
+      if (res.ok) {
+        setSubmitResult(`Submitted ${data.urlCount || "?"} URLs: ${data.message}`);
+      } else {
+        setSubmitResult(`Error: ${data.error || data.message || `HTTP ${res.status}`}`);
+      }
+    } catch (e) {
+      setSubmitResult(`Request failed: ${e}`);
+    }
+    setSubmitting(false);
+    setTimeout(() => setSubmitResult(null), 8000);
   };
 
   const inputClass = "w-full px-3 py-2 bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-lg text-sm text-[#e2e2ea] focus:outline-none focus:border-indigo-500/50";
@@ -128,7 +194,78 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          {/* Scanner info */}
+          {/* IndexNow SEO */}
+          <div className="glass-card p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-emerald-500/10">
+                <Globe className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-[#e2e2ea]">IndexNow API</h2>
+                <p className="text-xs text-[#55556a]">
+                  Instantly notify Bing, Yandex, and Seznam when content changes.
+                  API requests are rate-limited to ~100 URLs per submission.
+                  <a href="https://www.bing.com/indexnow" target="_blank" rel="noopener noreferrer"
+                    className="text-indigo-400 hover:text-indigo-300 ml-1 inline-flex items-center gap-0.5">
+                    Learn more <ExternalLink className="w-3 h-3" />
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-sm text-[#e2e2ea] mb-1.5">API Key</label>
+              <div className="relative">
+                <input
+                  type={showIndexnowKey ? "text" : "password"}
+                  value={indexnowKey}
+                  onChange={e => setIndexnowKey(e.target.value)}
+                  className={inputClass + " pr-10 font-mono text-xs"}
+                  placeholder="Generate with: openssl rand -hex 16"
+                />
+                <button
+                  onClick={() => setShowIndexnowKey(!showIndexnowKey)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#55556a] hover:text-[#e2e2ea]"
+                >
+                  {showIndexnowKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="text-xs text-[#55556a] space-y-1 mb-4">
+              <p>Once saved, the key is served at <code className="text-emerald-400">{typeof window !== "undefined" ? window.location.origin : ""}/indexnow-key.txt</code></p>
+              <p>Required for IndexNow protocol ownership verification. Keep this key secret.</p>
+            </div>
+
+            <div className="flex items-center gap-3 mb-4">
+              <Button onClick={saveIndexnowKey} disabled={saving}>
+                <Save className="w-4 h-4 mr-1.5" /> {saving ? "Saving..." : "Save Key"}
+              </Button>
+              {indexnowKey && (
+                <Button onClick={deleteIndexnowKey} disabled={saving} className="!bg-red-500/20 !text-red-300 hover:!bg-red-500/30">
+                  Remove Key
+                </Button>
+              )}
+            </div>
+
+            <div className="border-t border-[rgba(255,255,255,0.07)] pt-4">
+              <h3 className="text-sm font-medium text-[#e2e2ea] mb-2">Manual Submission</h3>
+              <p className="text-xs text-[#55556a] mb-3">
+                Submit all site URLs (pages, docs, plugins, agents) to IndexNow search engines.
+                Approved submissions are also sent automatically.
+              </p>
+              <div className="flex items-center gap-3">
+                <Button onClick={triggerIndexNow} disabled={submitting || !indexnowKey}>
+                  <Send className="w-4 h-4 mr-1.5" /> {submitting ? "Submitting..." : "Submit All URLs"}
+                </Button>
+                {submitResult && (
+                  <span className={`text-xs ${submitResult.startsWith("Error") || submitResult.startsWith("Request failed") ? "text-red-400" : "text-green-400"}`}>
+                    {submitResult}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-[#e2e2ea] mb-2">How Topic Scanning Works</h2>
             <div className="text-sm text-[#55556a] space-y-2">
@@ -162,6 +299,18 @@ export default function AdminSettingsPage() {
                 <span className="text-[#9090a8]">Environment Variable (GITHUB_TOKEN)</span>
                 <span className={settings._env_github_token === "set" ? "text-green-400" : "text-red-400"}>
                   {settings._env_github_token === "set" ? "Configured" : "Not set"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-[rgba(255,255,255,0.05)]">
+                <span className="text-[#9090a8]">IndexNow API Key</span>
+                <span className={settings.indexnow_api_key ? "text-green-400" : "text-red-400"}>
+                  {settings.indexnow_api_key ? "Configured" : "Not set"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-[#9090a8]">Environment Variable (INDEXNOW_API_KEY)</span>
+                <span className={settings._env_indexnow_api_key === "set" ? "text-green-400" : "text-red-400"}>
+                  {settings._env_indexnow_api_key === "set" ? "Configured" : "Not set"}
                 </span>
               </div>
             </div>

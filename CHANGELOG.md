@@ -5,6 +5,14 @@ All notable changes to the CortexPrism website will be documented in this file.
 ## [0.7.0] — 2026-06-17
 
 ### Added
+- IndexNow API integration for instant search engine notification (Bing, Yandex, Seznam):
+  - Core library (`src/lib/indexnow.ts`) with URL submission, collection, and auto-ping on plugin/agent approval
+  - Shared URL collection module (`src/lib/site-urls.ts`) serving both sitemap and IndexNow
+  - Admin settings UI for key management and manual "Submit All URLs" trigger
+  - `POST /api/indexnow/submit` — admin endpoint for single or bulk URL submission
+  - `GET /api/indexnow/key` (rewritten from `/indexnow-key.txt`) — protocol ownership verification
+  - `GET/PUT/DELETE /api/admin/indexnow` — admin API for IndexNow key management
+  - `INDEXNOW_API_KEY` environment variable support
 - 28 new CLI documentation pages covering all 42 registered Cortex commands:
   - New: `update`, `git`, `github`, `hooks`, `triggers`, `channels`, `mcp`, `remote`, `tui`, `projects`, `workflow`, `desktop`, `eval`, `qm`, `node`, `models`, `stop`, `soul`, `discord`, `plugins`, `marketplace`, `import`, `agent`, `service`, `voice`, `install`, `uninstall`, `start`, `restart`
 - 10 new architecture documentation pages:
