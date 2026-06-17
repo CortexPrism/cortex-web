@@ -60,6 +60,11 @@ export default function AdminSettingsPage() {
   };
 
   const saveIndexnowKey = async () => {
+    if (!indexnowKey) {
+      setMessage({ type: "error", text: "Please enter an API key" });
+      setTimeout(() => setMessage(null), 4000);
+      return;
+    }
     const headers = authHeaders();
     if (!headers.authorization) return;
     setSaving(true);
@@ -213,6 +218,14 @@ export default function AdminSettingsPage() {
               </div>
             </div>
 
+            {settings._env_indexnow_api_key === "set" && (
+              <div className="mb-4 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                Key is configured via <code className="text-emerald-400 font-mono">INDEXNOW_API_KEY</code> environment variable.
+                No further configuration needed.
+              </div>
+            )}
+
             <div className="mb-3">
               <label className="block text-sm text-[#e2e2ea] mb-1.5">API Key</label>
               <div className="relative">
@@ -222,6 +235,7 @@ export default function AdminSettingsPage() {
                   onChange={e => setIndexnowKey(e.target.value)}
                   className={inputClass + " pr-10 font-mono text-xs"}
                   placeholder="Generate with: openssl rand -hex 16"
+                  disabled={settings._env_indexnow_api_key === "set"}
                 />
                 <button
                   onClick={() => setShowIndexnowKey(!showIndexnowKey)}
@@ -237,16 +251,18 @@ export default function AdminSettingsPage() {
               <p>Required for IndexNow protocol ownership verification. Keep this key secret.</p>
             </div>
 
-            <div className="flex items-center gap-3 mb-4">
-              <Button onClick={saveIndexnowKey} disabled={saving}>
-                <Save className="w-4 h-4 mr-1.5" /> {saving ? "Saving..." : "Save Key"}
-              </Button>
-              {indexnowKey && (
-                <Button onClick={deleteIndexnowKey} disabled={saving} className="!bg-red-500/20 !text-red-300 hover:!bg-red-500/30">
-                  Remove Key
+            {settings._env_indexnow_api_key !== "set" && (
+              <div className="flex items-center gap-3 mb-4">
+                <Button onClick={saveIndexnowKey} disabled={saving}>
+                  <Save className="w-4 h-4 mr-1.5" /> {saving ? "Saving..." : "Save Key"}
                 </Button>
-              )}
-            </div>
+                {indexnowKey && (
+                  <Button onClick={deleteIndexnowKey} disabled={saving} className="!bg-red-500/20 !text-red-300 hover:!bg-red-500/30">
+                    Remove Key
+                  </Button>
+                )}
+              </div>
+            )}
 
             <div className="border-t border-[rgba(255,255,255,0.07)] pt-4">
               <h3 className="text-sm font-medium text-[#e2e2ea] mb-2">Manual Submission</h3>
@@ -255,7 +271,10 @@ export default function AdminSettingsPage() {
                 Approved submissions are also sent automatically.
               </p>
               <div className="flex items-center gap-3">
-                <Button onClick={triggerIndexNow} disabled={submitting || !indexnowKey}>
+                <Button
+                  onClick={triggerIndexNow}
+                  disabled={submitting || (settings._env_indexnow_api_key !== "set" && !indexnowKey)}
+                >
                   <Send className="w-4 h-4 mr-1.5" /> {submitting ? "Submitting..." : "Submit All URLs"}
                 </Button>
                 {submitResult && (
