@@ -1,6 +1,6 @@
 {
   "name": "cortex-discord-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "DOTENV_CONFIG_PATH=../.env node --import dotenv/config node_modules/.bin/tsx src/index.ts",

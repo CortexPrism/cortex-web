@@ -5,18 +5,35 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import {
-  LayoutDashboard, Users, Shield, GitBranch, ClipboardList, Activity, Menu, X, ChevronRight, Search, Settings, MessageSquare, Mail, BookOpen, ShieldAlert,
+  LayoutDashboard, Users, Shield, GitBranch, ClipboardList, Activity, Menu, X, ChevronRight, Search, Settings, MessageSquare, Mail, BookOpen,
 } from "lucide-react";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.FC<{ className?: string }>;
+  exact?: boolean;
+  subItems?: { href: string; label: string; exact?: boolean }[];
+};
+
+const navItems: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/submissions", label: "Submissions", icon: ClipboardList },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/roles", label: "Roles & Permissions", icon: Shield },
   { href: "/admin/github", label: "GitHub Connections", icon: GitBranch },
   { href: "/admin/github/scanner", label: "Topic Scanner", icon: Search },
-  { href: "/admin/discord", label: "Discord Bot", icon: MessageSquare },
-  { href: "/admin/discord/moderation", label: "Moderation Logs", icon: ShieldAlert },
+  {
+    href: "/admin/discord",
+    label: "Discord Bot",
+    icon: MessageSquare,
+    subItems: [
+      { href: "/admin/discord", label: "Dashboard", exact: true },
+      { href: "/admin/discord/moderation", label: "Moderation Logs" },
+      { href: "/admin/discord/tickets", label: "Tickets" },
+      { href: "/admin/discord/polls", label: "Polls" },
+    ],
+  },
   { href: "/admin/email", label: "Email", icon: Mail },
   { href: "/admin/knowledge-base", label: "Knowledge Base", icon: BookOpen },
   { href: "/admin/settings", label: "Settings", icon: Settings },
@@ -63,6 +80,44 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
         <nav className="p-3 space-y-1">
           {navItems.map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            const hasSubItems = 'subItems' in item && item.subItems && item.subItems.length > 0;
+
+            if (hasSubItems) {
+              const subIsActive = item.subItems!.some(si => si.exact ? pathname === si.href : pathname.startsWith(si.href));
+              return (
+                <div key={item.href}>
+                  <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    subIsActive
+                      ? "text-indigo-300"
+                      : "text-[#9090a8] hover:bg-[#111118] hover:text-[#e2e2ea]"
+                  }`}>
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                    <ChevronRight className={`w-3 h-3 ml-auto transition-transform ${subIsActive ? "rotate-90" : ""}`} />
+                  </div>
+                  <div className="ml-6 mt-0.5 space-y-0.5 border-l border-[rgba(255,255,255,0.07)] pl-3">
+                    {item.subItems!.map((si) => {
+                      const siActive = si.exact ? pathname === si.href : pathname.startsWith(si.href);
+                      return (
+                        <Link
+                          key={si.href}
+                          href={si.href}
+                          onClick={() => setSidebarOpen(false)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs transition-colors ${
+                            siActive
+                              ? "bg-indigo-500/10 text-indigo-300"
+                              : "text-[#9090a8] hover:bg-[#111118] hover:text-[#e2e2ea]"
+                          }`}
+                        >
+                          {si.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.href}

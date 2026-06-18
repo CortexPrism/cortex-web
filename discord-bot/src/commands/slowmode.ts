@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, EmbedBuilder, TextChannel } from "discord.js";
-import { isModerator } from "../lib/moderation";
+import { isModerator, parseDuration } from "../lib/moderation";
 
 export async function handleSlowmode(interaction: ChatInputCommandInteraction) {
   if (!interaction.guild) {
@@ -23,20 +23,12 @@ export async function handleSlowmode(interaction: ChatInputCommandInteraction) {
 
   let seconds = 0;
   if (duration) {
-    const match = duration.match(/^(\d+)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes|h|hour|hours)?$/i);
-    if (!match) {
+    const ms = parseDuration(duration);
+    if (ms === null || ms < 0) {
       await interaction.reply({ content: "Invalid duration format. Use e.g. `30s`, `5m`, `2h`, or `0` to disable.", ephemeral: true });
       return;
     }
-    const value = parseInt(match[1]);
-    const unit = (match[2] || "s").toLowerCase();
-
-    const multipliers: Record<string, number> = {
-      s: 1, sec: 1, secs: 1, second: 1, seconds: 1,
-      m: 60, min: 60, mins: 60, minute: 60, minutes: 60,
-      h: 3600, hour: 3600, hours: 3600,
-    };
-    seconds = value * (multipliers[unit] || 1);
+    seconds = Math.floor(ms / 1000);
   }
 
   if (seconds > 21600) {

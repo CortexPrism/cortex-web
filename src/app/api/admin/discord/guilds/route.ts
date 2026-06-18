@@ -9,31 +9,23 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const guildId = searchParams.get("guildId") || undefined;
+  const guildId = searchParams.get("guildId");
 
+  let guildConfigs;
   if (guildId) {
-    const config = await prisma.guildConfig.findUnique({ where: { guildId } });
-    if (!config) {
-      return Response.json({ error: "Guild not found" }, { status: 404 });
-    }
-    const modCount = await prisma.moderationAction.count({ where: { guildId } });
-    return Response.json({ config, moderationCount: modCount });
+    guildConfigs = [await prisma.guildConfig.upsert({
+      where: { guildId },
+      update: {},
+      create: { guildId },
+    })];
+  } else {
+    guildConfigs = await prisma.guildConfig.findMany({
+      orderBy: { updatedAt: "desc" },
+      take: 50,
+    });
   }
 
-  const configs = await prisma.guildConfig.findMany({
-    orderBy: { updatedAt: "desc" },
-  });
-
-  const configsWithCounts = await Promise.all(
-    configs.map(async (config) => {
-      const modCount = await prisma.moderationAction.count({
-        where: { guildId: config.guildId },
-      });
-      return { ...config, moderationCount: modCount };
-    }),
-  );
-
-  return Response.json({ guilds: configsWithCounts });
+  return Response.json({ guilds: guildConfigs });
 }
 
 export async function PUT(request: NextRequest) {
@@ -44,46 +36,37 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { guildId, key, value } = body;
+    const { guildId, ...data } = body;
 
-    if (!guildId || !key) {
-      return Response.json({ error: "guildId and key are required" }, { status: 400 });
+    if (!guildId || typeof guildId !== "string") {
+      return Response.json({ error: "guildId is required" }, { status: 400 });
     }
 
-    const allowedKeys = [
-      "logChannelId", "modRoleId", "adminRoleId", "muteRoleId",
+    const allowedFields = [
+      "guildName", "logChannelId", "modRoleId", "adminRoleId", "muteRoleId",
       "autoModEnabled", "welcomeEnabled", "welcomeMessage", "welcomeChannelId",
-      "leaveEnabled", "leaveMessage", "leaveChannelId",
-      "slowmodeDefault", "maxWarnsBeforeBan",
+      "leaveEnabled", "leaveMessage", "leaveChannelId", "slowmodeDefault",
+      "maxWarnsBeforeBan", "announcementChannelId", "ticketCategoryId",
+      "ticketLogChannelId", "ticketStaffRoleId", "levelingEnabled",
+      "levelingMessage", "levelingChannelId", "starboardEnabled",
+      "starboardChannelId", "starboardThreshold",
     ];
 
-    if (!allowedKeys.includes(key)) {
-      return Response.json({ error: `Invalid key: ${key}` }, { status: 400 });
-    }
-
-    const data: Record<string, unknown> = {};
-    if (value === null || value === "") {
-      data[key] = null;
-    } else {
-      const boolKeys = ["autoModEnabled", "welcomeEnabled", "leaveEnabled"];
-      const numKeys = ["slowmodeDefault", "maxWarnsBeforeBan"];
-      if (boolKeys.includes(key)) {
-        data[key] = value === true || value === "true";
-      } else if (numKeys.includes(key)) {
-        data[key] = parseInt(value as string);
-      } else {
-        data[key] = value;
+    const updateData: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (allowedFields.includes(key)) {
+        updateData[key] = value;
       }
     }
 
-    const config = await prisma.guildConfig.update({
+    const config = await prisma.guildConfig.upsert({
       where: { guildId },
-      data,
+      update: updateData,
+      create: { guildId, guildName: data.guildName || null, ...updateData },
     });
 
     return Response.json({ success: true, config });
   } catch (error) {
-    console.error("Failed to update guild config:", error);
-    return Response.json({ error: "Failed to update guild config" }, { status: 400 });
+    return Response.json({ error: "Failed: " + (error instanceof Error ? error.message : "Unknown") }, { status: 400 });
   }
 }

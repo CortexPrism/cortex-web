@@ -2,6 +2,78 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.9.0] — 2026-06-18
+
+### Added
+- **Discord bot major expansion** — 28 new slash subcommands across 9 command groups
+  - **Role management**: `/role create|delete|edit|assign|list|info|mass` — full role CRUD with color, hoist, mentionable options, toggle assignment, and mass assign/remove
+  - **Channel management**: `/channel create|delete|edit|info|list` — create channels of any type (text, voice, announcement, forum, stage), edit name/topic/NSFW/slowmode/category
+  - **Reaction roles**: `/reactionrole create|delete|list|panel` — emoji-based self-assignable roles with auto-generated embed panels
+  - **Ticketing system**: `/ticket create|close|claim|add|remove` — per-user text channels with priority levels (low/normal/high/urgent), staff claiming, user add/remove, and button interactions
+  - **Polls**: `/poll create|end` — multi-option polls with duration, single/multi-choice enforcement, and results display
+  - **Announcements**: `/announce`, `/say`, `/embed` — send rich embed announcements with custom colors, images, thumbnails, author fields, @everyone/@here pings
+  - **Channel lockdown**: `/lockdown [channel] [reason]`, `/unlock [channel]` — lock/unlock channels via permission overwrites
+  - **Nickname management**: `/nickname <user> <name> [reason]` — change or reset user nicknames
+- **Auto-moderation engine** (`lib/auto-mod.ts`) with 6 rule types
+  - Keyword filter, invite link filter, spam detection (message velocity), link filter, mention limit, caps filter
+  - Configurable actions per rule: warn, mute (with duration), kick, ban, or silent delete
+  - Auto-mod action logging with embed notifications to configured log channel
+  - Per-channel auto-mod exemption via `ChannelConfig`
+  - 30-second TTL cache for auto-mod config to minimize DB load
+- **Welcome/Leave messages** (`lib/events.ts`)
+  - Customizable welcome messages with variable substitution (`{user}`, `{user_tag}`, `{server}`, `{member_count}`)
+  - Leave messages with member join date and role display
+  - Per-guild channel configuration for welcome and leave embeds
+- **Reaction role live handling** — `MessageReactionAdd`/`MessageReactionRemove` event handlers in the bot process (replaces external client creation)
+- **Single-choice poll enforcement** — `MessageReactionAdd` handler removes extra reactions when `allowMultiple: false`
+- **Database schema expansion** — 6 new models
+  - `ChannelConfig` — per-channel slowmode, lock state, auto-mod exemption
+  - `AutoModRule` — filter type, action, optional mute duration, JSON config
+  - `ReactionRole` — channel, message, role, emoji binding with toggle/single/verify types
+  - `Poll` — title, options JSON, multi-choice flag, active state, expiry
+  - `Ticket` + `TicketMessage` — status lifecycle (open/claimed/closed), priority, claimed by, close reason, per-ticket message log
+  - `GuildConfig` expanded with 12 new fields: `announcementChannelId`, `ticketCategoryId`, `ticketLogChannelId`, `ticketStaffRoleId`, `levelingEnabled`, `levelingMessage`, `levelingChannelId`, `starboardEnabled`, `starboardChannelId`, `starboardThreshold`
+- **New API endpoints** (6 route files)
+  - `GET/PUT /api/admin/discord/guilds` — guild configuration CRUD
+  - `GET/POST/PUT/DELETE /api/admin/discord/automod` — auto-mod rules CRUD
+  - `GET/DELETE /api/admin/discord/reactionroles` — reaction role management
+  - `GET/PUT /api/admin/discord/tickets` — ticket list with status/pagination filters
+  - `GET/PUT /api/admin/discord/channels` — channel config management
+  - `GET/DELETE /api/admin/discord/polls` — poll management with vote tracking
+- **Tabbed Discord admin dashboard** — 7 tabs replacing single-page layout
+  - **Overview**: bot status, start/stop/restart/register commands buttons, usage bar chart
+  - **Bot Config**: OAuth, bot token, guild ID, webhook URL, admin IDs with DB/env status badges
+  - **Guild Settings**: 11-field web form for guild configuration (log channel, mod/admin roles, ticket settings, max warns, slowmode)
+  - **Auto-Mod**: toggle rules on/off, delete rules, with filter type and action display
+  - **Welcome/Leave**: toggle enable, edit message templates with variable reference
+  - **Commands**: full categorized command reference table (42+ slash commands)
+  - **Moderation Logs**: inline filtering by action type and user ID, paginated table
+- **New admin sub-pages**
+  - `/admin/discord/tickets` — ticket list with status filtering, priority icons, pagination
+  - `/admin/discord/polls` — poll list with vote bar charts, end-poll action, active/ended badges
+- **Grouped sidebar navigation** — Discord Bot section expands to sub-items: Dashboard, Moderation Logs, Tickets, Polls
+- **Shared command definitions module** (`discord-bot/src/commands/command-definitions.ts`) — single source of truth for all slash command metadata, imported by both `index.ts` and `deploy-commands.ts`
+- Bot intents upgraded to include `GuildMembers`, `GuildMessages`, `MessageContent`, `GuildMessageReactions`
+- **Unified duration parsing** — `slowmode.ts` now uses shared `parseDuration` from `lib/moderation.ts` (adds day-unit support to slowmode)
+
+### Changed
+- Discord admin page redesigned from single config page to tabbed dashboard with 7 tabs
+- Admin sidebar navigation restructured with expandable Discord group and sub-items
+- `ModerationAction` model expanded with `lockdown`, `unlock`, `nickname`, `role_assign`, `role_remove`, `role_create`, `role_delete`, `delete` action types
+- Guild Settings and Auto-Mod tabs now fall back to env `DISCORD_GUILD_ID` when DB value is unset
+- Discord bot version `1.0.0` → `1.1.0`
+- Web app version `0.3.0` → `0.9.0`
+
+### Fixed
+- **CRITICAL**: Ticket button handlers (`ticket_close_*`, `ticket_claim_*`) now require moderator authorization — previously any channel viewer could close/claim tickets
+- **CRITICAL**: Button ticket close now sets `closedBy` field for audit trail (previously left null)
+- Auto-mod "delete" action no longer incorrectly logs as "warn" (prevented spurious warn count inflation that could trigger auto-ban)
+- Poll results now persist computed vote counts to database on poll end — web admin previously showed 0 votes for all ended polls
+- `allowMultiple: false` poll flag now enforced — extra user reactions are removed on single-choice polls
+- Mass role assignment (`/role mass`) now reports member count and warns about rate limits
+- `handleReactionRoleToggle` dead code removed from `lib/events.ts` (76 lines of unused, broken double-client-creation code)
+- `ChannelType` unused import removed from `lockdown.ts`
+
 ## [0.8.0] — 2026-06-18
 
 ### Added

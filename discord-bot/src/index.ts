@@ -19,10 +19,31 @@ import { handleModlogs } from "./commands/modlogs";
 import { handleGuildInfo, handleGuildSettings } from "./commands/guild";
 import { handleUserInfo } from "./commands/userinfo";
 import { handleSlowmode } from "./commands/slowmode";
+import { handleRoleCreate, handleRoleDelete, handleRoleEdit, handleRoleAssign, handleRoleList, handleRoleInfo, handleRoleMassAssign } from "./commands/role";
+import { handleChannelCreate, handleChannelDelete, handleChannelEdit, handleChannelInfo, handleChannelList } from "./commands/channel";
+import { handleReactionRoleCreate, handleReactionRoleDelete, handleReactionRoleList, handleReactionRolePanel } from "./commands/reactionrole";
+import { handleAnnounce, handleSay, handleEmbed } from "./commands/announce";
+import { handleLockdown, handleUnlock } from "./commands/lockdown";
+import { handlePollCreate, handlePollEnd } from "./commands/poll";
+import { handleTicketCreate, handleTicketClose, handleTicketClaim, handleTicketAdd, handleTicketRemove } from "./commands/ticket";
+import { handleNickname } from "./commands/nickname";
+import { checkAutoMod } from "./lib/auto-mod";
+import { isModerator } from "./lib/moderation";
+import { handleWelcome, handleLeave } from "./lib/events";
+import { commandDefinitions } from "./commands/command-definitions";
 
 export const prisma = new PrismaClient();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
+  ],
+  partials: [],
+});
 
 const BOT_START_TIME = Date.now();
 
@@ -66,62 +87,266 @@ async function updateHeartbeat() {
   setTimeout(updateHeartbeat, 30000);
 }
 
+// Welcome / Leave events
+client.on(Events.GuildMemberAdd, async (member) => {
+  try { await handleWelcome(member); } catch {}
+});
+
+client.on(Events.GuildMemberRemove, async (member) => {
+  try { await handleLeave(member); } catch {}
+});
+
+// Auto-mod message check
+client.on(Events.MessageCreate, async (message) => {
+  try { await checkAutoMod(message); } catch {}
+});
+
+// Reaction role handling
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+  if (user.bot) return;
+  try {
+    if (reaction.partial) await reaction.fetch();
+    const guildId = reaction.message.guildId;
+    if (!guildId) return;
+
+    const emojiStr = reaction.emoji.id ? `<:${reaction.emoji.name}:${reaction.emoji.id}>` : reaction.emoji.name;
+    if (!emojiStr) return;
+
+    const poll = await prisma.poll.findFirst({
+      where: { guildId, messageId: reaction.message.id, isActive: true },
+    });
+    if (poll && !poll.allowMultiple) {
+      const userReactions = reaction.message.reactions.cache.filter(r => r.users.cache.has(user.id));
+      if (userReactions.size > 1) {
+        try { await reaction.users.remove(user.id); } catch {}
+        return;
+      }
+    }
+
+    const rr = await prisma.reactionRole.findFirst({
+      where: { guildId, channelId: reaction.message.channel.id, emoji: emojiStr, messageId: reaction.message.id },
+    });
+    if (!rr) return;
+
+    const guild = client.guilds.cache.get(guildId);
+    if (!guild) return;
+
+    const member = await guild.members.fetch(user.id).catch(() => null);
+    if (!member) return;
+
+    const role = guild.roles.cache.get(rr.roleId);
+    if (!role) return;
+
+    try {
+      if (rr.type === "toggle") {
+        if (member.roles.cache.has(role.id)) {
+          await member.roles.remove(role, "Reaction role");
+        } else {
+          await member.roles.add(role, "Reaction role");
+        }
+      } else if (rr.type === "single") {
+        if (!member.roles.cache.has(role.id)) {
+          await member.roles.add(role, "Reaction role");
+        }
+      }
+    } catch {}
+  } catch (err) {
+    console.error("Reaction role add error:", err);
+  }
+});
+
+client.on(Events.MessageReactionRemove, async (reaction, user) => {
+  if (user.bot) return;
+  try {
+    if (reaction.partial) await reaction.fetch();
+    const emojiStr = reaction.emoji.id ? `<:${reaction.emoji.name}:${reaction.emoji.id}>` : reaction.emoji.name;
+    if (!emojiStr) return;
+
+    const guildId = reaction.message.guildId;
+    if (!guildId) return;
+
+    const rr = await prisma.reactionRole.findFirst({
+      where: { guildId, channelId: reaction.message.channel.id, emoji: emojiStr, messageId: reaction.message.id },
+    });
+    if (!rr || rr.type !== "toggle") return;
+
+    const guild = client.guilds.cache.get(guildId);
+    if (!guild) return;
+
+    const member = await guild.members.fetch(user.id).catch(() => null);
+    if (!member) return;
+
+    const role = guild.roles.cache.get(rr.roleId);
+    if (!role) return;
+
+    try {
+      if (member.roles.cache.has(role.id)) {
+        await member.roles.remove(role, "Reaction role removed");
+      }
+    } catch {}
+  } catch (err) {
+    console.error("Reaction role remove error:", err);
+  }
+});
+
+// Ticket button interaction handler
+client.on(Events.InteractionCreate, async (interaction) => {
+  if (!interaction.isButton()) return;
+
+  if (interaction.customId.startsWith("ticket_close_")) {
+    const ticketId = interaction.customId.replace("ticket_close_", "");
+
+    if (!interaction.guild) {
+      await interaction.reply({ content: "Server only.", ephemeral: true });
+      return;
+    }
+    const { authorized } = await isModerator(interaction as never, interaction.guild);
+    if (!authorized) {
+      await interaction.reply({ content: "Only moderators can close tickets.", ephemeral: true });
+      return;
+    }
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) {
+      await interaction.reply({ content: "Ticket not found.", ephemeral: true });
+      return;
+    }
+    await interaction.deferReply({ ephemeral: true });
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: { status: "closed", closedAt: new Date(), closedBy: interaction.user.id },
+    });
+    await interaction.editReply({ content: "Ticket closed. Channel will be deleted shortly." });
+    const channel = interaction.channel;
+    if (channel) {
+      setTimeout(async () => {
+        try { await channel.delete("Ticket closed"); } catch {}
+      }, 5000);
+    }
+    return;
+  }
+
+  if (interaction.customId.startsWith("ticket_claim_")) {
+    const ticketId = interaction.customId.replace("ticket_claim_", "");
+
+    if (!interaction.guild) {
+      await interaction.reply({ content: "Server only.", ephemeral: true });
+      return;
+    }
+    const { authorized } = await isModerator(interaction as never, interaction.guild);
+    if (!authorized) {
+      await interaction.reply({ content: "Only moderators can claim tickets.", ephemeral: true });
+      return;
+    }
+
+    const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    if (!ticket) {
+      await interaction.reply({ content: "Ticket not found.", ephemeral: true });
+      return;
+    }
+    if (ticket.claimedBy) {
+      await interaction.reply({ content: `Already claimed by <@${ticket.claimedBy}>.`, ephemeral: true });
+      return;
+    }
+    await interaction.deferReply({ ephemeral: true });
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: { status: "claimed", claimedBy: interaction.user.id, claimedByTag: interaction.user.tag },
+    });
+    await interaction.editReply({ content: "Ticket claimed!" });
+    return;
+  }
+});
+
+// Slash command router
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   try {
-    switch (interaction.commandName) {
-      case "stats":
-        await handleStats(interaction);
-        break;
-      case "plugin":
-        await handlePlugin(interaction);
-        break;
-      case "agent":
-        await handleAgent(interaction);
-        break;
-      case "review":
-        await handleReview(interaction);
-        break;
-      case "warn":
-        await handleWarn(interaction);
-        break;
-      case "mute":
-        await handleMute(interaction);
-        break;
-      case "unmute":
-        await handleUnmute(interaction);
-        break;
-      case "kick":
-        await handleKick(interaction);
-        break;
-      case "ban":
-        await handleBan(interaction);
-        break;
-      case "unban":
-        await handleUnban(interaction);
-        break;
-      case "purge":
-        await handlePurge(interaction);
-        break;
-      case "modlogs":
-        await handleModlogs(interaction);
-        break;
-      case "guild":
-        {
-          const subCmd = interaction.options.getSubcommand();
-          if (subCmd === "info") await handleGuildInfo(interaction);
-          else if (subCmd === "settings") await handleGuildSettings(interaction);
-        }
-        break;
-      case "user":
-        await handleUserInfo(interaction);
-        break;
-      case "slowmode":
-        await handleSlowmode(interaction);
-        break;
+    const cmdHandlers: Record<string, (i: typeof interaction) => Promise<void>> = {
+      stats: handleStats,
+      warn: handleWarn,
+      mute: handleMute,
+      unmute: handleUnmute,
+      kick: handleKick,
+      ban: handleBan,
+      unban: handleUnban,
+      purge: handlePurge,
+      modlogs: handleModlogs,
+      slowmode: handleSlowmode,
+      user: handleUserInfo,
+      nickname: handleNickname,
+      lockdown: handleLockdown,
+      unlock: handleUnlock,
+      announce: handleAnnounce,
+      say: handleSay,
+      embed: handleEmbed,
+    };
+
+    const subCmdHandlers: Record<string, Record<string, (i: typeof interaction) => Promise<void>>> = {
+      plugin: { search: handlePlugin, info: handlePlugin },
+      agent: { search: handleAgent, info: handleAgent },
+      review: {
+        list: handleReview,
+        approve: handleReview,
+        reject: handleReview,
+      },
+      guild: {
+        info: handleGuildInfo,
+        settings: handleGuildSettings,
+      },
+      role: {
+        create: handleRoleCreate,
+        delete: handleRoleDelete,
+        edit: handleRoleEdit,
+        assign: handleRoleAssign,
+        list: handleRoleList,
+        info: handleRoleInfo,
+        mass: handleRoleMassAssign,
+      },
+      channel: {
+        create: handleChannelCreate,
+        delete: handleChannelDelete,
+        edit: handleChannelEdit,
+        info: handleChannelInfo,
+        list: handleChannelList,
+      },
+      reactionrole: {
+        create: handleReactionRoleCreate,
+        delete: handleReactionRoleDelete,
+        list: handleReactionRoleList,
+        panel: handleReactionRolePanel,
+      },
+      poll: {
+        create: handlePollCreate,
+        end: handlePollEnd,
+      },
+      ticket: {
+        create: handleTicketCreate,
+        close: handleTicketClose,
+        claim: handleTicketClaim,
+        add: handleTicketAdd,
+        remove: handleTicketRemove,
+      },
+    };
+
+    const handler = cmdHandlers[interaction.commandName];
+    if (handler) {
+      await handler(interaction);
+      trackCommand(interaction.commandName);
+      return;
     }
-    trackCommand(interaction.commandName);
+
+    const subCmdMap = subCmdHandlers[interaction.commandName];
+    if (subCmdMap) {
+      const subCmd = interaction.options.getSubcommand();
+      const subHandler = subCmdMap[subCmd];
+      if (subHandler) {
+        await subHandler(interaction);
+        trackCommand(interaction.commandName);
+        return;
+      }
+    }
   } catch (error) {
     console.error(`Error handling command ${interaction.commandName}:`, error);
     const reply = interaction.deferred
@@ -130,350 +355,24 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await reply({
       content: "An error occurred while processing the command.",
       ephemeral: true,
-    });
+    }).catch(() => {});
   }
 });
 
 async function registerCommands() {
   const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_BOT_TOKEN!);
-  const commands = [
-    {
-      name: "stats",
-      description: "Show marketplace statistics",
-    },
-    {
-      name: "plugin",
-      description: "Search or view plugin details",
-      options: [
-        {
-          name: "action",
-          description: "search or info",
-          type: 3,
-          required: true,
-          choices: [
-            { name: "search", value: "search" },
-            { name: "info", value: "info" },
-          ],
-        },
-        {
-          name: "query",
-          description: "Search query or plugin name/ID",
-          type: 3,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: "agent",
-      description: "Search or view agent details",
-      options: [
-        {
-          name: "action",
-          description: "search or info",
-          type: 3,
-          required: true,
-          choices: [
-            { name: "search", value: "search" },
-            { name: "info", value: "info" },
-          ],
-        },
-        {
-          name: "query",
-          description: "Search query or agent name/ID",
-          type: 3,
-          required: true,
-        },
-      ],
-    },
-    {
-      name: "review",
-      description: "Admin review commands for pending submissions",
-      options: [
-        {
-          name: "action",
-          description: "list, approve, or reject",
-          type: 3,
-          required: true,
-          choices: [
-            { name: "list", value: "list" },
-            { name: "approve", value: "approve" },
-            { name: "reject", value: "reject" },
-          ],
-        },
-        {
-          name: "id",
-          description: "Submission ID (required for approve/reject)",
-          type: 3,
-          required: false,
-        },
-        {
-          name: "reason",
-          description: "Rejection reason (required for reject)",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "warn",
-      description: "Warn a user",
-      options: [
-        {
-          name: "user",
-          description: "The user to warn",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "Reason for the warning",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "mute",
-      description: "Timeout a user",
-      options: [
-        {
-          name: "user",
-          description: "The user to mute",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "duration",
-          description: "Duration (e.g. 10m, 2h, 1d). Default: 1h",
-          type: 3,
-          required: false,
-        },
-        {
-          name: "reason",
-          description: "Reason for the mute",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "unmute",
-      description: "Remove a timeout from a user",
-      options: [
-        {
-          name: "user",
-          description: "The user to unmute",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "Reason for the unmute",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "kick",
-      description: "Kick a user from the server",
-      options: [
-        {
-          name: "user",
-          description: "The user to kick",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "Reason for the kick",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "ban",
-      description: "Ban a user from the server",
-      options: [
-        {
-          name: "user",
-          description: "The user to ban",
-          type: 6,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "Reason for the ban",
-          type: 3,
-          required: false,
-        },
-        {
-          name: "days",
-          description: "Days of messages to delete (0-7)",
-          type: 4,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "unban",
-      description: "Unban a user by ID",
-      options: [
-        {
-          name: "user_id",
-          description: "The user ID to unban",
-          type: 3,
-          required: true,
-        },
-        {
-          name: "reason",
-          description: "Reason for the unban",
-          type: 3,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "purge",
-      description: "Bulk delete messages",
-      options: [
-        {
-          name: "count",
-          description: "Number of messages to delete (1-100)",
-          type: 4,
-          required: true,
-        },
-        {
-          name: "user",
-          description: "Only delete messages from this user",
-          type: 6,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "modlogs",
-      description: "View moderation logs",
-      options: [
-        {
-          name: "user",
-          description: "Filter logs by user",
-          type: 6,
-          required: false,
-        },
-        {
-          name: "action",
-          description: "Filter by action type",
-          type: 3,
-          required: false,
-          choices: [
-            { name: "Warn", value: "warn" },
-            { name: "Mute", value: "mute" },
-            { name: "Unmute", value: "unmute" },
-            { name: "Kick", value: "kick" },
-            { name: "Ban", value: "ban" },
-            { name: "Unban", value: "unban" },
-            { name: "Purge", value: "purge" },
-          ],
-        },
-      ],
-    },
-    {
-      name: "guild",
-      description: "Server information and settings",
-      options: [
-        {
-          name: "action",
-          description: "info or settings",
-          type: 1,
-          required: true,
-          options: [],
-        },
-        {
-          name: "settings",
-          description: "View or modify guild settings",
-          type: 1,
-          options: [
-            {
-              name: "action",
-              description: "view or set",
-              type: 3,
-              required: true,
-              choices: [
-                { name: "view", value: "view" },
-                { name: "set", value: "set" },
-              ],
-            },
-            {
-              name: "key",
-              description: "Setting to change",
-              type: 3,
-              required: false,
-              choices: [
-                { name: "Log Channel", value: "log_channel" },
-                { name: "Mod Role", value: "mod_role" },
-                { name: "Admin Role", value: "admin_role" },
-                { name: "Max Warns Before Ban", value: "max_warns" },
-                { name: "Default Slowmode", value: "slowmode" },
-                { name: "Auto Mod", value: "auto_mod" },
-                { name: "Welcome Messages", value: "welcome" },
-                { name: "Leave Messages", value: "leave" },
-              ],
-            },
-            {
-              name: "value",
-              description: "New value for the setting",
-              type: 3,
-              required: false,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: "user",
-      description: "View user information",
-      options: [
-        {
-          name: "user",
-          description: "The user to view",
-          type: 6,
-          required: false,
-        },
-      ],
-    },
-    {
-      name: "slowmode",
-      description: "Set channel slowmode",
-      options: [
-        {
-          name: "duration",
-          description: "Slowmode duration (e.g. 30s, 5m, 2h, 0 to disable)",
-          type: 3,
-          required: false,
-        },
-        {
-          name: "channel",
-          description: "Channel to set slowmode in (defaults to current)",
-          type: 7,
-          required: false,
-        },
-      ],
-    },
-  ];
 
   try {
     if (process.env.DISCORD_GUILD_ID) {
       await rest.put(
         Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID!, process.env.DISCORD_GUILD_ID),
-        { body: commands },
+        { body: commandDefinitions },
       );
       console.log("Guild commands registered successfully");
     } else {
       await rest.put(
         Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
-        { body: commands },
+        { body: commandDefinitions },
       );
       console.log("Global commands registered successfully");
     }
