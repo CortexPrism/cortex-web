@@ -1,8 +1,9 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 
-export async function getKbArticleBySlug(slug: string) {
+export const getKbArticleBySlug = cache(async function getKbArticleBySlug(slug: string) {
   return prisma.knowledgeBaseArticle.findUnique({ where: { slug } });
-}
+});
 
 export async function getAllKbArticles(params?: {
   publishedOnly?: boolean;

@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  twitter: {
+    title: "CortexPrism API Documentation — OpenAPI Specification",
+    description:
+      "Browse the full OpenAPI specification for the CortexPrism agentic harness REST API. Agent management, sessions, memory, plugins, and more.",
+  },
 };
 
 export default function OpenApiLayout({ children }: { children: React.ReactNode }) {

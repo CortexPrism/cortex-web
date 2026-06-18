@@ -34,6 +34,11 @@ export const metadata: Metadata = {
       "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. MIT licensed. One-command install.",
     url: SITE_URL,
   },
+  twitter: {
+    title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
+    description:
+      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and enterprise security. MIT licensed.",
+  },
 };
 
 const CORTEX_VERSION_DEFAULT = "0.35.3";

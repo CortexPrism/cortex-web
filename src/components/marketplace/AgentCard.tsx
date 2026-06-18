@@ -73,7 +73,7 @@ export function AgentCard({ agent, featured = false }: AgentCardProps) {
                 hashColor(agent.name)
               )}>
                 {agent.icon ? (
-                  <img src={agent.icon} alt="" className="w-6 h-6" />
+                  <img src={agent.icon} alt={`${agent.name} icon`} className="w-6 h-6" />
                 ) : (
                   agent.name.charAt(0).toUpperCase()
                 )}

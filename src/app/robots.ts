@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
+import { SITE_URL } from "@/lib/seo";
 
 const publicDisallow = [
   "/api/",

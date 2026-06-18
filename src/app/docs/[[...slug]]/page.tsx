@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MdxContent } from "@/components/docs/MdxContent";
-import { getContentBySlug, getContentSlugs } from "@/lib/markdown";
+import { getContentBySlug, getContentSlugs, extractH1FromMdx } from "@/lib/markdown";
 import { getAllKbArticles, getKbArticleBySlug, getKbSlugs } from "@/lib/knowledge-base";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
@@ -59,9 +59,88 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           "CLI reference, architecture deep-dives, knowledge base, design docs, and developer guides. Everything you need to build with the CortexPrism agentic harness.",
         url: `${SITE_URL}/docs`,
       },
+      twitter: {
+        title: "CortexPrism Documentation — Guides, CLI & Architecture",
+        description:
+          "CLI reference, architecture deep-dives, knowledge base, design docs, and developer guides.",
+      },
     };
   }
-  return { title: `Docs: ${params.slug.join(" / ")}` };
+
+  const [section, fileSlug] = params.slug;
+  const sectionLabel = sectionLabels[section] || section;
+
+  if (section === "knowledge-base") {
+    if (!fileSlug) {
+      return {
+        title: "Knowledge Base — CortexPrism",
+        description:
+          "Guides, best practices, troubleshooting, and reference materials for CortexPrism. Browse articles on configuration, plugins, agents, and more.",
+        alternates: { canonical: `${SITE_URL}/docs/knowledge-base` },
+        openGraph: {
+          title: "CortexPrism Knowledge Base — Guides & Troubleshooting",
+          description:
+            "Browse CortexPrism knowledge base articles: FAQ, troubleshooting, migration guides, performance tuning, and security guidelines.",
+          url: `${SITE_URL}/docs/knowledge-base`,
+        },
+        twitter: {
+          title: "CortexPrism Knowledge Base — Guides & Troubleshooting",
+          description:
+            "Browse knowledge base articles: FAQ, troubleshooting, migration guides, and security guidelines.",
+        },
+      };
+    }
+
+    const article = await getKbArticleBySlug(fileSlug);
+    if (!article || !article.published) {
+      return { title: "Article Not Found" };
+    }
+
+    const desc = article.description || article.title;
+    const truncatedDesc = desc.length > 160 ? desc.slice(0, 157) + "..." : desc;
+    const url = `${SITE_URL}/docs/knowledge-base/${article.slug}`;
+    return {
+      title: `${article.title} — CortexPrism Knowledge Base`,
+      description: truncatedDesc,
+      alternates: { canonical: url },
+      openGraph: {
+        title: `${article.title} — CortexPrism Knowledge Base`,
+        description: desc,
+        url,
+        type: "article",
+      },
+      twitter: {
+        title: article.title,
+        description: truncatedDesc,
+      },
+    };
+  }
+
+  if (!sectionMap[section]) {
+    return { title: `Docs: ${params.slug.join(" / ")}` };
+  }
+
+  try {
+    const slug = fileSlug || "index";
+    const { content } = getContentBySlug(sectionMap[section], slug);
+    const h1 = extractH1FromMdx(content) || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const url = `${SITE_URL}/docs/${section}${slug === "index" ? "" : `/${slug}`}`;
+    return {
+      title: `${h1} — ${sectionLabel} | CortexPrism`,
+      alternates: { canonical: url },
+      openGraph: {
+        title: `${h1} — CortexPrism ${sectionLabel}`,
+        url,
+        type: "article",
+      },
+      twitter: {
+        title: `${h1} — ${sectionLabel}`,
+        description: `CortexPrism ${sectionLabel.toLowerCase()}: ${h1}. Part of the open-source agentic harness documentation.`,
+      },
+    };
+  } catch {
+    return { title: `Docs: ${params.slug.join(" / ")}` };
+  }
 }
 
 export default async function DocsPage({ params }: Props) {
@@ -122,9 +201,9 @@ export default async function DocsPage({ params }: Props) {
                     href={`/docs/knowledge-base/${article.slug}`}
                     className="glass-card p-5 hover:border-indigo-500/20 transition-colors group"
                   >
-                    <h3 className="font-semibold text-[#e2e2ea] group-hover:text-indigo-400 transition-colors mb-1">
+                    <h2 className="font-semibold text-[#e2e2ea] group-hover:text-indigo-400 transition-colors mb-1">
                       {article.title}
-                    </h3>
+                    </h2>
                     {article.description && (
                       <p className="text-sm text-[#55556a] line-clamp-2">{article.description}</p>
                     )}

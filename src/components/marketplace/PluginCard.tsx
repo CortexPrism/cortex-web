@@ -84,7 +84,7 @@ export function PluginCard({ plugin, featured = false }: PluginCardProps) {
                 hashColor(plugin.name)
               )}>
                 {plugin.icon ? (
-                  <img src={plugin.icon} alt="" className="w-6 h-6" />
+                  <img src={plugin.icon} alt={`${plugin.name} icon`} className="w-6 h-6" />
                 ) : (
                   plugin.name.charAt(0).toUpperCase()
                 )}

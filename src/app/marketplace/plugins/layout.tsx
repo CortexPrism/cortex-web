@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  twitter: {
+    title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
+    description:
+      "Discover plugins for CortexPrism: ESM modules, MCP servers, and WASM runtimes. Filter by category and plugin type.",
+  },
 };
 
 export default function PluginsLayout({ children }: { children: React.ReactNode }) {

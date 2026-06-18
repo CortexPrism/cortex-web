@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MdxContent } from "@/components/docs/MdxContent";
-import { getContentBySlug, getContentSlugs } from "@/lib/markdown";
+import { getContentBySlug, getContentSlugs, extractH1FromMdx } from "@/lib/markdown";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { generateBreadcrumbSchema, SITE_URL } from "@/lib/seo";
@@ -18,17 +18,24 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = params.slug?.[0] || "index";
-  const { frontmatter } = getContentBySlug("getting-started", slug);
-  const title = (frontmatter.title as string) || "Getting Started";
-  const desc = (frontmatter.description as string) || "Learn how to install, configure, and start using the CortexPrism agentic harness system";
+  const { content, frontmatter } = getContentBySlug("getting-started", slug);
+  const extractedTitle = extractH1FromMdx(content) || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const rawTitle = (frontmatter.title as string) || extractedTitle || "Getting Started";
+  const title = rawTitle.includes("CortexPrism") ? rawTitle : `${rawTitle} — CortexPrism`;
+  const desc = (frontmatter.description as string) || `Step-by-step guide for ${extractedTitle.toLowerCase()}. Learn how to get the most out of the CortexPrism agentic harness.`;
+  const url = `${SITE_URL}/getting-started/${slug === "index" ? "" : slug}`;
   return {
     title,
     description: desc,
-    alternates: { canonical: `${SITE_URL}/getting-started/${slug === "index" ? "" : slug}` },
+    alternates: { canonical: url },
     openGraph: {
       title: `${title} — CortexPrism`,
       description: desc,
-      url: `${SITE_URL}/getting-started/${slug === "index" ? "" : slug}`,
+      url,
+    },
+    twitter: {
+      title,
+      description: desc.slice(0, 200),
     },
   };
 }

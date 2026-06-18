@@ -63,7 +63,7 @@ export function AgentDetailView({ agent }: AgentDetailProps) {
         <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 mb-6">
           <div className="w-12 md:w-14 h-12 md:h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-xl md:text-2xl flex-shrink-0">
             {agent.icon ? (
-              <img src={agent.icon} alt="" className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
+              <img src={agent.icon} alt={`${agent.name} icon`} className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
             ) : (
               <span className="text-purple-400 font-bold">{agent.name.charAt(0)}</span>
             )}

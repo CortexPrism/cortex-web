@@ -28,6 +28,11 @@ export function getContentBySlug(section: string, slug: string): { content: stri
   return { content, frontmatter };
 }
 
+export function extractH1FromMdx(content: string): string {
+  const match = content.match(/^# (.+)$/m);
+  return match ? match[1] : "";
+}
+
 export function getAllContent(section: string) {
   return getContentSlugs(section).map((slug) => ({
     slug,

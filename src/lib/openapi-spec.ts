@@ -1,3 +1,5 @@
+import { SITE_URL } from "@/lib/seo";
+
 export const openapiSpec = {
   openapi: "3.1.0",
   info: {
@@ -6,12 +8,12 @@ export const openapiSpec = {
       "REST API for the CortexPrism plugin and agent marketplace. Allows browsing, publishing, and managing plugins and agent configurations, plus user authentication and admin review workflows.",
     version: "1.0.0",
     contact: {
-      url: "https://cortexprism.io",
+      url: SITE_URL,
     },
   },
   servers: [
     {
-      url: "https://cortexprism.io",
+      url: SITE_URL,
       description: "Production",
     },
     {

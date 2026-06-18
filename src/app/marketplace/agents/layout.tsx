@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  twitter: {
+    title: "CortexPrism Agents — Pre-Configured AI Agent Profiles",
+    description:
+      "Find pre-configured agent profiles for CortexPrism. Specialized agents for coding, data analysis, research, and more.",
+  },
 };
 
 export default function AgentsLayout({ children }: { children: React.ReactNode }) {

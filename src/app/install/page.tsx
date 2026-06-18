@@ -25,6 +25,11 @@ export const metadata: Metadata = {
       "One command to install the open-source AI agent runtime on Linux, macOS, or Windows. curl -fsSL https://cortexprism.io/install.sh | bash — fully self-hosted, no cloud required.",
     url: `${SITE_URL}/install`,
   },
+  twitter: {
+    title: "Install CortexPrism — Self-Host Your AI Agent Runtime",
+    description:
+      "One command to install CortexPrism on Linux, macOS, or Windows. Fully self-hosted, no cloud required.",
+  },
 };
 
 const howToSchema = generateHowToSchema({
@@ -61,6 +66,8 @@ export default function InstallPage() {
           One command to get started on Linux, macOS, or Windows.
         </p>
       </div>
+
+      <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Quick Install</h2>
 
       <div className="grid md:grid-cols-3 gap-6 mb-10">
         <div className="glass-card p-6">

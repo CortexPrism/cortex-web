@@ -38,7 +38,7 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-[rgba(255,255,255,0.07)]">
+    <footer className="border-t border-[rgba(255,255,255,0.07)]" aria-label="Site footer">
       <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 

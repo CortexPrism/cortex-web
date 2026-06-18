@@ -16,6 +16,11 @@ export const metadata: Metadata = {
       "Recent commits from cortex engine and cortex-web repositories. Track changes, new features, bug fixes, and improvements in the open-source agentic harness.",
     url: `${SITE_URL}/changelog`,
   },
+  twitter: {
+    title: "CortexPrism Changelog — Release History & Commits",
+    description:
+      "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history.",
+  },
 };
 
 interface Commit {

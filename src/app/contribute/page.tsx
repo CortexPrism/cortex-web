@@ -14,6 +14,11 @@ export const metadata: Metadata = {
       "Help build the future of agentic AI. Report bugs, submit PRs, develop plugins for the marketplace, or join the Discord community.",
     url: `${SITE_URL}/contribute`,
   },
+  twitter: {
+    title: "Contribute to CortexPrism — Open Source AI Agent Framework",
+    description:
+      "Help build the future of agentic AI. Report bugs, submit PRs, develop plugins, or join the community.",
+  },
 };
 
 const sections = [

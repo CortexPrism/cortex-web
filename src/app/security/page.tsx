@@ -25,6 +25,11 @@ export const metadata: Metadata = {
       "Defense-in-depth for AI agents: 3-stage tool validation, AES-256-GCM encrypted vault, policy engine, Docker-isolated sandboxes, and immutable audit trail via Cortex Lens.",
     url: `${SITE_URL}/security`,
   },
+  twitter: {
+    title: "CortexPrism Security — Enterprise-Grade AI Agent Security Architecture",
+    description:
+      "Defense-in-depth for AI agents: 3-stage tool validation, AES-256-GCM encrypted vault, policy engine, and Docker-isolated sandboxes.",
+  },
 };
 
 const layers = [

@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: {
     default: "CortexPrism — Open-Source AI Agent Runtime",
-    template: "%s | CortexPrism",
+    template: "%s",
   },
   description:
     "CortexPrism is an open-source AI agent runtime with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise-grade security. Self-host your autonomous agents — MIT licensed.",

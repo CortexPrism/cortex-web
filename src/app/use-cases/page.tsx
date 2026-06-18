@@ -26,6 +26,11 @@ export const metadata: Metadata = {
       "From self-hosted personal AI assistants with persistent memory to enterprise-grade secure agent deployments — CortexPrism adapts to research, development, CI/CD, and knowledge workflows.",
     url: `${SITE_URL}/use-cases`,
   },
+  twitter: {
+    title: "CortexPrism Use Cases — AI Automation, Dev Assistant & Enterprise Agents",
+    description:
+      "Self-hosted personal AI assistants with persistent memory, AI-assisted development, CI/CD automation, and secure enterprise agent deployments.",
+  },
 };
 
 const useCases = [

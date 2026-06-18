@@ -29,6 +29,11 @@ export const metadata: Metadata = {
       "Discover AI plugins (ESM modules, MCP servers, WASM runtimes) and pre-configured agent profiles. Community-driven marketplace for the open-source AI agent runtime.",
     url: `${SITE_URL}/marketplace`,
   },
+  twitter: {
+    title: "CortexPrism Marketplace — AI Plugins, MCP Servers & Agent Configs",
+    description:
+      "Browse AI plugins (ESM, MCP servers, WASM runtimes) and pre-configured agent profiles. Community-driven, open-source marketplace.",
+  },
 };
 
 export default async function MarketplacePage() {

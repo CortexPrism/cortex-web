@@ -29,6 +29,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: desc,
       url: `${SITE_URL}/marketplace/plugins/${plugin.slug}`,
       type: "article",
+      images: [
+        {
+          url: `${SITE_URL}/marketplace/plugins/${plugin.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${plugin.name} plugin on CortexPrism`,
+        },
+      ],
+    },
+    twitter: {
+      title: `${plugin.name} — CortexPrism Plugin`,
+      description: desc,
     },
   };
 }

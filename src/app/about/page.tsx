@@ -24,6 +24,11 @@ export const metadata: Metadata = {
       "Open-source AI agent runtime in TypeScript/Deno. 24 LLM providers, 5-tier memory, parallax security, sandboxed execution, MCP plugin marketplace. MIT licensed. No telemetry, no vendor lock-in.",
     url: `${SITE_URL}/about`,
   },
+  twitter: {
+    title: "About CortexPrism — Open-Source AI Agent Runtime",
+    description:
+      "Open-source AI agent runtime in TypeScript/Deno. 24 LLM providers, 5-tier memory, parallax security, sandboxed execution, MCP plugin marketplace. MIT licensed.",
+  },
 };
 
 export default function AboutPage() {

@@ -26,6 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${displayName} — CortexPrism Profile`,
       description: user.bio || `${displayName}'s published plugins and agents`,
+      url: `${SITE_URL}/profile/${user.username}`,
+    },
+    twitter: {
+      title: `${displayName} — CortexPrism Profile`,
+      description: user.bio || `${displayName} on CortexPrism Marketplace`,
     },
     alternates: { canonical: `${SITE_URL}/profile/${user.username}` },
   };

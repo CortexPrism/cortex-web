@@ -66,7 +66,7 @@ export function PluginDetailView({ plugin }: PluginDetailProps) {
         <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 mb-6">
           <div className="w-12 md:w-14 h-12 md:h-14 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xl md:text-2xl flex-shrink-0">
             {plugin.icon ? (
-              <img src={plugin.icon} alt="" className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
+              <img src={plugin.icon} alt={`${plugin.name} icon`} className="w-8 md:w-10 h-8 md:h-10 rounded-lg" />
             ) : (
               <span className="text-indigo-400 font-bold">{plugin.name.charAt(0)}</span>
             )}

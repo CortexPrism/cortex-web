@@ -60,7 +60,7 @@ export function ScreenshotGallery({ screenshots, showThumbnails = false }: Scree
               onClick={() => setCurrent(i)}
               className={`shrink-0 w-16 h-10 rounded-md overflow-hidden border-2 transition-colors ${i === current ? "border-indigo-500" : "border-transparent opacity-60 hover:opacity-100"}`}
             >
-              <img src={s.url} alt={s.alt || ""} className="w-full h-full object-cover" />
+              <img src={s.url} alt={s.alt || `Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

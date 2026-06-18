@@ -41,6 +41,11 @@ export const metadata: Metadata = {
       "24 LLM providers, 5-tier memory, MCP & ESM plugins, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, and workflow automation. 100% open source.",
     url: `${SITE_URL}/features`,
   },
+  twitter: {
+    title: "CortexPrism Features — AI Agent Framework Capabilities",
+    description:
+      "Explore 24 LLM providers, 5-tier memory, MCP & ESM plugins, parallax security, sandboxed code execution, multi-agent orchestration, and workflow automation.",
+  },
 };
 
 const features = [
