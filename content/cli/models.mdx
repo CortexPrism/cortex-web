@@ -18,8 +18,8 @@ cortex models <subcommand> [options]
 | Subcommand | Description |
 |------------|-------------|
 | `list` | List configured models |
-| `show` | Show details for a specific model |
-| `set` | Set the default model |
+| `show <provider>` | Show details for a configured provider |
+| `set <provider> <key> <value>` | Configure a provider setting |
 | `available` | List all available models across providers |
 
 ## Examples
@@ -28,11 +28,11 @@ cortex models <subcommand> [options]
 # List configured models
 cortex models list
 
-# Show details for a model
-cortex models show claude-sonnet-4-5
+# Show details for a provider
+cortex models show anthropic
 
-# Set the default model
-cortex models set gpt-4o
+# Configure a provider setting
+cortex models set anthropic model claude-sonnet-4-5
 
 # Browse all available models
 cortex models available

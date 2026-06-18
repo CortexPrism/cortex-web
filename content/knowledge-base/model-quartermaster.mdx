@@ -5,13 +5,13 @@ description: A practical guide to the Model Quartermaster — understanding tool
 
 # Model Quartermaster Guide
 
-The Model Quartermaster (QM/MQM) is an adaptive prediction engine that learns which tool your agent should call next. It observes every tool call across your sessions, computes five different prediction signals, and fuses them into an actionable suggestion — automate, suggest, or defer.
+The Model Quartermaster (MQM) is an adaptive prediction engine that learns which model your agent should use for each task. It observes every LLM call across your sessions, computes six different prediction signals, and fuses them into an actionable suggestion — automate, suggest, or defer.
 
-Over time, the Quartermaster's predictions improve through reinforcement learning, making your agent faster and more autonomous.
+Over time, the Quartermaster's predictions improve through reinforcement learning, making your agent more cost-efficient and performant.
 
 ## What the Quartermaster Does
 
-Every time your agent needs to decide which tool to call, the Quartermaster runs five independent prediction signals against the current context. It fuses their outputs into a weighted score and makes one of three decisions:
+Every time your agent needs to decide which model to use, the Quartermaster runs six independent prediction signals against the current context. It fuses their outputs into a weighted score and makes one of three decisions:
 
 | Confidence | Action | Behavior |
 |------------|--------|----------|
@@ -51,8 +51,8 @@ The dashboard displays:
 
 - **Accuracy bars per signal**: How often each signal's prediction was correct
 - **Current signal weights**: Visual representation of how much each signal contributes
-- **Top tools by prediction accuracy**: Which tools the QM predicts best
-- **Confidence distribution histogram**: How often the QM hits each confidence band
+- **Top models by prediction accuracy**: Which models the MQM predicts best
+- **Confidence distribution histogram**: How often the MQM hits each confidence band
 - **Session and model-level trends**: Accuracy over time
 
 ### Prediction Decisions
@@ -77,45 +77,53 @@ Each decision entry shows:
 - The confidence score
 - Which signal contributed most to the prediction
 
-## The Five Prediction Signals
+## The Six Prediction Signals
 
-Each signal looks at tool call patterns from a different angle. The Quartermaster weights them dynamically based on historical accuracy.
+Each signal looks at model call patterns from a different angle. The Quartermaster weights them dynamically based on historical accuracy.
 
 ### 1. Trajectory Signal
 
-**What it tracks**: Historical sequences of tool calls. If the agent typically calls `read_file` → `grep` → `edit_file` in that order, the trajectory signal learns this pattern.
+**What it tracks**: Recent model usage patterns and sequences. If you typically use `claude-sonnet-4-5` for code review tasks followed by `gpt-4o` for documentation, the trajectory signal learns this pattern.
 
 **Weight**: Dynamic (EMA), adjusted up or down based on correctness.
 
-**When it's strongest**: Repetitive workflows like fixing lint errors, refactoring code, or running test suites — anything with a predictable sequence of tool calls.
+**When it's strongest**: Repetitive workflows with predictable model sequences — coding sessions that alternate between reasoning-heavy and creative tasks.
 
 ### 2. Episodic Signal
 
-**What it tracks**: Similarity between the current conversation context and past conversations. It generates 12-feature fingerprints from the conversation (tool distribution, message length, token composition, task category indicators) and performs cosine similarity matching.
+**What it tracks**: Similarity between the current conversation context and past conversations. It generates 12-feature fingerprints from the conversation (model distribution, message length, token composition, task category indicators) and performs cosine similarity matching.
 
 **Weight**: Dynamic (EMA).
 
 **When it's strongest**: Tasks similar to ones you've done before — deploying the same project, debugging similar error types, following established patterns.
 
-### 3. Tool Stats Signal
+### 3. Historical Signal
 
-**What it tracks**: Pure statistical success/failure rates per tool. If `bash` succeeds 95% of the time and `webfetch` fails 40% of the time (due to network issues), this signal biases toward reliable tools.
-
-**Weight**: Dynamic (EMA).
-
-**When it's strongest**: In environments where tool reliability varies significantly — flaky network connections, resource-constrained machines, or tools with known limitations.
-
-### 4. Task Context Signal
-
-**What it tracks**: The type, complexity, and requirements of the current task. A "fix this TypeScript error" task calls for different tools than "deploy to production."
+**What it tracks**: Past performance for specific task categories. Queries historical success rates of models for similar task types and uses that to influence the current prediction.
 
 **Weight**: Dynamic (EMA).
 
-**When it's strongest**: When the task type is unambiguous — clear bug reports, specific feature requests, well-scoped refactoring tasks.
+**When it's strongest**: When you've accumulated significant history across well-defined task categories — code review, refactoring, documentation, testing.
 
-### 5. Reflection Signal
+### 4. Cost Signal
 
-**What it tracks**: Per-turn reflection feedback. After each agent action, the agent reflects on whether the right tool was used. This signal incorporates that meta-cognitive feedback.
+**What it tracks**: Cost efficiency optimization. Prefers models based on their cost-per-token profiles, balancing capability against expense.
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: In cost-sensitive environments or when task complexity doesn't justify expensive frontier models.
+
+### 5. Quality Signal
+
+**What it tracks**: Expected output quality based on each model's known capabilities. Evaluates whether a model is better suited for reasoning, creative work, factual accuracy, or code generation.
+
+**Weight**: Dynamic (EMA).
+
+**When it's strongest**: When output quality is the primary concern — production code, security audits, customer-facing content.
+
+### 6. Reflection Signal
+
+**What it tracks**: Per-turn reflection feedback. After each agent action, the agent reflects on whether the right model was used. This signal incorporates that meta-cognitive feedback.
 
 **Weight**: Dynamic (EMA).
 
@@ -135,10 +143,11 @@ Example output:
 
 ```
 Signal Weights (session sess_abc123):
-  Trajectory:    0.32  ████████████████░░░░░░
-  Episodic:      0.28  ██████████████░░░░░░░░
-  Tool Stats:    0.18  █████████░░░░░░░░░░░░░
-  Task Context:  0.14  ███████░░░░░░░░░░░░░░░
+  Trajectory:    0.22  ███████████░░░░░░░░░░░
+  Episodic:      0.18  █████████░░░░░░░░░░░░░
+  Historical:    0.20  ██████████░░░░░░░░░░░░
+  Cost:          0.15  ███████░░░░░░░░░░░░░░░
+  Quality:       0.17  ████████░░░░░░░░░░░░░░
   Reflection:    0.08  ████░░░░░░░░░░░░░░░░░░
 ```
 
@@ -203,17 +212,11 @@ The asymmetry means the Quartermaster is **pessimistic by design** — it's quic
 
 ### Convergence
 
-Weights typically stabilize after **200–500 observations**. During the first 50 observations (learning-only mode), the QM builds baselines but doesn't predict. Observations 50–200 are the active exploration phase where predictions start but weights fluctuate significantly. After ~200 observations, weights converge and predictions become stable.
+Weights typically stabilize after **200–500 observations**. During the first 50 observations (learning-only mode), the MQM builds baselines but doesn't predict. Observations 50–200 are the active exploration phase where predictions start but weights fluctuate significantly. After ~200 observations, weights converge and predictions become stable.
 
 ### The 90% Confidence Threshold
 
-The 90% threshold for auto-execution is deliberately high. The Quartermaster must be nearly certain before it acts without the agent's confirmation:
-
-- **Below 90%**: The tool is suggested or deferred — the agent (or you) still makes the final call.
-- **90% or above, safe tool**: The tool auto-executes. Read-only tools like `read_file`, `grep`, and `glob` can auto-execute at this level.
-- **90% or above, unsafe tool**: The tool is still only suggested. Write, execute, and network tools never auto-execute.
-
-This threshold provides a safety buffer — even if the Quartermaster is "confident," the agent retains control over any destructive operation.
+The 90% threshold for auto-execution is deliberately high. The Quartermaster must be nearly certain before it acts without confirmation:
 
 ## CLI Quick Reference
 
@@ -249,17 +252,17 @@ cortex qm stats
 
 # 3. View the dashboard to understand prediction quality
 cortex qm dashboard -s sess_abc123
-# Shows: Trajectory signal is strongest (0.34 weight)
+# Shows: Trajectory signal is strongest (0.22 weight)
 #        Episodic signal has improved 12% this session
-#        Top predicted tools: read_file (89%), grep (82%), edit_file (76%)
+#        Top predicted models: claude-sonnet-4-5 (89%), gpt-4o (82%), gemini-2.5-pro (76%)
 
 # 4. Check what decisions are being made
 cortex qm decisions -s sess_abc123 --limit 5
-# Tool: read_file | Predicted: read_file | Correct: yes | Confidence: 93%
-# Tool: grep       | Predicted: grep       | Correct: yes | Confidence: 88%
-# Tool: bash       | Predicted: bash       | Correct: no  | Confidence: 45%
-# Tool: edit_file  | Predicted: edit_file  | Correct: yes | Confidence: 91%
-# Tool: read_file  | Predicted: read_file  | Correct: yes | Confidence: 95%
+# Model: claude-sonnet-4-5 | Predicted: claude-sonnet-4-5 | Correct: yes | Confidence: 93%
+# Model: gpt-4o          | Predicted: gpt-4o          | Correct: yes | Confidence: 88%
+# Model: gemini-2.5-pro  | Predicted: gemini-2.5-pro  | Correct: no  | Confidence: 45%
+# Model: claude-sonnet-4-5 | Predicted: claude-sonnet-4-5 | Correct: yes | Confidence: 91%
+# Model: gpt-4o          | Predicted: gpt-4o          | Correct: yes | Confidence: 95%
 
 # 5. After switching to a very different project, reset
 cortex qm reset -s sess_abc123

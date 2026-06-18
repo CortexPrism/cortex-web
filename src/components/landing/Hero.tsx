@@ -42,7 +42,7 @@ export function Hero({ version }: HeroProps) {
           {/* Version badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-8 text-sm rounded-full border border-indigo-500/25 bg-indigo-500/8 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.12)]">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-            v{version} — Pre-release
+            v{version}
           </div>
 
           {/* Headline */}

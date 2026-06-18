@@ -31,10 +31,9 @@ Override with:
     "ollama":     { "kind": "ollama",     "model": "llama3.2",                          "baseUrl": "http://localhost:11434" }
   },
   "agent": {
-    "name": "Cortex",
+    "name": "My Agent",
     "maxTurns": 50,
-    "streamOutput": true,
-    "enableReflection": true
+    "streamOutput": true
   },
   "router": {
     "enabled": false,
@@ -78,7 +77,7 @@ The `update` section controls Cortex's self-update behavior:
 
 | Field | Type | Description | Default |
 |-------|------|-------------|---------|
-| `channel` | `string` | Update channel: `stable` or `pre` | `stable` |
+| `channel` | `string` | Update channel: `stable` or `pre-release` | `stable` |
 | `checkOnStartup` | `boolean` | Check for updates on startup | `true` |
 | `autoUpdate` | `boolean` | Automatically apply updates | `false` |
 | `checkIntervalHours` | `number` | Periodic check interval | `24` |
@@ -90,7 +89,7 @@ The `update` section controls Cortex's self-update behavior:
 | Channel | Description |
 |---------|-------------|
 | `stable` | Production-ready releases with full testing |
-| `pre` | Pre-release builds with latest features |
+| `pre-release` | Pre-release builds with latest features |
 
 ### Binary vs Source Mode
 

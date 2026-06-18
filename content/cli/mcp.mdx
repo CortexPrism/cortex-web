@@ -17,8 +17,11 @@ cortex mcp <subcommand> [options]
 
 | Subcommand | Description |
 |------------|-------------|
-| `serve` | Start Cortex as an MCP server |
+| `serve` | Start Cortex as an MCP server over HTTP |
 | `stdio` | Run MCP server over standard I/O transport |
+| `connect` | Connect to a remote MCP server |
+| `disconnect` | Disconnect from an MCP server |
+| `connections` | List active MCP connections |
 
 ## MCP Integration
 
@@ -26,7 +29,8 @@ Cortex implements an MCP server that exposes Cortex capabilities (tools, memory,
 
 ### Transport
 - **stdio**: Standard input/output transport for process-level integration
-- The MCP server handles JSON-RPC messages according to the Model Context Protocol specification
+- **HTTP**: Server mode on port 9187 for remote MCP connections
+- The MCP server handles JSON-RPC 2.0 messages according to the Model Context Protocol specification
 
 ## Available Tools via MCP
 

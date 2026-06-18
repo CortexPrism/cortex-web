@@ -40,7 +40,7 @@ const useCases = [
       "Tool integration — read files, search web, execute code",
       "Sandboxed code execution for data analysis and automation",
     ],
-    example: "cortex chat --model claude-sonnet-4-20250514 --tools all",
+    example: "cortex chat --model claude-sonnet-4-5",
   },
   {
     icon: Beaker,
@@ -79,7 +79,7 @@ const useCases = [
       "Policy engine for safe automation",
       "Full audit trail via Cortex Lens",
     ],
-    example: "cortex jobs add --schedule '0 9 * * 1' --task 'weekly-report'",
+    example: "cortex jobs add weekly-report 'generate-report' --cron '0 9 * * 1'",
   },
   {
     icon: Search,

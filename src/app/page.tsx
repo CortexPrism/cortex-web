@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
 };
 
-const CORTEX_VERSION_DEFAULT = "0.1.0";
+const CORTEX_VERSION_DEFAULT = "0.35.3";
 
 function getCortexVersion(): string {
   const envVersion = process.env.NEXT_PUBLIC_CORTEX_VERSION;

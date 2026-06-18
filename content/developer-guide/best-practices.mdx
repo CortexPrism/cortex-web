@@ -245,8 +245,8 @@ Deno.test("my capability rejects invalid input", async () => {
 Test your plugin in a real CortexPrism session:
 
 ```bash
-cortex plugin install ./my-plugin
-cortex chat --plugin my-plugin --no-stream <<< "Use my-plugin to do something"
+cortex plugins install ./my-plugin
+cortex chat --agent my-agent <<< "Use my-plugin to do something"
 ```
 
 ## Documentation

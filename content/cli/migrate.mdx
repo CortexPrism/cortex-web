@@ -1,0 +1,37 @@
+# `cortex migrate`
+
+Initialize or migrate all Cortex databases. Runs the full migration chain for all SQLite databases used by the system.
+
+## Usage
+
+```bash
+cortex migrate
+```
+
+## Description
+
+The `migrate` command ensures all databases are at the latest schema version. It runs migrations for:
+
+- `cortex.db` — Core system configuration and state
+- `memory.db` — 5-tier memory system (episodic, semantic, reflection, graph, skills)
+- `lens.db` — Cortex Lens immutable audit trail
+- `vault.db` — Encrypted credential vault
+- `plugins.db` — Plugin registry and state
+
+All databases use SQLite with WAL mode enabled for concurrent read access.
+
+## When to Run
+
+- First installation (run automatically by `cortex setup`)
+- After a Cortex version upgrade that includes schema changes
+- When troubleshooting database-related errors
+
+## Examples
+
+```bash
+# Initialize all databases to latest schema
+cortex migrate
+
+# The command is idempotent — safe to run multiple times
+cortex migrate
+```

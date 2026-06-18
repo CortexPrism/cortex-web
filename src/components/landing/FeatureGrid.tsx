@@ -89,7 +89,7 @@ const features = [
   {
     icon: BrainCircuit,
     title: "Model Quartermaster",
-    description: "Adaptive 5-signal tool prediction engine with reinforcement learning.",
+    description: "Adaptive 6-signal model selection engine with reinforcement learning.",
     color: "text-violet-400",
     bg: "bg-violet-500/10",
     glow: "rgba(167,139,250,0.15)",

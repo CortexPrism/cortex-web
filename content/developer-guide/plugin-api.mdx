@@ -396,12 +396,8 @@ CREATE TABLE plugin_config (
 ## CLI Commands
 
 ```bash
-cortex plugin install <source>     # Install from marketplace, path, npm, jsr, or URL
-cortex plugin uninstall <name>     # Remove a plugin
-cortex plugin list                  # List installed plugins with status
-cortex plugin enable <name>        # Activate a plugin
-cortex plugin disable <name>       # Deactivate without removing
-cortex plugin config <name>        # View or set plugin configuration
-cortex plugin info <name>          # Show plugin details and capabilities
-cortex plugin call <name> <cap>    # Invoke a capability directly (for testing)
+cortex plugins install <source>     # Install from marketplace, URL, or local path
+cortex plugins list                 # List installed plugins with status
+cortex plugins enable <name>        # Activate a plugin
+cortex plugins disable <name>       # Deactivate without removing
 ```

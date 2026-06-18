@@ -22,7 +22,7 @@ cortex update --status                # Show current version and channel info
 | Option | Description |
 |--------|-------------|
 | `--check` | Check for available updates without applying |
-| `--channel` | Set update channel (`stable`, `pre`) |
+| `--channel` | Set update channel (`stable`, `pre-release`) |
 | `--rollback` | Rollback to the previous installed version |
 | `--status` | Display current version, channel, and update state |
 | `--force` | Force apply update even if already on latest |
@@ -77,7 +77,7 @@ cortex update --check
 cortex update --force
 
 # Switch to pre-release channel
-cortex update --channel pre
+cortex update --channel pre-release
 
 # Rollback to previous version
 cortex update --rollback

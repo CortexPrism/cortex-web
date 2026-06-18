@@ -33,14 +33,12 @@ cortex git <subcommand> [options]
 ### `cortex git status`
 ```bash
 cortex git status                     # Show working tree status
-cortex git status --agent             # Agent-powered status with suggestions
 ```
 
 ### `cortex git log`
 ```bash
 cortex git log                        # Show commit history
 cortex git log --limit 20             # Limit to 20 entries
-cortex git log --agent                # Agent-powered log analysis
 ```
 
 ### `cortex git diff`
@@ -48,21 +46,18 @@ cortex git log --agent                # Agent-powered log analysis
 cortex git diff                       # Show unstaged changes
 cortex git diff --stat                # Show diff statistics
 cortex git diff --file path/to/file   # Diff a specific file
-cortex git diff --agent               # Agent-powered diff summary
 ```
 
 ### `cortex git add`
 ```bash
 cortex git add path/to/file           # Stage a specific file
 cortex git add --all                  # Stage all changes
-cortex git add --agent                # Agent-powered staging suggestions
 ```
 
 ### `cortex git commit`
 ```bash
-cortex git commit                     # Create commit (agent generates message)
-cortex git commit --all               # Stage all and commit
-cortex git commit --agent             # Agent-powered commit with analysis
+cortex git commit <message>            # Create commit with message
+cortex git commit --all                # Stage all and commit
 ```
 
 ### `cortex git push`
@@ -70,7 +65,6 @@ cortex git commit --agent             # Agent-powered commit with analysis
 cortex git push                       # Push to default remote
 cortex git push --remote origin       # Specify remote
 cortex git push --branch main         # Specify branch
-cortex git push --agent               # Agent-powered push
 ```
 
 ### `cortex git pull`
@@ -78,7 +72,6 @@ cortex git push --agent               # Agent-powered push
 cortex git pull                       # Pull from default remote
 cortex git pull --remote origin       # Specify remote
 cortex git pull --branch main         # Specify branch
-cortex git pull --agent               # Agent-powered pull
 ```
 
 ### `cortex git clone`
@@ -92,7 +85,6 @@ cortex git clone <url> --branch main  # Clone a specific branch
 cortex git branch                     # List all branches
 cortex git branch --create feature-x  # Create a new branch
 cortex git branch --checkout main     # Checkout a branch
-cortex git branch --agent             # Agent-powered branch management
 ```
 
 ### `cortex git remote`
@@ -100,23 +92,13 @@ cortex git branch --agent             # Agent-powered branch management
 cortex git remote                     # List remotes
 cortex git remote --add origin <url>  # Add a remote
 cortex git remote --url               # Show remote URLs
-cortex git remote --agent             # Agent-powered remote management
 ```
-
-## Agent-Powered Features
-
-When using the `--agent` flag, git commands leverage the Cortex agent to:
-- Generate meaningful commit messages from diffs
-- Suggest branch naming conventions
-- Analyze change patterns for PR descriptions
-- Detect potential merge conflicts
-- Provide code review suggestions
 
 ## Examples
 
 ```bash
-# Agent-powered commit with auto-generated message
-cortex git commit --agent
+# Commit with a message
+cortex git commit "fix: resolve type error in auth module"
 
 # Clone and set up a project
 cortex git clone https://github.com/user/repo.git

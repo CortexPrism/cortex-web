@@ -62,7 +62,7 @@ winget install DenoLand.Deno
 # macOS / Linux
 git clone https://github.com/CortexPrism/cortex.git
 cd cortex
-deno task setup
+deno run --allow-all src/main.ts setup
 ```
 
 ```powershell
@@ -102,7 +102,7 @@ cortex --version
 
 You should see the version number printed:
 ```
-cortex 0.1.0
+cortex 0.35.3
 ```
 
 ## Next Steps

@@ -15,6 +15,8 @@ CortexPrism uses multiple SQLite databases, each serving a specific purpose. All
 
 ## Migration History
 
+Core migrations (23+ total across all databases):
+
 | Migration | Database | Description |
 |-----------|----------|-------------|
 | 001_core.sql | cortex.db | Core schema: sessions, turns, jobs |
@@ -26,6 +28,7 @@ CortexPrism uses multiple SQLite databases, each serving a specific purpose. All
 | 007_jobs_v2.sql | cortex.db | Job scheduler columns |
 | 008_memory_embeddings.sql | memory.db | Embedding + decay columns |
 | 009_policy.sql | cortex.db | Policy rules + default deny seeds |
+| 010-023 | Various | Hub nodes, agents, services, skills, channels, workflows, onboarding, evaluations, triggers, MQM, voice, computer use |
 
 ## Data Directory Structure
 

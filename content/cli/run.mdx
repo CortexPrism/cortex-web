@@ -15,6 +15,7 @@ cortex run script.py --fix --max-fix 6  # Up to 6 fix attempts
 
 | Option | Description |
 |--------|-------------|
+| `--lang, -l` | Force language interpreter (e.g., `python`, `javascript`, `bash`) |
 | `--no-sandbox` | Run as direct subprocess instead of Docker sandbox |
 | `--fix` | Enable LLM auto-fix loop when code fails |
 | `--max-fix` | Maximum number of fix attempts (default: 4) |
@@ -24,13 +25,13 @@ cortex run script.py --fix --max-fix 6  # Up to 6 fix attempts
 
 | Language | Extension | Sandbox Image |
 |----------|-----------|---------------|
-| Python | `.py` | `python:3.12-slim` |
-| JavaScript | `.js` | `node:22-slim` |
-| TypeScript | `.ts` | `node:22-slim` |
-| Bash | `.sh` | `ubuntu:24.04` |
-| Ruby | `.rb` | `ruby:3.3-slim` |
-| Go | `.go` | `golang:1.23-bookworm` |
-| Rust | `.rs` | `rust:1.78-slim` |
+| Python | `.py` | `python:3.12-alpine` |
+| JavaScript | `.js` | `node:22-alpine` |
+| TypeScript | `.ts` | `denoland/deno:alpine` |
+| Bash | `.sh` | `alpine:3.20` |
+| Ruby | `.rb` | `ruby:3.3-alpine` |
+| Go | `.go` | `golang:1.22-alpine` |
+| Rust | `.rs` | `rust:1.78-alpine` |
 
 ## Docker Sandbox
 

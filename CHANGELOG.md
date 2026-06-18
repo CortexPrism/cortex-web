@@ -2,7 +2,62 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
-## [0.7.0] — 2026-06-17
+## [0.8.0] — 2026-06-18
+
+### Added
+- New CLI documentation pages: `log.mdx`, `migrate.mdx`
+- `cortex log` entry added to CLI index (show, tail, clear, path, set-level, status)
+- Vault `--type` option (`api_key`, `token`, `password`) documented
+- ElevenLabs TTS provider noted in voice docs
+- Memory `health` and `heuristics` subcommands documented
+- MCP server `connect`, `disconnect`, `connections` subcommands and HTTP transport documented
+- Plugin capabilities list expanded in architecture docs (23 capability types)
+
+### Changed
+- **Version**: all references updated from `0.1.0` → `0.35.3` across landing page, docs, and developer guide
+- **Model Quartermaster**: signal count corrected 5→6 throughout (trajectory, episodic, historical, cost, quality, reflection); clarified MQM is for model selection (not tool prediction)
+- **Web UI tabs**: expanded from 17 (with wrong names) to 22 (with accurate names from source)
+- **API endpoints**: serve docs expanded from 8 to 20 documented endpoints (notes 85+ exist)
+- **Soul templates**: 5→8 correctly listed (professional, friendly, developer, creative, analyst, teacher, minimalist, custom)
+- **Setup wizard**: steps corrected from 3 wrong steps → 6 actual steps across setup.mdx, first-run.mdx, and index.mdx
+- **Docker images**: all 7 sandbox images fixed to match source (`-slim`→`-alpine`, `ubuntu:24.04`→`alpine:3.20`, `node:22-slim` TS→`denoland/deno:alpine`)
+- **Database migrations**: list expanded from 9 to 23+ with summary
+- **Pipeline hooks**: built-in hooks table completely rewritten (8 wrong hooks → 8 correct with accurate stage assignments)
+- **Policy rule kinds**: 3→6 (tool, shell, domain, capability, path, computer)
+- **Memory tiers**: removed fabricated T1–T5 numbering; corrected tier names
+- **CLI index**: 36→43 commands with new log and migrate entries
+- Landing page "Pre-release" badge removed
+- Update channel: `pre` → `pre-release` across configuration, architecture, and update CLI docs
+- Built-in agent tools list expanded from 8 to 26 accurately named tools
+- Runtime install command: `deno task setup` → `deno run --allow-all src/main.ts setup`
+- Plugin CLI command: `cortex plugin` → `cortex plugins` (plural) across all developer guide files and marketplace components
+
+### Fixed
+- **CRITICAL**: Security policy docs claimed "default-deny" — corrected to "default-allow" matching source code (`security/policy.ts:66`)
+- **CRITICAL**: Rule evaluation order corrected — deny-first then allow → priority-based evaluation with default-allow
+- Security page rule kind count: 3→6
+- `cortex jobs` page completely rewritten: removed non-existent `remove`/`pause`/`resume` subcommands; added actual `cancel`/`run-due`; fixed flags `--schedule`→`--cron`, `--task`→positional args
+- `cortex serve` host short flag: `-h`→`-H`; added `serve install`/`serve uninstall` as subcommands
+- `cortex models` subcommands: `show`/`set` documented with correct `<provider>` and `<key>`/<`value>` args
+- `cortex log` defaults corrected: 50→100 entries; removed non-existent `--json` flag
+- `cortex reflect`: removed non-existent `patterns` subcommand and `-s` flag; removed fabricated `enableReflection` config example
+- Docker sandbox: removed non-existent `--sandbox-only` flag; replaced with `--no-sandbox`
+- Environment variables: removed fabricated `CORTEX_SANDBOX_TIMEOUT`, `CORTEX_SANDBOX_MEMORY`, `CORTEX_SANDBOX_MAX_OUTPUT` (sandbox limits are hardcoded)
+- Server auth config: `server.auth.jwtSecret` → `webAuth.sessionSecret` matching actual config schema
+- Discord config: removed fabricated config.json schema (token only via flag/env var)
+- Removed all `--agent` flag references from git commands (does not exist in source)
+- Removed fabricated `cortex plugin call/config/info` commands across developer guide
+- Removed fabricated npm/jsr plugin install sources
+- Removed fabricated migration flags: `--status`, `--dry-run`, `--to v2`
+- Removed fabricated import sources: `openai-agents`, `langchain`
+- Removed fabricated `--adapt` flag from plugin install
+- Removed fabricated `--plugin` flag, `--tools` flag, and `--no-stream` from chat examples
+- TUI page rewritten to match actual split-pane chat interface (was aspirational multi-panel dashboard)
+- Features page: fixed `--semantic`→`--type semantic`, policy format, agent tools list
+- Use-cases page: removed non-existent `--tools all` flag
+- `enableReflection` removed from config examples (not in AgentConfig schema)
+- Stale jobs command syntax fixed in features, use-cases, and best-practices pages
+- Memory search example flag corrected from `--semantic` to `--type semantic`
 
 ### Added
 - IndexNow API integration for instant search engine notification (Bing, Yandex, Seznam):

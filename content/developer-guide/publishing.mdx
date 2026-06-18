@@ -18,11 +18,10 @@ Ensure your plugin has a complete manifest and is tested:
 
 ```bash
 # Test locally
-cortex plugin install ./my-plugin
-cortex plugin call my-plugin my-capability '{"input": "test"}'
+cortex plugins install ./my-plugin
 
-# Ensure it works in a chat session
-cortex chat --plugin my-plugin
+# Ensure tool capabilities work in a chat session
+cortex chat --agent my-agent
 ```
 
 ### Step 2: Submit via Web UI

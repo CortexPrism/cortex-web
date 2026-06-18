@@ -330,11 +330,9 @@ const withConfig = await testPlugin(myPlugin, {
 
 The plugin manager can load plugins from:
 
-1. **Local directory**: `cortex plugin install ./path/to/plugin`
-2. **npm package**: `cortex plugin install npm:@scope/my-plugin`
-3. **JSR package**: `cortex plugin install jsr:@scope/my-plugin`
-4. **Marketplace**: `cortex plugin install marketplace:my-plugin`
-5. **Single file URL**: `cortex plugin install https://example.com/plugin.js`
+1. **Local directory**: `cortex plugins install ./path/to/plugin`
+2. **Marketplace**: `cortex plugins install marketplace:cortexprism.io/plugins/my-plugin`
+3. **URL**: `cortex plugins install https://example.com/plugin.js`
 
 For distribution, bundle to a single ESM file:
 

@@ -14,7 +14,7 @@ export function InstallCommand({ type, slug, host = "cortexprism.io" }: InstallC
 
   const command =
     type === "plugin"
-      ? `cortex plugin install marketplace:${host}/plugins/${slug}`
+      ? `cortex plugins install marketplace:${host}/plugins/${slug}`
       : `cortex agent import https://${host}/api/marketplace/agents/${slug}/download`;
 
   const handleCopy = async () => {

@@ -23,7 +23,7 @@ cortex --version
 ```bash
 cd ~/cortex
 git pull origin main
-deno task setup    # Runs migrations and dependency updates
+deno run --allow-all src/main.ts setup    # Runs migrations and dependency updates
 ```
 
 ### Docker Install
@@ -40,14 +40,8 @@ docker rm cortex-server
 CortexPrism uses SQLite with automatic migration support:
 
 ```bash
-# Run all pending migrations
+# Run all pending migrations (idempotent, safe to run multiple times)
 cortex migrate
-
-# Check migration status
-cortex migrate --status
-
-# Dry run (see what would be applied)
-cortex migrate --dry-run
 ```
 
 ### Manual Migration
@@ -58,8 +52,8 @@ If automatic migration fails, you can run migrations manually:
 # Backup first
 cp ~/.cortex/data/cortex.db ~/.cortex/data/cortex.db.backup
 
-# Run specific migration
-cortex migrate --to v2
+# Then re-run migrate
+cortex migrate
 ```
 
 ## Data Directory Migration
@@ -121,7 +115,7 @@ cp ~/.cortex/data/cortex.db.backup ~/.cortex/data/cortex.db
 
 # Revert to previous version
 git checkout <previous-tag>
-deno task setup
+deno run --allow-all src/main.ts setup
 
 # Update plugins to latest compatible versions
 cortex plugins update --all
@@ -134,37 +128,24 @@ cortex plugins update --all
 CortexPrism supports importing configurations from the OpenAI Agents SDK:
 
 ```bash
-cortex import openai-agents --config agent_config.json
+cortex import json --config agent_config.json
 ```
 
-### From LangChain
+### From Custom Tools
 
-```bash
-cortex import langchain --config chain_config.json
-```
-
-### From Custom Setup
-
-If you have an existing tool configuration, you can wrap it as a CortexPrism plugin:
-
-```bash
-cortex plugin install ./my-existing-tool --adapt
-```
-
-The adapter mode generates a compatibility layer between your tool and the plugin system.
+If you have an existing tool configuration, you can wrap it as a CortexPrism plugin using the plugin system.
 
 ## Pre-Migration Checklist
 
 1. **Back up databases** — `cp ~/.cortex/data/*.db ~/backup/`
-2. **Export plugin list** — `cortex plugin list --format json > plugins.json`
-3. **Export config** — `cp ~/.cortex/config.json config.backup.json`
-4. **Check disk space** — Ensure enough space for migration
-5. **Review changelog** — Check breaking changes in the [Changelog](/changelog)
+2. **Export config** — `cp ~/.cortex/config.json config.backup.json`
+3. **Check disk space** — Ensure enough space for migration
+4. **Review changelog** — Check breaking changes in the [Changelog](/changelog)
 
 ## Post-Migration Checklist
 
 1. **Verify version** — `cortex --version`
-2. **Test chat** — `cortex chat --no-stream "Hello"`
-3. **Check plugins** — `cortex plugin list`
+2. **Test chat** — `cortex chat "Hello" --model claude-sonnet-4-5`
+3. **Check plugins** — `cortex plugins list`
 4. **Verify data** — `cortex memory search "test"` (if you had memory)
 5. **Check logs** — Review Lens audit log for errors

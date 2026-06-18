@@ -5,37 +5,33 @@ Manage scheduled cron jobs that run on the daemon scheduler. Jobs are persisted 
 ## Usage
 
 ```bash
-cortex jobs add --schedule "<cron>" --task <command>   # Add a scheduled job
-cortex jobs list                                        # List all jobs
-cortex jobs remove <job_id>                             # Remove a job
-cortex jobs pause <job_id>                              # Pause a job
-cortex jobs resume <job_id>                             # Resume a paused job
+cortex jobs <subcommand> [options]
 ```
 
 ## Subcommands
 
 | Subcommand | Description |
 |------------|-------------|
-| `add` | Create a new scheduled job |
-| `list` | List all jobs with their status |
-| `remove` | Delete a job by ID |
-| `pause` | Pause a job without deleting it |
-| `resume` | Resume a paused job |
+| `list` | List all jobs with their status and next run time |
+| `add <name> <command>` | Create a new scheduled job |
+| `cancel <id>` | Cancel a pending or failed job |
+| `run-due` | Execute all currently due jobs immediately |
 
-## Options
+## `cortex jobs add` Options
 
 | Option | Description |
 |--------|-------------|
-| `--schedule` | CRON expression (e.g., `0 9 * * 1` for weekly Monday 9AM) |
-| `--task` | Command or task to execute |
-| `--help` | Show help for this command |
+| `--cron <expr>` | CRON expression (e.g., `0 9 * * 1` for weekly Monday 9AM) |
+| `--in <minutes>` | Run after N minutes from now |
+| `--max-attempts <n>` | Max retry attempts on failure (default: 3) |
 
 ## Scheduler Behavior
 
-- The scheduler daemon polls the database every 30 seconds for due jobs
+- The scheduler daemon polls the database for due jobs
 - On failure, jobs are retried with configurable backoff
 - Execution history is logged for audit
 - Memory consolidation can be scheduled as a recurring job
+- CRON jobs auto-reschedule after completion
 
 ## CRON Format
 
@@ -52,18 +48,18 @@ cortex jobs resume <job_id>                             # Resume a paused job
 ## Examples
 
 ```bash
-# Add a weekly report generation job every Monday at 9 AM
-cortex jobs add --schedule "0 9 * * 1" --task "generate-weekly-report"
+# Add a weekly report every Monday at 9 AM
+cortex jobs add weekly-report "generate-weekly-report" --cron "0 9 * * 1"
+
+# Add a one-time job to run in 30 minutes
+cortex jobs add quick-backup "run-backup" --in 30
 
 # List all jobs
 cortex jobs list
 
-# Pause a job temporarily
-cortex jobs pause job_xyz789
+# Cancel a pending job
+cortex jobs cancel job_xyz789
 
-# Resume a paused job
-cortex jobs resume job_xyz789
-
-# Remove a completed or unwanted job
-cortex jobs remove job_xyz789
+# Run all due jobs immediately
+cortex jobs run-due
 ```

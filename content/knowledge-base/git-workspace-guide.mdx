@@ -34,10 +34,10 @@ After cloning, Cortex automatically runs setup steps including dependency detect
 cortex git status
 
 # Agent-powered status with next-action suggestions
-cortex git status --agent
+cortex git status
 ```
 
-The `--agent` flag surfaces recommendations like "You have 3 modified files — consider grouping the CSS changes into a separate commit" or "Unstaged files detected: `src/auth.ts` may conflict with pending changes on `main`."
+The git status command shows working tree state.
 
 ### Understanding Diffs
 
@@ -45,10 +45,10 @@ Rather than parsing raw diff output, let the agent summarize changes in natural 
 
 ```bash
 # Full working tree diff summary
-cortex git diff --agent
+cortex git diff
 
 # Summary for a specific file
-cortex git diff --file src/auth.ts --agent
+cortex git diff --file src/auth.ts
 
 # Statistics-only view
 cortex git diff --stat
@@ -71,7 +71,7 @@ The agent generates conventional commit messages by analyzing your staged diffs:
 cortex git add src/components/Button.tsx
 
 # Commit with agent-generated message
-cortex git commit --agent
+cortex git commit
 ```
 
 The agent produces messages following the [Conventional Commits](https://www.conventionalcommits.org/) format:
@@ -85,7 +85,7 @@ fix(api): handle null response body in error interceptor
 If you want to stage everything and commit in one step:
 
 ```bash
-cortex git commit --all --agent
+cortex git commit --all
 ```
 
 ### Write Your Own Message
@@ -113,10 +113,10 @@ cortex git branch --create feature/payment-integration
 cortex git branch --checkout main
 
 # Agent-powered branch naming suggestions
-cortex git branch --agent
+cortex git branch
 ```
 
-With `--agent`, Cortex analyzes your staged changes and suggests branch names that match your team's conventions:
+The branch command creates and manages branches.
 
 > Suggested branch names based on changes to `src/billing/invoice.ts`:
 > 1. `feature/invoice-generation`
@@ -134,11 +134,11 @@ cortex git branch --create feature/user-onboarding
 # 2. Make your code changes...
 
 # 3. Review what changed
-cortex git diff --agent
+cortex git diff
 
 # 4. Stage and commit with auto-generated message
 cortex git add --all
-cortex git commit --agent
+cortex git commit
 
 # 5. Push to remote
 cortex git push --remote origin --branch feature/user-onboarding
@@ -157,10 +157,10 @@ cortex git push --remote origin --branch feature/new-dashboard
 cortex git pull
 
 # Agent-powered pull with conflict preview
-cortex git pull --agent
+cortex git pull
 ```
 
-The `--agent` flag on pull performs pre-flight conflict detection — it analyzes the incoming changes and warns you before you start resolving conflicts.
+The pull command fetches and merges changes from a remote.
 
 ## Conflict Resolution
 
@@ -168,7 +168,7 @@ When a merge or pull produces conflicts, the agent helps you understand and reso
 
 ```bash
 # Pull with conflict analysis
-cortex git pull --agent
+cortex git pull
 ```
 
 The agent surfaces context like:
@@ -182,12 +182,12 @@ After resolving conflicts manually:
 cortex git add src/utils/helpers.ts
 
 # Commit the merge resolution
-cortex git commit --agent
+cortex git commit
 ```
 
 ### Conflict Resolution Tips
 
-1. **Use `cortex git diff --agent` on conflicted files** to understand what each side changed before editing.
+1. **Use `cortex git diff` on conflicted files** to understand what each side changed before editing.
 2. **Pull from main frequently** during long-running feature branches to avoid large conflict surfaces.
 3. **Let the agent suggest resolution strategies** — it has context about both sides of the merge.
 4. **Test after resolution** — run your tests before pushing the merge commit.
@@ -198,10 +198,10 @@ Before opening a pull request, use Cortex to prepare clean, review-ready commits
 
 ```bash
 # 1. Review the full diff between your branch and main
-cortex git diff --agent
+cortex git diff
 
 # 2. Inspect your commit history
-cortex git log --limit 10 --agent
+cortex git log --limit 10
 
 # 3. Re-order or squash commits if needed (using native git)
 git rebase -i HEAD~5
@@ -225,23 +225,23 @@ cortex git log
 cortex git log --limit 20
 
 # Agent-powered analysis of commit patterns
-cortex git log --agent
+cortex git log
 ```
 
-With `--agent`, the log analysis identifies trends: "3 of the last 5 commits touched `src/api/` — this module is the most active area of the codebase" or "Average commit size has increased 40% this week — consider smaller, more focused commits."
+The log command shows commit history with filtering options.
 
 ## Agent-Powered Features Summary
 
 | Feature | Command Flag | What It Does |
 |---------|-------------|--------------|
-| Commit messages | `commit --agent` | Generates conventional commits from diffs |
-| Diff summaries | `diff --agent` | Natural language explanation of changes |
-| Status insights | `status --agent` | Next-action suggestions |
-| Log analysis | `log --agent` | Commit pattern analysis and trends |
-| Branch naming | `branch --agent` | Suggests branch names from changes |
-| Pull preview | `pull --agent` | Pre-flight conflict detection |
-| Staging help | `add --agent` | Intelligent staging suggestions |
-| Push workflows | `push --agent` | PR-ready push with description prep |
+| Commit messages | `commit` | Generates conventional commits from diffs |
+| Diff summaries | `diff` | Natural language explanation of changes |
+| Status insights | `status` | Next-action suggestions |
+| Log analysis | `log` | Commit pattern analysis and trends |
+| Branch naming | `branch` | Suggests branch names from changes |
+| Pull preview | `pull` | Pre-flight conflict detection |
+| Staging help | `add` | Intelligent staging suggestions |
+| Push workflows | `push` | PR-ready push with description prep |
 
 ## Next Steps
 

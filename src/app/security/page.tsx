@@ -51,7 +51,8 @@ const layers = [
       "Stage 2: Shell command pattern check — regex deny rules for dangerous commands",
       "Stage 3: Domain allow/deny — for web search URLs",
       "All decisions logged as policy_check events in Lens",
-      "Default-deny for known dangerous patterns (rm -rf /, fork bombs, disk writes)",
+      "Seeded deny rules for dangerous patterns (rm -rf /, fork bombs, disk writes)",
+      "Default-allow when no rules match — add explicit deny rules for sensitive operations",
     ],
   },
   {
@@ -60,7 +61,7 @@ const layers = [
     description:
       "Granular allow/deny rules with priority-based evaluation. Rules are stored in SQLite and evaluated by priority (lower number = higher precedence).",
     details: [
-      "Three rule kinds: tool, shell, domain",
+      "Six rule kinds: tool, shell, domain, capability, path, computer",
       "Regex-based pattern matching",
       "Priority ordering for rule precedence",
       "Default-allow when no rules match",

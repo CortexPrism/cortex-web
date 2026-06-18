@@ -17,25 +17,43 @@ cortex serve -s                      # Stop background server
 | Option | Description |
 |--------|-------------|
 | `--port, -p` | HTTP server port (default: 3000) |
-| `--host, -h` | Bind address (default: 127.0.0.1) |
+| `--host, -H` | Bind address (default: 127.0.0.1) |
 | `-d` | Run server in background (daemon mode) |
 | `-r` | Restart an existing background server (use with `-d`) |
 | `-s` | Stop a running background server |
 | `--help` | Show help for this command |
 
+## Service Management
+
+```bash
+cortex serve install      # Install as a system service
+cortex serve uninstall    # Uninstall the system service
+```
+
 ## REST API Endpoints
+
+The server exposes 85+ REST API endpoints across 20+ resource groups. Key endpoints include:
 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/health` | Health check |
-| GET | `/api/sessions?limit=20` | List recent sessions |
+| GET | `/api/sessions` | List recent sessions |
+| GET | `/api/sessions/tree` | Session hierarchy tree |
 | GET | `/api/sessions/:id` | Get session details |
 | GET | `/api/sessions/:id/events` | Get session events |
 | GET | `/api/sessions/:id/messages` | Get session messages |
 | POST | `/api/sessions/:id/resume` | Resume a session |
 | DELETE | `/api/sessions/:id` | Delete a session |
-| GET | `/api/jobs?status=pending` | List jobs by status |
 | GET | `/api/memory/search?q=<query>` | Search memory |
+| POST | `/api/memory/add` | Add memory entry |
+| GET | `/api/jobs` | List jobs by status |
+| GET | `/api/config` | Get system configuration |
+| GET | `/api/providers/configured` | List configured providers |
+| GET | `/api/lens/recent` | Recent audit events |
+| GET | `/api/skills` | List skill modules |
+| GET | `/api/plugins` | List installed plugins |
+| GET | `/api/agents` | List agent configurations |
+| GET | `/api/metrics` | Prometheus metrics
 
 ## WebSocket Protocol
 
@@ -63,23 +81,28 @@ Connect to `ws://<host>:<port>/ws` for real-time streaming chat.
 ## Web UI Dashboard
 
 The built-in web UI provides a full-featured dashboard with these tabs:
+- **Dashboard** — KPI cards, server info, system resources, daemon status
 - **Chat** — WebSocket-powered streaming chat interface
-- **Editor** — Code editor with syntax highlighting
-- **Git** — Git workspace management (status, log, diff, commit, push)
-- **GitHub** — GitHub integration (PRs, issues, repos)
-- **Code Runner** — Sandboxed code execution interface
-- **Lens** — Full activity audit timeline of all sessions, tool calls, and policy decisions
-- **Memory** — Search and browse memory entries across all tiers
-- **Jobs** — View scheduled job status and history
 - **Sessions** — Browse and manage all chat sessions
+- **Memory** — Search and browse memory entries across all tiers
+- **Skills** — Manage and browse skill modules
+- **Soul** — Agent personality management
+- **Activity** — Cortex Lens audit timeline of all tool calls and policy decisions
+- **Editor** — Code editor with syntax highlighting
+- **Code Runner** — Sandboxed code execution interface
+- **Version Control** — Git workspace management (status, log, diff, commit, push)
+- **Projects** — Project management
 - **Agents** — Configure and manage agent profiles
 - **Services** — Manage micro-service instances
+- **Nodes** — Distributed node management and metrics
+- **Jobs** — View scheduled job status and history
+- **Automation** — Trigger and hook configuration
+- **Channels** — Communication channel management
 - **Settings** — System configuration
-- **Soul** — Agent personality management
-- **Plugins** — Plugin installation and management
-- **Marketplace** — Browse and install from marketplace
+- **Policies** — Security policy rule management
+- **Extensions** — Plugin installation and management (with marketplace sub-tab)
 - **Analytics** — Usage and performance analytics
-- **Logs** — System log viewer
+- **Quartermaster** — Model Quartermaster stats and dashboard
 
 Session resume is supported: including an existing `sessionId` in a `chat` message reopens the per-session database and loads previous history.
 

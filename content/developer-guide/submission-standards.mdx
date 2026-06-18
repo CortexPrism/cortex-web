@@ -49,7 +49,7 @@ Brief one-line description.
 ## Installation
 
 \`\`\`bash
-cortex plugin install marketplace:my-plugin
+cortex plugins install marketplace:my-plugin
 \`\`\`
 
 ## Configuration
@@ -269,9 +269,9 @@ Before submitting, verify each item:
 - [ ] `.gitignore` excludes build artifacts and secrets
 
 **Code**
-- [ ] Plugin installs and loads without errors (`cortex plugin install ./my-plugin`)
-- [ ] All capabilities work correctly (`cortex plugin call my-plugin cap-name '{}'`)
-- [ ] The plugin works in a chat session (`cortex chat --plugin my-plugin`)
+- [ ] Plugin installs and loads without errors (`cortex plugins install ./my-plugin`)
+- [ ] All capabilities work in a chat session (`cortex chat --agent my-agent`)
+- [ ] The plugin works in a chat session (`cortex chat --agent my-agent`)
 - [ ] All permissions declared are actually used
 - [ ] Error handling covers expected failure modes
 - [ ] Input validation is implemented for all capability parameters
@@ -305,9 +305,9 @@ git tag v1.0.0
 git push origin v1.0.0
 
 # Verify the build
-cortex plugin install ./my-plugin
-cortex plugin call my-plugin my-cap '{"test": true}'
-```
+cortex plugins install ./my-plugin
+# Test in a chat session
+cortex chat --agent my-agent
 
 #### 2. Submit via Web UI
 
@@ -435,7 +435,7 @@ Common rejection reasons and how to avoid them:
 | Rejection Reason | How to Avoid |
 |-----------------|--------------|
 | Missing or invalid manifest | Validate your manifest JSON before submitting |
-| Plugin fails to load | Test `cortex plugin install ./my-plugin` before submitting |
+| Plugin fails to load | Test `cortex plugins install ./my-plugin` before submitting |
 | Insufficient documentation | Write a complete README with installation and examples |
 | Overly broad permissions | Only declare the permissions your plugin actually uses |
 | Missing license | Include a `LICENSE` file with a valid SPDX identifier |

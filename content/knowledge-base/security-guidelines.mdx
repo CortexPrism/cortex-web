@@ -40,7 +40,7 @@ cortex vault store "openai-key" --service openai
 The vault uses AES-256-GCM encryption with PBKDF2 key derivation:
 
 - **Encryption**: AES-256-GCM (authenticated encryption)
-- **Key derivation**: PBKDF2 with 600,000 iterations
+- **Key derivation**: PBKDF2 with 100,000 iterations
 - **Key source**: `CORTEX_VAULT_KEY` environment variable
 - **Storage**: Encrypted SQLite database (`vault.db`)
 - **Access logging**: All vault access is logged to Lens
@@ -61,9 +61,15 @@ cortex vault get "db-password"
 
 ## Policy Rules
 
-### Default Deny
+### Default Allow
 
-The policy engine uses a default-deny approach. Only explicitly allowed operations are permitted.
+The policy engine uses a default-allow approach. When no rule matches, operations are permitted. Add explicit deny rules to block dangerous patterns, then allow rules to grant specific access.
+
+### Rule Evaluation Order
+
+1. Rules are evaluated by priority (lower number = higher precedence)
+2. First matching rule determines the decision
+3. Default action: allow (when no rules match)
 
 ```bash
 # List current policies
@@ -81,9 +87,9 @@ cortex policy remove <policy-id>
 
 ### Rule Evaluation Order
 
-1. Explicit deny rules (checked first)
-2. Explicit allow rules
-3. Default action (deny)
+1. Rules evaluated by priority (lowest number first)
+2. First matching rule determines the decision
+3. Default action: allow (when no rules match)
 
 ### Recommended Rules
 
@@ -137,13 +143,10 @@ Enable API authentication in production:
 
 ```json
 {
-  "server": {
-    "port": 3000,
-    "host": "127.0.0.1",
-    "auth": {
-      "required": true,
-      "jwtSecret": "your-secure-secret-change-in-production"
-    }
+  "webAuth": {
+    "requireAuth": true,
+    "sessionSecret": "your-secure-secret-change-in-production",
+    "passwordHash": "$2b$..."
   }
 }
 ```
@@ -175,8 +178,8 @@ When Docker is unavailable, subprocess mode provides weaker isolation:
 # Warn when falling back to subprocess
 cortex run script.py  # Logs warning if Docker unavailable
 
-# Force sandbox mode
-cortex run script.py --sandbox-only  # Fails if Docker unavailable
+# Disable sandbox (use subprocess directly)
+cortex run script.py --no-sandbox  # Disables Docker sandbox
 ```
 
 ## Audit Logging (Cortex Lens)

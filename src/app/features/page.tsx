@@ -85,7 +85,7 @@ const features = [
       "Graph: Knowledge graph nodes and edges built from semantic entity extraction",
       "Skills: Procedural knowledge extracted from sessions with multi-step tool usage",
     ],
-    example: 'cortex memory search "deployment config" --semantic',
+    example: 'cortex memory search "deployment config" --type semantic',
   },
   {
     icon: Shield,
@@ -99,7 +99,7 @@ const features = [
       "Approval workflows for sensitive actions",
       "Sandboxed plugin execution isolation",
     ],
-    example: "cortex policy add code.execute.python -k capability -e allow -r \"trusted\"",
+    example: "cortex policy add code_exec -k tool -e allow -r trusted",
   },
   {
     icon: Code2,
@@ -141,7 +141,7 @@ const features = [
       "Job queue with priority levels",
       "Execution logs and monitoring",
     ],
-    example: 'cortex daemon start && cortex jobs add weekly-report "cortex run report.py" --cron "0 9 * * 1"',
+    example: 'cortex daemon start && cortex jobs add weekly-report "generate-report" --cron "0 9 * * 1"',
   },
   {
     icon: Puzzle,
@@ -155,7 +155,7 @@ const features = [
       "Version management with dependency resolution",
       "Isolated plugin sandboxes",
     ],
-    example: "cortex plugin install marketplace:cortexprism.io/plugins/python-executor",
+    example: "cortex plugins install marketplace:cortexprism.io/plugins/python-executor",
   },
   {
     icon: Monitor,
@@ -183,7 +183,7 @@ const features = [
       "Per-agent tool and provider assignments",
       "Agent-to-agent collaboration",
     ],
-    example: "cortex agent create code-reviewer -m claude-sonnet-4-5 -d \"Reviews pull requests\" --tools read,write,shell",
+    example: 'cortex agent create code-reviewer -m claude-sonnet-4-5 -d "Reviews pull requests" --tools file_read,web_search,shell',
   },
   {
     icon: Share2,
@@ -211,18 +211,18 @@ const features = [
       "Diff analysis with natural language summaries",
       "Intelligent branch naming and conflict detection",
     ],
-    example: "cortex git commit --agent workspace-1",
+    example: "cortex git commit \"fix: resolve type error in auth module\"",
   },
   {
     icon: BrainCircuit,
     title: "Model Quartermaster",
     subtitle: "Adaptive Tool Prediction",
     description:
-      "An adaptive 5-signal prediction engine that observes tool calls, learns patterns, and predicts which tool the agent should use next. Powered by reinforcement learning.",
+      "An adaptive 6-signal model-selection engine that observes LLM calls, learns patterns, and predicts the optimal model for each task. Powered by reinforcement learning.",
     benefits: [
-      "Five prediction signals: trajectory, episodic, tool stats, task context, reflection",
+      "Six prediction signals: trajectory, episodic, historical, cost, quality, reflection",
       "Automatic tool execution above 90% confidence for safe operations",
-      "Reinforcement learning with EMA weight adjustment",
+      "Reinforcement learning with EMA weight adjustment (alpha=0.15 reward, alpha=0.25 punishment)",
       "Dashboard with accuracy bars, signal weights, and top tools",
     ],
     example: "cortex qm dashboard -s sess_abc123",
@@ -239,7 +239,7 @@ const features = [
       "Parallel execution via Promise.allSettled",
       "Human-in-the-loop approval gates with resume support",
     ],
-    example: "cortex workflow run",
+    example: "cortex workflow run my-workflow",
   },
   {
     icon: Search,

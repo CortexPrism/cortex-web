@@ -32,13 +32,13 @@ When Docker is available, containers are created with strict resource limits:
 
 | Language | Extension | Docker Image | Interpreter |
 |----------|-----------|-------------|-------------|
-| Python | `.py` | `python:3.12-slim` | `python3` |
-| JavaScript | `.js` | `node:22-slim` | `node` |
-| TypeScript | `.ts` | `node:22-slim` | `npx tsx` |
-| Bash | `.sh` | `ubuntu:24.04` | `bash` |
-| Ruby | `.rb` | `ruby:3.3-slim` | `ruby` |
-| Go | `.go` | `golang:1.23-bookworm` | `go run` |
-| Rust | `.rs` | `rust:1.78-slim` | `rustc -o /tmp/out && /tmp/out` |
+| Python | `.py` | `python:3.12-alpine` | `python3` |
+| JavaScript | `.js` | `node:22-alpine` | `node` |
+| TypeScript | `.ts` | `denoland/deno:alpine` | `deno eval` |
+| Bash | `.sh` | `alpine:3.20` | `bash` |
+| Ruby | `.rb` | `ruby:3.3-alpine` | `ruby` |
+| Go | `.go` | `golang:1.22-alpine` | `go run` |
+| Rust | `.rs` | `rust:1.78-alpine` | `rustc -o /tmp/out && /tmp/out` |
 
 ## Subprocess Fallback
 
@@ -75,13 +75,15 @@ cortex run complex.js --fix --max-fix 8
 
 ## Configuration
 
-The sandbox can be configured through environment variables:
+Sandbox resource limits are hardcoded constants in the executor:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `CORTEX_SANDBOX_TIMEOUT` | Execution timeout in seconds | `30` |
-| `CORTEX_SANDBOX_MEMORY` | Memory limit in MB | `256` |
-| `CORTEX_SANDBOX_MAX_OUTPUT` | Output cap in KB | `64` |
+| Constraint | Value |
+|------------|-------|
+| Memory limit | 256MB |
+| CPU limit | 0.5 cores |
+| PID limit | 64 |
+| Execution timeout | 30 seconds |
+| Max output | 64KB |
 
 ## Best Practices
 

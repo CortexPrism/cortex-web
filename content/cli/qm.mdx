@@ -1,11 +1,11 @@
 ---
 title: cortex qm / mqm
-description: Model Quartermaster — adaptive tool-prediction engine with 5-signal analysis, reinforcement learning, and dashboard
+description: Model Quartermaster — adaptive model-selection engine with 6-signal analysis, reinforcement learning, and dashboard
 ---
 
 # `cortex qm` / `cortex mqm`
 
-The Model Quartermaster is an adaptive tool-prediction engine that observes tool calls across sessions, computes five weighted signal scores, and fuses them to predict which tool the agent should call next. `cortex qm` provides session-level analysis; `cortex mqm` provides model-level analysis.
+The Model Quartermaster is an adaptive model-selection engine that observes LLM calls across sessions, computes six weighted signal scores, and fuses them to predict the optimal model for each task. `cortex mqm` provides model-level analysis across all sessions; the legacy `cortex qm` tool-prediction variant is also available for tool-level analysis.
 
 ## Usage
 
@@ -14,26 +14,27 @@ cortex qm <subcommand> [options]
 cortex mqm <subcommand> [options]
 ```
 
-## Five Prediction Signals
+## Six Prediction Signals (MQM)
 
 | Signal | Description |
 |--------|-------------|
-| **Trajectory** | Historical tool call sequence patterns |
+| **Trajectory** | Recent model usage patterns and sequences |
 | **Episodic** | Similar conversation context matching |
-| **Tool Stats** | Statistical success/failure rates per tool |
-| **Task Context** | Current task type and requirements |
+| **Historical** | Past performance data for task categories |
+| **Cost** | Cost efficiency optimization across models |
+| **Quality** | Expected quality based on model capabilities |
 | **Reflection** | Per-turn reflection feedback integration |
 
 ## `cortex qm` Subcommands
 
 | Subcommand | Description |
 |------------|-------------|
-| `patterns` | List learned tool patterns |
+| `patterns` | List learned patterns |
 | `weights` | Show current signal weights |
-| `stats` | Display tool usage statistics |
+| `stats` | Display usage statistics |
 | `decisions` | Show prediction decisions for a session |
 | `trace` | Trace the prediction chain for a turn |
-| `dashboard` | Rich visual dashboard with accuracy bars and top tools |
+| `dashboard` | Rich visual dashboard with accuracy bars and top predictions |
 | `accuracy` | Show prediction accuracy metrics |
 | `reset` | Reset quartermaster state for a session |
 | `reset-all` | Reset all quartermaster data |
@@ -49,7 +50,7 @@ cortex mqm <subcommand> [options]
 
 | Subcommand | Description |
 |------------|-------------|
-| `stats` | Model-level tool usage statistics |
+| `stats` | Model-level usage statistics |
 | `decisions` | Model-level prediction decisions |
 | `weights` | Model-level signal weights |
 | `accuracy` | Accuracy metrics across all sessions |
@@ -67,9 +68,9 @@ cortex mqm <subcommand> [options]
 
 | Confidence | Action |
 |------------|--------|
-| ≥ 90% | **Automate** — Execute tool automatically (safe tools only) |
-| 60–89% | **Suggest** — Recommend tool to the agent |
-| < 60% or unsafe | **Defer** — Let the agent decide |
+| ≥ 90% | **Automate** — Auto-select model (safe operations only) |
+| 60–89% | **Suggest** — Recommend model to the agent |
+| < 60% | **Defer** — Let the agent decide |
 
 ## Active Mode
 
@@ -78,16 +79,16 @@ The Quartermaster requires 50 observations before entering active prediction mod
 ## Reinforcement Learning
 
 After each prediction, the Quartermaster evaluates correctness:
-- **Reward**: Increase signal weights for correct predictions
-- **Punishment**: Decrease weights for incorrect predictions
-- **Adaptive EMA**: Weights adjust via exponential moving average
+- **Reward (EMA α = 0.15)**: Increase signal weights for correct predictions
+- **Punishment (EMA α = 0.25)**: Decrease weights for incorrect predictions
+- **Convergence**: Weights stabilize after ~200–500 observations
 
 ## Dashboard Output
 
 The `dashboard` subcommand provides the richest output:
 - Accuracy bars per signal
 - Current signal weights visualization
-- Top tools by prediction accuracy
+- Top models by prediction accuracy
 - Session and model-level trends
 - Confidence distribution histograms
 

@@ -11,9 +11,12 @@ cortex setup
 ```
 
 The setup wizard guides you through:
-1. **Provider configuration** — Add API keys for LLM providers
-2. **Data directory** — Choose data storage location (default: `~/.cortex/`)
-3. **Default model** — Set your preferred LLM model for chat sessions
+1. **Mode selection** — Choose CLI or Web interface
+2. **Provider configuration** — Add API keys for up to 24 LLM providers (or skip)
+3. **AI personalization** — Optional context about how you use AI
+4. **Personality template** — Choose from 8 soul templates
+5. **Channel setup** — CLI, CLI+Web, CLI+Discord, or all channels
+6. **Telemetry preference** — Opt in or out of anonymous usage data
 
 ## `cortex migrate`
 
@@ -26,11 +29,11 @@ cortex migrate
 Migrates all databases:
 | Database | File | Migrations |
 |----------|------|------------|
-| Core | `cortex.db` | sessions, turns, jobs, policy rules |
-| Memory | `memory.db` | 5-tier memory, FTS5, embeddings |
-| Lens | `lens.db` | Audit events |
-| Vault | `vault.db` | Encrypted credential entries |
-| Plugins | `plugins.db` | Plugin registry |
+| Core | `cortex.db` | sessions, turns, jobs, policy rules, agents, services, hubs, nodes |
+| Memory | `memory.db` | 5-tier memory, FTS5, embeddings, reflections, graph, skills |
+| Lens | `lens.db` | Immutable audit events (50+ event types) |
+| Vault | `vault.db` | Encrypted credential entries (AES-256-GCM) |
+| Plugins | `plugins.db` | Plugin registry and state |
 
 Migrations are idempotent with checksum guards — safe to run multiple times.
 

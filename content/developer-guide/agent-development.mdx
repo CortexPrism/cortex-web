@@ -79,14 +79,30 @@ Agents can use built-in tools and plugin-provided tools:
 
 | Tool | Description |
 |------|-------------|
-| `web_search` | Search the web via DuckDuckGo |
-| `read_file` | Read files from the filesystem |
-| `write_file` | Write files to the filesystem |
+| `file_read` | Read files from the filesystem (with enhanced multi-modal support) |
+| `file_write` | Write files to the filesystem |
+| `file_edit` | Apply precise string replacements in files |
+| `file_delete` | Delete files |
+| `file_rename` | Rename or move files |
+| `file_copy` | Copy files |
+| `file_glob` | Find files by glob patterns |
+| `file_search` | Search file contents with regex |
+| `file_tree` | Display directory tree |
+| `file_diff` | Compute file diffs |
+| `file_undo` | Undo file changes |
 | `shell` | Execute shell commands |
-| `code_exec` | Run code in sandbox |
+| `code_exec` | Run code in sandboxed environments (Docker/gVisor) |
+| `web_search` | Search the web (DuckDuckGo, Brave, Tavily, SerpAPI) |
+| `web_fetch` | Fetch and parse content from URLs |
 | `memory_search` | Search the memory system |
 | `memory_store` | Store information in memory |
-| `fetch_url` | Fetch content from URLs |
+| `sub_agent` | Spawn sub-agent processes for independent tasks |
+| `load_skill` | Load skill modules into agent context |
+| `skill_read` | Read bundled skill definitions |
+| `git` | Full git porcelain (status, log, diff, commit, push, clone, etc.) |
+| `github` | GitHub integration (PRs, issues, repositories) |
+| `listen` | Voice input via microphone |
+| `speak` | Text-to-speech output |
 
 ### Plugin Tools
 

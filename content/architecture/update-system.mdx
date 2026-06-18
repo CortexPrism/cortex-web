@@ -15,7 +15,7 @@ The Cortex update system provides dual-mode updates (binary and source), SHA-256
 │                                                           │
 │  ┌──────────────────────────────────────────────────┐    │
 │  │                    Channels                       │    │
-│  │              stable ←→ pre                       │    │
+│  │              stable ←→ pre-release                  │    │
 │  └──────────────────────────────────────────────────┘    │
 │                         │                                  │
 │  ┌──────────────────────┼──────────────────────────┐    │
@@ -58,7 +58,7 @@ The Cortex update system provides dual-mode updates (binary and source), SHA-256
 | Channel | Description | Update Frequency |
 |---------|-------------|-----------------|
 | `stable` | Production-ready releases | Weekly/monthly |
-| `pre` | Pre-release builds | Daily/as-needed |
+| `pre-release` | Pre-release builds | Daily/as-needed |
 
 ## Configuration
 
@@ -79,7 +79,7 @@ The Cortex update system provides dual-mode updates (binary and source), SHA-256
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `channel` | Update channel (`stable` or `pre`) | `stable` |
+| `channel` | Update channel (`stable` or `pre-release`) | `stable` |
 | `checkOnStartup` | Check for updates on cortex start | `true` |
 | `autoUpdate` | Automatically apply updates | `false` |
 | `checkIntervalHours` | Periodic check interval | `24` |

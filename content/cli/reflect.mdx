@@ -29,14 +29,17 @@ Reflection is fire-and-forget — the agent loop does not wait for reflection to
 
 ## Configuration
 
-Reflection can be enabled/disabled in config:
+Reflection runs automatically after each agent turn. Use `cortex reflect` to review and manage reflection patterns:
 
-```json
-{
-  "agent": {
-    "enableReflection": true
-  }
-}
+```bash
+# Inspect recent reflections
+cortex reflect list -s sess_abc123
+
+# Show consolidated patterns
+cortex reflect patterns
+
+# Run manual consolidation
+cortex reflect consolidate
 ```
 
 ## Examples

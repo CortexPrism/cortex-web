@@ -248,7 +248,7 @@ cortex git branch --create feature/user-profile
 
 # 2. Make changes, then commit
 cortex git add --all
-cortex git commit --agent
+cortex git commit
 
 # 3. Push the branch
 cortex git push --remote origin --branch feature/user-profile
@@ -276,7 +276,7 @@ cortex git branch --create fix/safari-login-button
 
 # 4. Fix, commit, push, create PR
 cortex git add --all
-cortex git commit --agent
+cortex git commit
 cortex git push --remote origin --branch fix/safari-login-button
 cortex github pr create --body "Fixes #42: Safari 17.4 login button event handling"
 

@@ -103,5 +103,5 @@ Keep the daemon running for scheduled jobs and periodic memory consolidation:
 
 ```bash
 cortex daemon start
-cortex jobs add --schedule "0 9 * * 1" --task "weekly-report"
+cortex jobs add weekly-report "generate-weekly-report" --cron "0 9 * * 1"
 ```

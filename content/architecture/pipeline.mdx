@@ -69,14 +69,14 @@ interface HookResult {
 
 | Hook | Stage | Description |
 |------|-------|-------------|
-| **Content Safety** | pre-llm | Prompt injection detection, PII redaction |
-| **Output Truncation** | post-llm | Truncate responses at 8K tokens |
-| **Summarization** | pre-llm | Auto-compact context at 80K tokens |
-| **Loop Detection** | post-tool | Detect >5 same-file edits, escalate |
-| **Token Budget** | pre-llm | Enforce per-turn token limits |
-| **Reflection Injection** | pre-llm | Inject reflection patterns into context |
-| **MQM Routing** | pre-llm | Route model selection via Quartermaster |
-| **Validation** | pre-tool | Run custom validation plugins |
+| **Injection Guard** | pre-reason, pre-tool | Prompt injection and content safety detection |
+| **MQM Routing** | pre-llm, post-llm | Route model selection via Quartermaster |
+| **Summarization** | pre-reason | Auto-compact context when approaching token limits |
+| **Output Truncation** | post-tool, post-output | Truncate tool results and responses |
+| **Loop Detection** | pre-tool | Detect repetitive tool calls and intervene |
+| **Tool Output Sandbox** | post-tool | Validate and sanitize tool outputs |
+| **Audit Log** | post-reason | Log LLM calls and decisions to Lens |
+| **Cost Tracker** | pre-tool, post-tool | Track per-tool and per-turn cost metrics |
 
 ## Hook Registration
 

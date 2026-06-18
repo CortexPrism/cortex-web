@@ -18,6 +18,8 @@ cortex memory add "<fact>" --category project --importance 0.9  # Categorized me
 |------------|-------------|
 | `search` | Search memory with hybrid retrieval |
 | `add` | Add a new semantic memory entry |
+| `health` | Show memory system health metrics |
+| `heuristics` | Display memory decay and scoring heuristics |
 
 ## Options
 
@@ -33,11 +35,11 @@ cortex memory add "<fact>" --category project --importance 0.9  # Categorized me
 
 | Tier | Persistence | Content |
 |------|-------------|---------|
-| Ephemeral (T1) | Session | Current conversation context window |
-| Episodic (T2) | Session | Turn summaries of user+agent exchanges |
-| Semantic (T3) | Long-term | Injected facts and knowledge |
-| Archival (T4) | Permanent | Compressed historical data, entities |
-| Reflection (T5) | Permanent | LLM-extracted behavior patterns, per-turn meta-cognition |
+| Episodic | Session | Turn summaries of user+agent exchanges with auto-decay |
+| Semantic | Long-term | Injected facts and knowledge with hybrid FTS5 + vector retrieval |
+| Reflection | Permanent | LLM-extracted behavior patterns from per-turn meta-cognition |
+| Graph | Long-term | Knowledge graph of entities and relationships |
+| Skills | Permanent | Procedural knowledge extracted from multi-step tool usage |
 
 ## Retrieval Algorithm
 

@@ -1,0 +1,72 @@
+# `cortex log`
+
+View and manage Cortex logging output. The logging system writes JSONLines to a rotating log file with configurable log levels.
+
+## Usage
+
+```bash
+cortex log <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `show` | Display recent log entries (latest 100 by default) |
+| `tail` | Stream new log entries in real time |
+| `clear` | Clear/truncate the log file |
+| `path` | Print the path to the current log file |
+| `set-level` | Set the log level for the current session |
+| `status` | Show current logging configuration |
+
+### Options
+
+| Option | Subcommand | Description |
+|--------|------------|-------------|
+| `--limit, -n` | `show` | Number of log entries to display (default: 100) |
+| `--level, -l` | `show`, `tail` | Filter by log level (trace, debug, info, warn, error) |
+
+## Log Levels
+
+| Level | Description |
+|-------|-------------|
+| `trace` | Verbose diagnostic output |
+| `debug` | Debug-level information |
+| `info` | General operational messages |
+| `warn` | Warning conditions |
+| `error` | Error conditions |
+| `silent` | Suppress all log output |
+
+## Configuration
+
+The logging system is configured in `~/.cortex/config.json`:
+
+```json
+{
+  "logging": {
+    "filePath": "~/.cortex/cortex.log",
+    "level": "info"
+  }
+}
+```
+
+Environment variable override: `CORTEX_LOG_LEVEL`
+
+## Examples
+
+```bash
+# View recent logs
+cortex log show
+
+# View last 100 log entries
+cortex log show -n 100
+
+# Filter by error level
+cortex log show --level error
+
+# Stream logs in real time
+cortex log tail
+
+# Check current configuration
+cortex log status
+```
