@@ -20,6 +20,7 @@ const navLinks = [
       { href: "/docs/cli",                   label: "CLI Reference",    desc: "All commands and flags" },
       { href: "/docs/architecture",          label: "Architecture",     desc: "How CortexPrism is built" },
       { href: "/docs/developer-guide",       label: "Developer Guide",  desc: "Build plugins and extensions" },
+      { href: "/features",                   label: "All Features",     desc: "Full capability breakdown" },
     ],
   },
   { href: "/marketplace", label: "Marketplace" },

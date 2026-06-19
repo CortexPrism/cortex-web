@@ -124,9 +124,9 @@ export default function InstallPage() {
           <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">Prerequisites</h3>
           <ul className="text-sm text-[#9090a8] space-y-1">
             <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Linux, macOS, or Windows</li>
-            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Git</li>
-            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>curl or wget</li>
-            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Docker (optional)</li>
+            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Deno 2.x (installer handles this)</li>
+            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Git (for source mode)</li>
+            <li className="flex items-start gap-2"><span className="text-green-400">◆</span>Docker (optional, for sandboxes)</li>
           </ul>
         </div>
 
@@ -160,30 +160,31 @@ export default function InstallPage() {
       <div className="glass-card p-8 mb-10">
         <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Manual Installation</h2>
         <p className="text-sm text-[#9090a8] mb-4">
-          If you prefer to install manually, or the quick install doesn&apos;t work for your setup:
+          Clone the repo directly and run with Deno:
         </p>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="glass-card p-4">
             <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">macOS / Linux</h3>
             <pre className="text-sm font-mono">
               <code>
-                <span className="text-[#55556a]"># 1. Install Deno</span>
-                {"\n"}
-                <span className="text-green-400">curl -fsSL https://deno.land/install.sh</span>
-                <span className="text-[#e2e2ea]"> | sh</span>
-                {"\n\n"}
-                <span className="text-[#55556a]"># 2. Clone the repo</span>
+                <span className="text-[#55556a]"># Clone and setup</span>
                 {"\n"}
                 <span className="text-green-400">git clone</span>
-                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
+                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git ~/.cortex</span>
                 {"\n"}
                 <span className="text-green-400">cd</span>
-                <span className="text-[#e2e2ea]"> cortex</span>
-                {"\n\n"}
-                <span className="text-[#55556a]"># 3. Run setup</span>
+                <span className="text-[#e2e2ea]"> ~/.cortex</span>
+                {"\n"}
+                <span className="text-green-400">deno run --allow-all</span>
+                <span className="text-[#e2e2ea]"> src/db/migrate.ts</span>
                 {"\n"}
                 <span className="text-green-400">deno run --allow-all</span>
                 <span className="text-[#e2e2ea]"> src/main.ts setup</span>
+                {"\n\n"}
+                <span className="text-[#55556a]"># Add alias to shell profile</span>
+                {"\n"}
+                <span className="text-green-400">echo &apos;alias cortex=&quot;deno run --allow-all ~/.cortex/src/main.ts&quot;&apos;</span>
+                <span className="text-[#e2e2ea]"> &gt;&gt; ~/.bashrc</span>
               </code>
             </pre>
           </div>
@@ -191,20 +192,16 @@ export default function InstallPage() {
             <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">Windows (PowerShell)</h3>
             <pre className="text-sm font-mono">
               <code>
-                <span className="text-[#55556a]"># 1. Install Deno</span>
-                {"\n"}
-                <span className="text-green-400">iwr https://deno.land/install.ps1</span>
-                <span className="text-[#e2e2ea]"> -useb | iex</span>
-                {"\n\n"}
-                <span className="text-[#55556a]"># 2. Clone the repo</span>
+                <span className="text-[#55556a]"># Clone and setup</span>
                 {"\n"}
                 <span className="text-green-400">git clone</span>
-                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git</span>
+                <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex.git $env:USERPROFILE\.cortex</span>
                 {"\n"}
                 <span className="text-green-400">cd</span>
-                <span className="text-[#e2e2ea]"> cortex</span>
-                {"\n\n"}
-                <span className="text-[#55556a]"># 3. Run setup</span>
+                <span className="text-[#e2e2ea]"> $env:USERPROFILE\.cortex</span>
+                {"\n"}
+                <span className="text-green-400">deno run --allow-all</span>
+                <span className="text-[#e2e2ea]"> src/db/migrate.ts</span>
                 {"\n"}
                 <span className="text-green-400">deno run --allow-all</span>
                 <span className="text-[#e2e2ea]"> src/main.ts setup</span>
@@ -214,23 +211,55 @@ export default function InstallPage() {
         </div>
       </div>
 
-      <div className="glass-card p-8">
-        <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Docker</h2>
+      <div className="glass-card p-8 mb-10">
+        <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Pre-compiled Binary</h2>
         <p className="text-sm text-[#9090a8] mb-4">
-          Run CortexPrism in a containerized environment:
+          Download the latest binary from the GitHub Releases page. All binaries include SHA-256 checksums and optional GPG signatures.
         </p>
         <div className="glass-card p-4">
           <pre className="text-sm font-mono">
             <code>
-              <span className="text-[#55556a]"># Pull and run</span>
+              <span className="text-[#55556a]"># Download from releases</span>
               {"\n"}
-              <span className="text-green-400">docker pull cortexprism/cortex:latest</span>
+              <span className="text-green-400">curl -LO</span>
+              <span className="text-[#e2e2ea]"> https://github.com/CortexPrism/cortex/releases/latest/download/cortex-linux-x64</span>
               {"\n"}
-              <span className="text-green-400">docker run -it --rm \\</span>
+              <span className="text-green-400">chmod +x</span>
+              <span className="text-[#e2e2ea]"> cortex-linux-x64</span>
+              {"\n\n"}
+              <span className="text-[#55556a]"># Verify checksum</span>
               {"\n"}
-              <span className="text-[#e2e2ea]">  -v ~/.cortex:/home/cortex/.cortex \\</span>
+              <span className="text-green-400">sha256sum -c</span>
+              <span className="text-[#e2e2ea]"> cortex-linux-x64.sha256</span>
+              {"\n\n"}
+              <span className="text-[#55556a]"># Run setup and start</span>
               {"\n"}
-              <span className="text-[#e2e2ea]">  cortexprism/cortex:latest chat</span>
+              <span className="text-green-400">./cortex-linux-x64</span>
+              <span className="text-[#e2e2ea]"> setup</span>
+              {"\n"}
+              <span className="text-green-400">./cortex-linux-x64</span>
+              <span className="text-[#e2e2ea]"> chat</span>
+            </code>
+          </pre>
+        </div>
+      </div>
+
+      <div className="glass-card p-8">
+        <h2 className="text-xl font-bold text-[#e2e2ea] mb-4">Post-Install</h2>
+        <p className="text-sm text-[#9090a8] mb-4">
+          After installing, run these commands to get started:
+        </p>
+        <div className="glass-card p-4">
+          <pre className="text-sm font-mono">
+            <code>
+              <span className="text-green-400">cortex setup</span>
+              <span className="text-[#9090a8]">        # Interactive setup wizard — choose provider, enter API key</span>
+              {"\n"}
+              <span className="text-green-400">cortex chat</span>
+              <span className="text-[#9090a8]">         # Start your first chat session</span>
+              {"\n"}
+              <span className="text-green-400">cortex serve</span>
+              <span className="text-[#9090a8]">        # Open the Web UI at http://127.0.0.1:3000</span>
             </code>
           </pre>
         </div>

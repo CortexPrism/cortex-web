@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Bot, Beaker, TestTube, GitBranch, Search, Shield } from "lucide-react";
+import { ArrowRight, Bot, Beaker, TestTube, GitBranch, Search, Shield, Mic, Monitor, Code2 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Use Cases — AI Automation, Dev Assistant & Enterprise Agents",
+  title: "CortexPrism Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",
   description:
-    "See how CortexPrism powers personal AI assistants with persistent memory, AI-assisted development and debugging, research automation, CI/CD workflows, knowledge management, and secure enterprise AI agent deployments.",
+    "See how CortexPrism powers voice-enabled AI assistants, personal AI with persistent memory, AI-assisted development and debugging, research automation, GUI automation, CI/CD workflows, knowledge management, and secure enterprise AI agent deployments.",
   keywords: [
     "AI agent use cases",
     "AI automation use cases",
@@ -18,18 +18,21 @@ export const metadata: Metadata = {
     "knowledge management AI",
     "agentic AI workflow",
     "autonomous agent examples",
+    "voice AI agent",
+    "GUI automation AI",
+    "computer use AI agent",
   ],
   alternates: { canonical: `${SITE_URL}/use-cases` },
   openGraph: {
-    title: "CortexPrism Use Cases — AI Automation, Dev Assistant & Enterprise Agents",
+    title: "CortexPrism Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",
     description:
-      "From self-hosted personal AI assistants with persistent memory to enterprise-grade secure agent deployments — CortexPrism adapts to research, development, CI/CD, and knowledge workflows.",
+      "From voice-enabled assistants and self-hosted personal AI with persistent memory to GUI automation and enterprise-grade secure agent deployments — CortexPrism adapts to any workflow.",
     url: `${SITE_URL}/use-cases`,
   },
   twitter: {
-    title: "CortexPrism Use Cases — AI Automation, Dev Assistant & Enterprise Agents",
+    title: "CortexPrism Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",
     description:
-      "Self-hosted personal AI assistants with persistent memory, AI-assisted development, CI/CD automation, and secure enterprise agent deployments.",
+      "Voice-enabled assistants, self-hosted personal AI with persistent memory, AI-assisted development, GUI automation, and secure enterprise agent deployments.",
   },
 };
 
@@ -103,14 +106,53 @@ const useCases = [
     icon: Shield,
     title: "Secure Agent Deployments",
     subtitle: "Enterprise-grade security for agent operations",
-    description: "Deploy AI agents with confidence using the Parallax security model, encrypted credential vault, and granular policy controls.",
+    description: "Deploy AI agents with confidence using the Parallax + LLM supervisor security model, encrypted credential vault, DLP Guard, and granular policy controls.",
     bullets: [
-      "3-stage tool validation gate",
-      "AES-256-GCM encrypted credential vault",
-      "Custom policy rules with regex pattern matching",
+      "3-stage tool validation gate + LLM security supervisor",
+      "AES-256-GCM encrypted credential vault with PBKDF2",
+      "DLP Guard with 22 scanners for data loss prevention",
       "Comprehensive audit logging in Cortex Lens",
     ],
     example: "cortex policy add 'rm.*-rf.*/' --kind shell --effect deny",
+  },
+  {
+    icon: Mic,
+    title: "Voice-Enabled Agent",
+    subtitle: "Hands-free AI interaction",
+    description: "Interact with your AI agent using natural speech. Full voice pipeline with speech-to-text, text-to-speech, and voice activity detection for seamless conversation.",
+    bullets: [
+      "Speech-to-text via OpenAI Whisper for natural input",
+      "Text-to-speech with OpenAI TTS or ElevenLabs voices",
+      "Energy-based VAD for automatic turn detection",
+      "Real-time audio streaming over WebSocket",
+    ],
+    example: "cortex voice enable",
+  },
+  {
+    icon: Monitor,
+    title: "GUI Automation & Computer Use",
+    subtitle: "Automate desktop applications",
+    description: "Use CortexPrism to automate GUI applications, fill forms, scrape visual data, and control desktop environments. Perfect for legacy system integration and RPA workflows.",
+    bullets: [
+      "Virtual display automation via Xvfb",
+      "Mouse and keyboard control with coordinate precision",
+      "Screenshot capture and visual analysis",
+      "Docker-isolated or native desktop runtime",
+    ],
+    example: "cortex desktop screenshot",
+  },
+  {
+    icon: Code2,
+    title: "Codebase Intelligence",
+    subtitle: "Understand and navigate large codebases",
+    description: "Index your entire codebase with tree-sitter WASM parsing across 14+ languages. Navigate call graphs, trace execution paths, and analyze impact of changes.",
+    bullets: [
+      "Multi-language parsing: TS, JS, Python, Go, Rust, Java, Kotlin, C, C++, Ruby, PHP, Swift, Lua, Bash",
+      "Call graph resolution with cross-file import analysis",
+      "Visual dependency graphs via D3.js in the Web UI",
+      "Impact analysis and path tracing for change management",
+    ],
+    example: "cortex serve && open http://127.0.0.1:3000/codegraph",
   },
 ];
 

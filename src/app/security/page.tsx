@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Shield, Lock, Eye, FileSearch, Server, Wrench, FileCode } from "lucide-react";
+import { Shield, Lock, Eye, FileSearch, Server, Wrench, FileCode, Brain, Scan } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Security — Enterprise-Grade AI Agent Security Architecture",
+  title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
   description:
-    "CortexPrism's Parallax security model provides defense-in-depth for AI agents: 3-stage tool validation, AES-256-GCM encrypted credential vault, granular policy engine, Docker-sandboxed code execution, and full immutable audit logging.",
+    "CortexPrism's Parallax security model with LLM supervisor provides defense-in-depth for AI agents: 3-stage tool validation, LLM-based sensitive data access control, AES-256-GCM encrypted vault, DLP Guard with 22 scanners, granular policy engine, Docker-sandboxed code execution, and immutable audit logging.",
   keywords: [
     "AI agent security",
     "enterprise AI security",
@@ -17,18 +17,21 @@ export const metadata: Metadata = {
     "defense-in-depth AI",
     "AI policy engine",
     "secure LLM deployment",
+    "LLM security supervisor",
+    "DLP data loss prevention AI",
+    "data classification AI",
   ],
   alternates: { canonical: `${SITE_URL}/security` },
   openGraph: {
-    title: "CortexPrism Security — Enterprise-Grade AI Agent Security Architecture",
+    title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
     description:
-      "Defense-in-depth for AI agents: 3-stage tool validation, AES-256-GCM encrypted vault, policy engine, Docker-isolated sandboxes, and immutable audit trail via Cortex Lens.",
+      "Defense-in-depth for AI agents: 3-stage tool validation, LLM security supervisor, AES-256-GCM vault, DLP Guard with 22 scanners, policy engine, Docker-isolated sandboxes, and immutable audit trail.",
     url: `${SITE_URL}/security`,
   },
   twitter: {
-    title: "CortexPrism Security — Enterprise-Grade AI Agent Security Architecture",
+    title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
     description:
-      "Defense-in-depth for AI agents: 3-stage tool validation, AES-256-GCM encrypted vault, policy engine, and Docker-isolated sandboxes.",
+      "Defense-in-depth for AI agents: 3-stage validation, LLM security supervisor, AES-256-GCM vault, DLP Guard, policy engine, and Docker-isolated sandboxes.",
   },
 };
 
@@ -124,6 +127,34 @@ const layers = [
       "Configurable approval timeout",
       "Policy-based automatic approval for trusted patterns",
       "Full audit of all approved and rejected operations",
+    ],
+  },
+  {
+    icon: Brain,
+    title: "LLM Security Supervisor",
+    description:
+      "Sensitive data access (memory, databases, screenshots) requires approval from a fast LLM supervisor model with decision caching and human escalation for uncertain cases.",
+    details: [
+      "Fast supervisor models: Gemini 2.0 Flash, GPT-4o Mini",
+      "Decision caching with 1-hour session TTL to reduce latency",
+      "Human escalation for uncertain classification cases",
+      "Structured approval pipeline with auto-approve thresholds",
+      "Webhook notifications for pending approvals with 5-minute timeouts",
+      "Temporary grants: approved access cached per session to prevent approval fatigue",
+    ],
+  },
+  {
+    icon: Scan,
+    title: "DLP Guard & Data Classification",
+    description:
+      "Automatic sensitivity detection and data loss prevention. Classifies data as SECRET/SENSITIVE/NORMAL/PUBLIC with 22 DLP scanners monitoring all agent outputs.",
+    details: [
+      "Automatic classification: SECRET/SENSITIVE/NORMAL/PUBLIC based on pattern matching",
+      "Detects passwords, API keys, PII, PHI, PCI, and confidential markers",
+      "22-scanner DLP system monitoring all agent outputs",
+      "Three action levels: monitor (log only), redact (mask in output), block (deny entirely)",
+      "All existing data backfilled with classifications on first run",
+      "AI Guardrails: 5 pluggable classifiers for prompt injection, PII leakage, harmful code, excessive length, shell injection",
     ],
   },
 ];

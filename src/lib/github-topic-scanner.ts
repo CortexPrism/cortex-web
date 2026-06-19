@@ -72,7 +72,6 @@ export async function searchGitHubByTopic(
   perPage: number = 100,
 ): Promise<GitHubSearchItem[]> {
   const allItems: GitHubSearchItem[] = [];
-  let totalCount = 0;
   let page = 1;
   const maxPages = 10;
 
@@ -94,9 +93,8 @@ export async function searchGitHubByTopic(
         break;
       }
       const data: GitHubSearchResponse = await res.json();
-      if (page === 1) totalCount = data.total_count;
       allItems.push(...data.items);
-      if (allItems.length >= totalCount || data.items.length === 0) break;
+      if (data.items.length < perPage) break;
       page++;
     } catch {
       break;
@@ -159,6 +157,74 @@ async function checkManifest(
   return result;
 }
 
+async function buildImportedRepoUrls(
+  discovered: { owner: string; repo: string; fullName: string }[],
+): Promise<Set<string>> {
+  const imported = new Set<string>();
+  if (discovered.length === 0) return imported;
+
+  const repoUrls = discovered.map(r => `https://github.com/${r.owner}/${r.repo}`);
+
+  try {
+    const [existingPlugins, existingAgents] = await Promise.all([
+      prisma.plugin.findMany({
+        where: {
+          OR: [
+            { repository: { in: repoUrls } },
+            { githubImportId: { in: discovered.map(r => `topic:${r.fullName}`) } },
+            { githubImportId: { in: discovered.map(r => `api:${r.owner}/${r.repo}`) } },
+          ],
+        },
+        select: { repository: true, githubImportId: true },
+      }),
+      prisma.agentConfig.findMany({
+        where: {
+          OR: [
+            { repository: { in: repoUrls } },
+            { githubImportId: { in: discovered.map(r => `topic:${r.fullName}`) } },
+            { githubImportId: { in: discovered.map(r => `api:${r.owner}/${r.repo}`) } },
+          ],
+        },
+        select: { repository: true, githubImportId: true },
+      }),
+    ]);
+
+    for (const p of existingPlugins) {
+      if (p.repository) imported.add(p.repository);
+      if (p.githubImportId) {
+        for (const r of discovered) {
+          if (
+            p.githubImportId === `topic:${r.fullName}` ||
+            p.githubImportId === `api:${r.owner}/${r.repo}` ||
+            p.githubImportId.startsWith(`github:${r.owner}/${r.repo}:`)
+          ) {
+            imported.add(`https://github.com/${r.owner}/${r.repo}`);
+          }
+        }
+      }
+    }
+
+    for (const a of existingAgents) {
+      if (a.repository) imported.add(a.repository);
+      if (a.githubImportId) {
+        for (const r of discovered) {
+          if (
+            a.githubImportId === `topic:${r.fullName}` ||
+            a.githubImportId === `api:${r.owner}/${r.repo}` ||
+            a.githubImportId.startsWith(`github:${r.owner}/${r.repo}:`)
+          ) {
+            imported.add(`https://github.com/${r.owner}/${r.repo}`);
+          }
+        }
+      }
+    }
+  } catch {
+    // if DB query fails, proceed without filtering — nothing marked as imported
+  }
+
+  return imported;
+}
+
 export async function scanTopic(topic: string, userId: string): Promise<{ scanId: string; totalFound: number }> {
   const token = await getGitHubToken();
 
@@ -200,8 +266,14 @@ export async function scanTopic(topic: string, userId: string): Promise<{ scanId
       r.topics.some(t => CORTEX_TOPICS.all.includes(t)) || r.manifestCheck.found
     );
 
+    const importedRepoUrls = await buildImportedRepoUrls(
+      discovered.map(r => ({ owner: r.owner, repo: r.repo, fullName: r.fullName })),
+    );
+
     for (const r of discovered) {
       const kind = detectKind(r.topics, r.manifestCheck);
+      const repoUrl = `https://github.com/${r.owner}/${r.repo}`;
+      const alreadyImported = importedRepoUrls.has(repoUrl);
       try {
         await prisma.discoveredRepo.create({
           data: {
@@ -216,7 +288,7 @@ export async function scanTopic(topic: string, userId: string): Promise<{ scanId
             repoKind: kind,
             manifestFound: r.manifestCheck.found,
             manifestData: r.manifestCheck.manifest ? JSON.stringify(r.manifestCheck.manifest) : null,
-            importStatus: "pending",
+            importStatus: alreadyImported ? "imported" : "pending",
           },
         });
       } catch {

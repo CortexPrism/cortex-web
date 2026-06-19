@@ -47,17 +47,17 @@ export function Hero({ version }: HeroProps) {
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">
-            <span className="text-[#e2e2ea]">Open-Source </span>
-            <span className="gradient-text">Agentic Harness</span>
+            <span className="text-[#e2e2ea]">The Open-Source </span>
+            <span className="gradient-text">AI Agent Harness</span>
             <br />
-            <span className="text-[#e2e2ea]">for Modern AI</span>
+            <span className="text-[#e2e2ea]">with Memory, Tools &amp; Web UI</span>
           </h1>
 
           <p className="mt-6 text-lg md:text-xl text-[#9090a8] max-w-2xl mx-auto leading-relaxed">
-            A powerful, secure, and extensible runtime for building agentic
-            applications. Chat with 24 LLM providers, execute code in
-            sandboxes, manage memory across five tiers, orchestrate workflows,
-            and deploy distributed agents — all open source.
+            A self-hosted, open-source agentic AI harness that turns any LLM
+            into a capable autonomous agent. Persistent 5-tier memory, 60+
+            built-in tools, sandboxed code execution, a full-featured web UI,
+            and enterprise-grade Parallax security — powered by Deno.
           </p>
 
           {/* CTAs */}

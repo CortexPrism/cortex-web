@@ -20,8 +20,7 @@ curl -fsSL https://cortexprism.io/install.sh | bash
 ### Windows (PowerShell)
 
 ```powershell
-iwr -Uri https://cortexprism.io/install.ps1 -OutFile install.ps1
-.\install.ps1
+irm https://cortexprism.io/install.ps1 | iex
 ```
 
 Windows users can also use Git Bash or WSL2 with the macOS/Linux command above.
@@ -74,6 +73,17 @@ deno run --allow-all src/main.ts setup
 
 The setup command runs database migrations and creates the initial config file.
 
+## Pre-compiled Binary
+
+Download the latest binary from the [Releases page](https://github.com/CortexPrism/cortex/releases). All binaries include SHA-256 checksums and optional GPG signatures.
+
+```bash
+curl -LO https://github.com/CortexPrism/cortex/releases/latest/download/cortex-linux-x64
+chmod +x cortex-linux-x64
+./cortex-linux-x64 setup
+./cortex-linux-x64 chat
+```
+
 ## Docker Installation
 
 A Docker image is available for containerized deployments:
@@ -102,7 +112,7 @@ cortex --version
 
 You should see the version number printed:
 ```
-cortex 0.35.3
+cortex 0.44.0
 ```
 
 ## Next Steps

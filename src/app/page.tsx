@@ -11,37 +11,38 @@ import fs from "fs";
 import path from "path";
 
 export const metadata: Metadata = {
-  title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
+  title: "CortexPrism — Open-Source AI Agent Harness with Memory, Tools & Web UI",
   description:
-    "Open-source AI agent runtime with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. Install with one command and deploy autonomous agents with confidence. MIT licensed.",
+    "The open-source, self-hosted AI agent harness. 24 LLM providers, 5-tier memory, 60+ built-in tools, sandboxed code execution, full web UI, and layered Parallax security. Powered by Deno. MIT licensed.",
   keywords: [
     "open source AI agent",
-    "AI agent runtime",
+    "AI agent harness",
     "LLM orchestration",
     "self-hosted AI",
-    "MCP plugin marketplace",
     "autonomous agents",
     "agent orchestration framework",
     "multi-provider LLM",
     "agentic AI platform",
+    "AI memory system",
+    "Deno AI runtime",
   ],
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
+    title: "CortexPrism — Open-Source AI Agent Harness with Memory, Tools & Web UI",
     description:
-      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise security. MIT licensed. One-command install.",
+      "Self-hosted AI agent harness: 24 LLM providers, 5-tier memory, 60+ tools, sandboxed code execution, full web UI, and layered Parallax security. Powered by Deno. MIT licensed.",
     url: SITE_URL,
   },
   twitter: {
-    title: "CortexPrism — Open-Source AI Agent Runtime & Plugin Marketplace",
+    title: "CortexPrism — Open-Source AI Agent Harness with Memory, Tools & Web UI",
     description:
-      "Open-source AI agent runtime: 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, and enterprise security. MIT licensed.",
+      "Self-hosted AI agent harness: 24 LLM providers, 5-tier memory, 60+ tools, sandboxed code execution, and layered Parallax security. Powered by Deno. MIT licensed.",
   },
 };
 
-const CORTEX_VERSION_DEFAULT = "0.35.3";
+const CORTEX_VERSION_DEFAULT = "0.44.0";
 
 function getCortexVersion(): string {
   const envVersion = process.env.NEXT_PUBLIC_CORTEX_VERSION;

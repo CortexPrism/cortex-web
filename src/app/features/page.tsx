@@ -15,13 +15,19 @@ import {
   Workflow,
   BrainCircuit,
   Search,
+  Sparkles,
+  GitGraph,
+  Mic,
+  MonitorSmartphone,
+  Globe,
+  Network,
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Features — AI Agent Framework Capabilities",
+  title: "CortexPrism Features — AI Agent Harness Capabilities",
   description:
-    "Explore CortexPrism's full feature set: chat with 24 LLM providers, 5-tier memory, MCP & ESM plugin system, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, workflow engine, and audit trail. All open source.",
+    "Explore CortexPrism's full feature set: chat with 24 LLM providers, 5-tier memory, 60+ built-in tools, self-learning skills, code intelligence, voice pipeline, computer use, browser automation, A2A protocol, MCP & ESM plugin system, Parallax security, sandboxed code execution, multi-agent orchestration, and workflow engine. All open source.",
   keywords: [
     "AI agent framework features",
     "LLM orchestration tools",
@@ -33,18 +39,23 @@ export const metadata: Metadata = {
     "open source AI tools",
     "autonomous agent capabilities",
     "model context protocol",
+    "self-learning skills AI",
+    "code intelligence graph",
+    "voice pipeline AI",
+    "computer use AI agent",
+    "A2A protocol",
   ],
   alternates: { canonical: `${SITE_URL}/features` },
   openGraph: {
-    title: "CortexPrism Features — AI Agent Framework Capabilities",
+    title: "CortexPrism Features — AI Agent Harness Capabilities",
     description:
-      "24 LLM providers, 5-tier memory, MCP & ESM plugins, parallax security, sandboxed code execution, intelligent model routing, multi-agent orchestration, and workflow automation. 100% open source.",
+      "24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice pipeline, computer use, browser automation, A2A protocol, MCP & ESM plugins, Parallax security, sandboxed code execution, multi-agent orchestration. 100% open source.",
     url: `${SITE_URL}/features`,
   },
   twitter: {
-    title: "CortexPrism Features — AI Agent Framework Capabilities",
+    title: "CortexPrism Features — AI Agent Harness Capabilities",
     description:
-      "Explore 24 LLM providers, 5-tier memory, MCP & ESM plugins, parallax security, sandboxed code execution, multi-agent orchestration, and workflow automation.",
+      "24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, A2A protocol, sandboxed execution, multi-agent orchestration.",
   },
 };
 
@@ -259,6 +270,90 @@ const features = [
       "REST API for programmatic audit log access",
     ],
     example: "cortex serve && open http://127.0.0.1:3000",
+  },
+  {
+    icon: Sparkles,
+    title: "Skills System",
+    subtitle: "Self-Learning Procedural Knowledge",
+    description:
+      "Auto-extracts reusable procedural patterns from successful tool-call sequences and stores them as versioned, quality-scored skills with trust tiering and dependency tracking.",
+    benefits: [
+      "6-state lifecycle: candidate → verified → released → degraded → deprecated → archived",
+      "Embedding-based retrieval with cosine similarity matching to user queries",
+      "Automatic deduplication and merging of similar skills",
+      "4-tier trust system controlling agent skill exposure",
+    ],
+    example: "cortex serve && open http://127.0.0.1:3000/skills",
+  },
+  {
+    icon: GitGraph,
+    title: "Code Intelligence",
+    subtitle: "Multi-Language Code Graph",
+    description:
+      "Tree-sitter WASM parser for 14+ languages with call graph resolution, impact analysis, architecture extraction, and symbol search. Visualized via D3.js force-directed graph.",
+    benefits: [
+      "14+ languages: TS, JS, Python, Go, Rust, Java, Kotlin, C, C++, Ruby, PHP, Swift, Lua, Bash",
+      "6-strategy call target resolution with cross-file import analysis",
+      "14 node labels and 18 edge types in the graph database",
+      "D3.js Web UI with symbol search, impact analysis, and path tracing",
+    ],
+    example: "cortex serve && open http://127.0.0.1:3000/codegraph",
+  },
+  {
+    icon: Mic,
+    title: "Voice Pipeline",
+    subtitle: "Speech-to-Text & Text-to-Speech",
+    description:
+      "Full voice interaction pipeline with OpenAI Whisper STT, OpenAI TTS / ElevenLabs, energy-based VAD, and real-time audio streaming over WebSocket.",
+    benefits: [
+      "Speech-to-text via OpenAI Whisper with configurable models",
+      "Text-to-speech with OpenAI TTS and ElevenLabs provider support",
+      "Energy-based voice activity detection with adjustable threshold",
+      "Real-time audio streaming over WebSocket for low-latency interaction",
+    ],
+    example: "cortex voice enable",
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Computer Use",
+    subtitle: "GUI Automation via Virtual Displays",
+    description:
+      "GUI automation using X11 virtual framebuffer (Xvfb) with mouse control, keyboard input, and screenshot capture. Docker-isolated or native runtime.",
+    benefits: [
+      "Virtual display management with multi-display support",
+      "Mouse: coordinate movement, left/right/middle clicks, double/triple clicks, drag",
+      "Keyboard: text typing with configurable delays, key combos, key holding",
+      "15 agent actions: screenshot, click, type, key, scroll, wait, mouse_move, drag",
+    ],
+    example: "cortex desktop screenshot",
+  },
+  {
+    icon: Globe,
+    title: "Browser Automation",
+    subtitle: "Headless Web Interaction",
+    description:
+      "Headless Playwright-powered browser for web navigation, interaction, screenshots, and accessibility snapshots. Fully integrated with agent tools.",
+    benefits: [
+      "Navigate to URLs, click elements, type text, and submit forms",
+      "Take full-page screenshots and accessibility snapshots",
+      "Execute JavaScript on pages and wait for conditions",
+      "All actions gated through policy validator with user approval",
+    ],
+    example: 'cortex chat -m claude-sonnet-4-5',
+  },
+  {
+    icon: Network,
+    title: "A2A Protocol Bridge",
+    subtitle: "Cross-Framework Agent Collaboration",
+    description:
+      "Google Agent2Agent (A2A) v1.0 protocol for cross-framework agent collaboration. JSON-RPC 2.0 server/client with SSE streaming and tool wrapping.",
+    benefits: [
+      "Full A2A v1.0 compliance with JSON-RPC 2.0 transport",
+      "Server mode: expose CortexPrism agents to other A2A-compatible frameworks",
+      "Client mode: consume external A2A agents as CortexPrism tools",
+      "SSE streaming for real-time agent-to-agent communication",
+    ],
+    example: "cortex serve && open http://127.0.0.1:3000/a2a",
   },
 ];
 

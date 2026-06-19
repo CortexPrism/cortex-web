@@ -25,19 +25,28 @@ After setup, your configuration is stored at `~/.cortex/config.json`:
   "providers": {
     "anthropic": {
       "kind": "anthropic",
-      "model": "claude-sonnet-4-20250514",
+      "model": "claude-sonnet-4-5",
       "apiKey": "sk-ant-..."
     }
   },
   "agent": {
     "name": "Cortex",
-    "maxTurns": 50,
+    "maxTurns": 8,
     "streamOutput": true
   },
   "router": {
     "enabled": false,
-    "confidenceThreshold": 0.7,
-    "cascade": []
+    "strategy": "cascade",
+    "confidenceThreshold": 0.7
+  },
+  "modelSelection": {
+    "enabled": true,
+    "mode": "balanced",
+    "observeThreshold": 50
+  },
+  "update": {
+    "channel": "stable",
+    "checkOnStartup": true
   }
 }
 ```
@@ -54,12 +63,11 @@ CORTEX_DATA_DIR=/data/cortex cortex chat
 The data directory contains:
 | File | Contents |
 |------|----------|
-| `cortex.db` | Core: sessions, jobs, policy rules |
-| `memory.db` | 5-tier memory: episodic, semantic, reflection |
-| `lens.db` | Audit log: all events, tool calls, policy checks |
-| `vault.db` | Encrypted credentials |
+| `cortex.db` | Core: sessions, jobs, policy rules, services, nodes |
+| `memory.db` | 5-tier memory: episodic, semantic, reflection, graph, skills |
+| `lens.db` | Immutable audit log: all events, tool calls, policy checks, cost tracking |
+| `vault.db` | AES-256-GCM encrypted credentials |
 | `plugins.db` | Plugin registry |
-| `sess_*.db` | Per-session message history |
 
 ## Your First Chat
 
@@ -79,21 +87,24 @@ Type a message and the agent will respond. Try these:
 - `"Search the web for latest AI news"` — Web search via DuckDuckGo
 - `"Run a Python script that calculates fibonacci"` — Sandboxed code execution
 - `"Read the file ~/.cortex/config.json"` — File reading via tool
-- `"Remember that I use VS Code"` — Store a fact in memory
+- `"Remember that I use VS Code"` — Store a fact in 5-tier memory
+- `"Search my memory for deployment configs"` — Hybrid FTS5 + vector retrieval
 
 ## What Happens Behind the Scenes
 
 ```
 Your message
-  → Agent retrieves relevant memories
-  → Builds prompt with context
+  → Agent retrieves relevant memories (hybrid FTS5 + vector search)
+  → Builds prompt with memory + tool context
   → Sends to LLM provider
   → LLM responds (may request tool calls)
   → Tool calls are validated by Parallax security
+  → Sensitive data access checked by LLM supervisor
   → Approved tools execute (file read, web search, code run)
   → Results fed back to LLM for final response
   → Response streamed back to you
   → Session history saved to SQLite
   → Episodic memory written (async)
-  → Reflection performed (async)
+  → Self-reflection performed (async)
+  → Tool call patterns extracted into skills (async)
 ```

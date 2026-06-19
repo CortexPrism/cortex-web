@@ -11,6 +11,10 @@ import {
   Workflow,
   BrainCircuit,
   Search,
+  Sparkles,
+  GitGraph,
+  Mic,
+  MonitorSmartphone,
 } from "lucide-react";
 
 const features = [
@@ -109,6 +113,38 @@ const features = [
     color: "text-sky-400",
     bg: "bg-sky-500/10",
     glow: "rgba(56,189,248,0.15)",
+  },
+  {
+    icon: Sparkles,
+    title: "Self-Learning Skills",
+    description: "Auto-extracts reusable patterns from tool calls with 6-state lifecycle and trust tiering.",
+    color: "text-rose-400",
+    bg: "bg-rose-500/10",
+    glow: "rgba(251,113,133,0.15)",
+  },
+  {
+    icon: GitGraph,
+    title: "Code Intelligence",
+    description: "Tree-sitter WASM code graph across 14+ languages with call-graph traversal and impact analysis.",
+    color: "text-lime-400",
+    bg: "bg-lime-500/10",
+    glow: "rgba(163,230,53,0.15)",
+  },
+  {
+    icon: Mic,
+    title: "Voice Pipeline",
+    description: "Speech-to-text, text-to-speech, energy-based VAD, and real-time audio streaming over WebSocket.",
+    color: "text-fuchsia-400",
+    bg: "bg-fuchsia-500/10",
+    glow: "rgba(232,121,249,0.15)",
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Computer Use",
+    description: "GUI automation via virtual displays with mouse, keyboard, and screenshot actions.",
+    color: "text-yellow-400",
+    bg: "bg-yellow-500/10",
+    glow: "rgba(250,204,21,0.15)",
   },
 ];
 

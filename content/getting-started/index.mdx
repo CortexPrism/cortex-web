@@ -10,13 +10,41 @@ Get started with CortexPrism in under 5 minutes.
 
 ## Installation
 
+### Option 1: One-line installer (recommended)
+
+**macOS / Linux:**
+
 ```bash
-git clone https://github.com/CortexPrism/cortex.git
-cd cortex
+curl -fsSL https://cortexprism.io/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://cortexprism.io/install.ps1 | iex
+```
+
+The installer checks for / installs Deno, clones Cortex to `~/.cortex`, creates the `cortex` CLI alias, and runs database migrations.
+
+### Option 2: Manual clone
+
+```bash
+git clone https://github.com/CortexPrism/cortex.git ~/.cortex
+cd ~/.cortex
+deno run --allow-all src/db/migrate.ts
 deno run --allow-all src/main.ts setup
 ```
 
-This installs dependencies and initializes all databases.
+Add `cortex` to your PATH by appending to your shell profile:
+
+```bash
+echo 'alias cortex="deno run --allow-all ~/.cortex/src/main.ts"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Option 3: Pre-compiled binary
+
+Download the latest binary from the [Releases page](https://github.com/CortexPrism/cortex/releases). All binaries include SHA-256 checksums and optional GPG signatures.
 
 ## Configure a Provider
 

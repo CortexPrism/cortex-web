@@ -48,7 +48,7 @@ export function CtaSection() {
             Install in one line
           </h2>
           <p className="mt-4 text-lg text-[#9090a8] max-w-xl mx-auto relative">
-            Works on Linux, macOS, and WSL. Gets you Deno, the CortexPrism engine, and all dependencies.
+            Works on Linux, macOS, Windows, and WSL. Ships as a single Deno binary — no Docker required to get started.
           </p>
 
           <div className="mt-8 max-w-2xl mx-auto relative">

@@ -4,9 +4,9 @@ export const SITE_URL =
 export const SITE_NAME = "CortexPrism";
 
 export const SITE_DESCRIPTION =
-  "Open-source AI agent runtime with multi-provider LLM support, 5-tier memory, MCP plugin marketplace, and enterprise-grade security. Self-host your AI agents with confidence.";
+  "The open-source AI agent harness with persistent memory, 60+ built-in tools, a full-featured web UI, and layered security — powered by Deno. Self-host your AI agents with confidence.";
 
-const SITE_TAGLINE = "Open-Source AI Agent Runtime";
+const SITE_TAGLINE = "Open-Source AI Agent Harness — Powered by Deno";
 
 /**
  * Primary and secondary keyword targets for CortexPrism.
