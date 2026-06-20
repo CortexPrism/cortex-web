@@ -306,7 +306,6 @@ src/
 npm install
 npm run db:generate
 npm run db:push
-npm run db:seed
 ```
 
 ### Start Dev Server
@@ -322,7 +321,6 @@ The dev server runs on `http://localhost:3001`.
 ```bash
 npm run db:generate    # Generate Prisma client
 npm run db:push        # Push schema to SQLite
-npm run db:seed        # Seed with default admin user and categories
 npm run db:studio      # Open Prisma Studio
 ```
 
@@ -393,10 +391,6 @@ The `Dockerfile` uses multi-stage build with Next.js standalone output. The `doc
 | `DISCORD_ADMIN_IDS` | — | Comma-separated Discord user IDs with bot admin access |
 
 ---
-
-## Default Admin
-
-After seeding: `admin@cortexprism.io` / `admin12345`
 
 ---
 

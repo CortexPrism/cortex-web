@@ -286,7 +286,7 @@ First, register or login to get a token:
 # Register
 curl -X POST https://cortexprism.io/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email":"user@example.com","username":"myuser","password":"securepassword123"}'
+  -d '{"email":"user@example.com","username":"myuser","password":"your-secure-password"}'
 
 # Response:
 { "token": "eyJhbG...", "user": { "id": "...", "email": "...", "role": "user" } }

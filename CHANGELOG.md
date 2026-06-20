@@ -406,7 +406,7 @@ All notable changes to the CortexPrism website will be documented in this file.
 - "Edit Profile" link on own public profile page via `ProfileActions` client component
 - `updateUser` method in AuthContext for syncing profile changes to state and localStorage
 - Shared `authenticateRequest()` helper in `@/lib/auth` to deduplicate API auth logic
-- Jacob seed user (admin@cortexprism.io / password123) as admin
+- Seed script for creating initial admin users and categories
 - Dynamic password hashing in seed script (bcrypt at runtime, not hardcoded hash)
 - Navbar dropdown close delay (200ms) to prevent premature dismissal on hover gap
 
@@ -498,7 +498,7 @@ All notable changes to the CortexPrism website will be documented in this file.
 - SubmissionReview audit trail tracking who approved/rejected each item
 - Login and Register pages with form validation
 - Dynamic navigation bar showing Sign In or username based on auth state
-- Admin seed user (admin@cortexprism.io) created during database seeding
+- Database seeding script for initial admin users and categories
 
 ### Changed
 - Marketplace API now filters by `status: "approved"` instead of `published: true`

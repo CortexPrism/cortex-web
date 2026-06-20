@@ -75,24 +75,22 @@ async function main() {
     }
   }
 
-  const users = [
-    { email: "admin@cortexprism.io", username: "admin", password: "admin12345", role: "admin" },
-    { email: "jacob@cortexprism.io", username: "jacob", password: "password123", role: "admin" },
-  ];
+  const seedEmail = process.env.SEED_ADMIN_EMAIL;
+  const seedPassword = process.env.SEED_ADMIN_PASSWORD;
 
-  for (const u of users) {
-    const exists = await prisma.user.findUnique({ where: { email: u.email } });
+  if (seedEmail && seedPassword) {
+    const exists = await prisma.user.findUnique({ where: { email: seedEmail } });
     if (!exists) {
-      const hash = await bcrypt.hash(u.password, 12);
+      const hash = await bcrypt.hash(seedPassword, 12);
       await prisma.user.create({
         data: {
-          email: u.email,
-          username: u.username,
+          email: seedEmail,
+          username: seedEmail.split("@")[0],
           passwordHash: hash,
-          role: u.role,
+          role: "admin",
         },
       });
-      console.log(`${u.role} user created (${u.email} / ${u.password})`);
+      console.log("Admin user created");
     }
   }
 
