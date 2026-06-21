@@ -2,6 +2,67 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.12.0] — 2026-06-21
+
+### Fixed
+- **License correction** — all references updated from "MIT licensed" to "Apache 2.0 licensed" across 26 files (10 locale files, 7 TypeScript source files, MDX content, SEO metadata, OG image, llms.txt, contribute page link)
+- **Version sync with Cortex v0.48.5** — `CORTEX_VERSION_DEFAULT` updated from `0.45.3` to `0.48.5`, installation docs version output corrected
+- **CLI documentation overhaul** — complete rewrite of `content/cli/index.mdx` to match actual command tree from `src/cli/registry.ts`
+  - 19 renamed commands updated with correct new paths (e.g. `cortex chat` → `cortex agent chat`, `cortex serve` → `cortex server start`)
+  - 5 orphaned commands removed from index (`discord`, `import`, `qm`, `mqm`, `mcp-gateway`)
+  - 4 new docs created for undocumented commands: `agent-exec.mdx`, `config.mdx`, `compliance.mdx`, `debug.mdx`
+  - Rename reference table added for backward compatibility
+- **Architecture doc accuracy fixes**
+  - `agent-loop.mdx`: `MAX_TOOL_ROUNDS` corrected from 8 to 12
+  - `channels.mdx`: "Future: Slack, Teams, Telegram" → implemented (9 adapters total)
+  - `databases.mdx`: migration count `34+` → `37`, range `010-034` → `010-037`
+  - `databases.mdx`: session DB pattern `sess_*.db` → `sessions/<id>.db` (4 locations)
+  - `pipeline.mdx`: stage count `10` → `12` (adds pre-llm/post-llm)
+  - `memory-system.mdx`: default half-life `7 days` → `14 days episodic, 30 days semantic`
+  - `quartermaster.mdx`: table names corrected (`qm_model_stats`→`qm_tool_stats`, `qm_weights`→`qm_signal_weights`)
+  - `observability.mdx`: metric names fixed with `cortex_` prefix and correct units
+  - `model-router.mdx`: added note about full 24-provider list complementing 12-provider table
+  - `security-parallax.mdx`: PBKDF2 iterations corrected from `100000` to `200000`
+- **Knowledge base accuracy fixes**
+  - `faq.mdx`: "MIT License" → "Apache 2.0 License"
+  - `performance-tuning.mdx`: "Prisma client" → `@libsql/client` (Deno runtime, not Node.js)
+  - `model-quartermaster.mdx`: added note about `cortex qm`/`mqm` CLI availability (web UI)
+- **Developer guide fixes**
+  - `agent-development.mdx`: removed dead `file_diff` tool from built-in tool list
+  - `plugin-api.mdx`: memory tier types corrected (`ephemeral`/`working` → `episodic`/`semantic`/`reflection`/`graph`/`procedural`)
+- **Install page and getting-started command name updates**
+  - All `cortex chat` → `cortex agent chat`, `cortex serve` → `cortex server start`
+  - `first-run.mdx`: `maxTurns: 8` → `50` (matches source config default)
+- **Code intelligence language claim**: "40+ languages" → "14+ languages" on features and about pages (matches actual tree-sitter coverage)
+- **Architecture overview**: database listing changed from `sess_*.db` to `plugins.db`
+
+### Changed
+- **Service command description** — `service.mdx` CLI doc updated from "Micro-service management" to "System service management" (install/uninstall only in registry)
+
+## [0.11.0] — 2026-06-21
+
+### Added
+- **Blog system** — full-featured blog with MDX authoring, search, and tag filtering
+  - `BlogPost` database model with title, slug, MDX content, excerpt, cover image, tags (JSON array), published/draft toggle, publishedAt timestamp, and author relation to User
+  - `GET /api/blog` — public listing API with search (title, excerpt, tags), tag filter, and pagination
+  - `GET /api/blog/[id]` — single post by ID or slug
+  - `GET /api/blog/tags` — all unique tags across published posts
+  - `POST /api/blog` — admin-only create with Zod validation and slug uniqueness check
+  - `PUT /api/blog/[id]` — admin-only update with partial field support and slug-conflict detection
+  - `DELETE /api/blog/[id]` — admin-only delete
+  - `/blog` — public listing page with debounced search (300ms), tag pill filters, pagination, skeleton loading states, error/empty states with retry
+  - `/blog/[slug]` — server-rendered detail page with MDX content via react-markdown/remark-gfm, cover image, author card with avatar/bio, read-time estimate, back navigation
+  - `/admin/blog` — full admin editor with post list, inline create/edit form, title-to-slug auto-generation, comma-separated tags input, publish/draft toggle, delete confirmation modal
+  - `BlogCard` component with cover image, color-coded tags (deterministic hash), excerpt, author/date metadata, hover effects
+  - Blog link added to Navbar (desktop + mobile) and Footer (Community section)
+  - Blog nav item added to admin panel sidebar
+  - Translations (`nav.blog`, `footer.blog`) added across all 10 locale files
+- **Blog SEO** — complete metadata strategy
+  - `layout.tsx` for blog listing with canonical URL, OpenGraph (type: website), Twitter card, robots index+follow, metaBase defaults
+  - `generateMetadata()` for blog detail pages — dynamic title/description, OpenGraph (type: article, publishedTime/modifiedTime), canonical URL, cover image (falls back to site OG image)
+  - JSON-LD structured data on all blog detail pages: `BreadcrumbList` + `Article` (with author, publisher, dates)
+  - Description truncation to 160 characters from excerpt with contextual fallback
+
 ## [0.10.0] — 2026-06-20
 
 ### Added

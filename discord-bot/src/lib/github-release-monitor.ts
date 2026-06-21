@@ -4,7 +4,6 @@ import { ReleaseWatch } from "@prisma/client";
 
 const GITHUB_API = "https://api.github.com";
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
-const CONCURRENCY = 5;
 
 let cachedToken: string | null = null;
 let tokenFetched = false;
@@ -53,6 +52,13 @@ interface GitHubRelease {
 interface GitHubTag {
   name: string;
   commit: { sha: string };
+}
+
+interface GitHubRepo {
+  stargazers_count: number;
+  forks_count: number;
+  html_url: string;
+  description: string | null;
 }
 
 function truncate(str: string | null, len: number): string {
@@ -156,6 +162,63 @@ export async function checkSingleRepo(
       }
     } catch (err) {
       console.error(`Failed to check releases for ${owner}/${repo}:`, err);
+    }
+
+    try {
+      const repoInfo = (await githubFetch(`/repos/${owner}/${repo}`)) as GitHubRepo;
+      const stars = repoInfo.stargazers_count;
+      const forks = repoInfo.forks_count;
+
+      const prevStars = watch.lastStarCount;
+      const prevForks = watch.lastForkCount;
+
+      if (prevStars !== null && stars !== prevStars && channel) {
+        const delta = stars - prevStars;
+        const sign = delta > 0 ? "+" : "";
+        const embed = new EmbedBuilder()
+          .setColor(delta > 0 ? 0xf1c40f : 0xe74c3c)
+          .setTitle(`⭐ Star count changed: ${stars.toLocaleString()}`)
+          .setURL(repoInfo.html_url)
+          .setDescription(
+            `${sign}${delta} star${Math.abs(delta) !== 1 ? "s" : ""} since last check.\n` +
+            `Went from **${prevStars.toLocaleString()}** → **${stars.toLocaleString()}**`
+          )
+          .setAuthor({ name: `${owner}/${repo}`, url: repoInfo.html_url })
+          .setFooter({ text: `Stars • ${owner}/${repo}` })
+          .setTimestamp();
+
+        await channel.send({ embeds: [embed] }).catch(() => {});
+        found++;
+      }
+
+      if (prevForks !== null && forks !== prevForks && channel) {
+        const delta = forks - prevForks;
+        const sign = delta > 0 ? "+" : "";
+        const embed = new EmbedBuilder()
+          .setColor(0x1abc9c)
+          .setTitle(`🔱 Fork count changed: ${forks.toLocaleString()}`)
+          .setURL(repoInfo.html_url)
+          .setDescription(
+            `${sign}${delta} fork${Math.abs(delta) !== 1 ? "s" : ""} since last check.\n` +
+            `Went from **${prevForks.toLocaleString()}** → **${forks.toLocaleString()}**`
+          )
+          .setAuthor({ name: `${owner}/${repo}`, url: repoInfo.html_url })
+          .setFooter({ text: `Forks • ${owner}/${repo}` })
+          .setTimestamp();
+
+        await channel.send({ embeds: [embed] }).catch(() => {});
+        found++;
+      }
+
+      await prisma.releaseWatch.update({
+        where: { id: watch.id },
+        data: {
+          lastStarCount: stars,
+          lastForkCount: forks,
+        },
+      });
+    } catch (err) {
+      console.error(`Failed to check repo stats for ${owner}/${repo}:`, err);
     }
 
     return found;

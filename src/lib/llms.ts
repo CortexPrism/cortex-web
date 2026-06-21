@@ -34,7 +34,7 @@ export function buildLlmsTxt(): string {
 
   lines.push(`# ${SITE_NAME} — Open-Source AI Agent Operating System`);
   lines.push("");
-  lines.push("> CortexPrism is an open-source AI Agent Operating System with 24 LLM providers, 5-tier memory system, MCP plugin marketplace, sandboxed code execution, and parallax enterprise-grade security. Self-host autonomous AI agents — MIT licensed.");
+  lines.push("> CortexPrism is an open-source AI Agent Operating System with 24 LLM providers, 5-tier memory system, MCP plugin marketplace, sandboxed code execution, and parallax enterprise-grade security. Self-host autonomous AI agents — Apache 2.0 licensed.");
   lines.push("");
 
   lines.push("## Get Started");

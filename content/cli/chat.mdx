@@ -1,4 +1,4 @@
-# `cortex chat`
+# `cortex agent chat`
 
 Start an interactive streaming chat session with any supported LLM provider. This is the primary interface for interacting with the CortexPrism agent.
 
@@ -48,7 +48,7 @@ When tools are enabled, the agent can:
 
 ## Session Persistence
 
-Each chat session creates a per-session SQLite database (`sess_*.db`) that stores full message history. Sessions can be resumed later using `--resume` or the interactive session browser via `cortex sessions`.
+Each chat session creates a per-session SQLite database (`sessions/<id>.db`) that stores full message history. Sessions can be resumed later using `--resume` or the interactive session browser via `cortex agent sessions`.
 
 ## Agent Loop Flow
 

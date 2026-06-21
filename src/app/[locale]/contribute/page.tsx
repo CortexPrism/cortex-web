@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Contribute to CortexPrism — Open Source AI Agent Operating System",
   description:
-    "Contribute to the open-source CortexPrism project. Report issues, submit pull requests, develop plugins, or join the community. MIT licensed and community-driven.",
+    "Contribute to the open-source CortexPrism project. Report issues, submit pull requests, develop plugins, or join the community. Apache 2.0 licensed and community-driven.",
   alternates: { canonical: `${SITE_URL}/contribute` },
   openGraph: {
     title: "Contribute to CortexPrism — Open Source AI Agent Operating System",
@@ -65,8 +65,8 @@ export default function ContributePage() {
       <div className="glass-card p-8 mb-12">
         <p className="text-[#9090a8] leading-relaxed">
           CortexPrism is an open-source project released under the{" "}
-          <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
-            MIT License
+          <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300">
+            Apache 2.0 License
           </a>
           . We welcome contributions from the community — whether it&apos;s fixing bugs, adding features,
           improving documentation, or developing plugins. Every contribution makes the project better for everyone.

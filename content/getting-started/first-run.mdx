@@ -31,7 +31,7 @@ After setup, your configuration is stored at `~/.cortex/config.json`:
   },
   "agent": {
     "name": "Cortex",
-    "maxTurns": 8,
+    "maxTurns": 50,
     "streamOutput": true
   },
   "router": {
@@ -57,7 +57,7 @@ Default: `~/.cortex/data/`
 
 Override:
 ```bash
-CORTEX_DATA_DIR=/data/cortex cortex chat
+CORTEX_DATA_DIR=/data/cortex cortex agent chat
 ```
 
 The data directory contains:
@@ -72,7 +72,7 @@ The data directory contains:
 ## Your First Chat
 
 ```bash
-cortex chat
+cortex agent chat
 ```
 
 On first chat, the system:

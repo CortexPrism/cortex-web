@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Trash2, Power, PowerOff, RefreshCw, ExternalLink, GitBranch, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Trash2, Power, PowerOff, RefreshCw, ExternalLink, GitBranch, CheckCircle, XCircle, Star, GitFork } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 
 interface ReleaseWatchItem {
@@ -11,6 +11,8 @@ interface ReleaseWatchItem {
   watchType: string;
   lastReleaseTag: string | null;
   lastReleasePublishedAt: string | null;
+  lastStarCount: number | null;
+  lastForkCount: number | null;
   channelId: string;
   guildId: string;
   isActive: boolean;
@@ -133,7 +135,7 @@ export default function AdminReleaseWatchesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#e2e2ea]">Release Watches</h1>
-          <p className="text-[#9090a8] text-sm">Monitor GitHub repositories and post new releases/tags to Discord channels</p>
+          <p className="text-[#9090a8] text-sm">Monitor GitHub repositories and post new releases, tags, stars, and forks to Discord channels</p>
         </div>
         <Button onClick={() => setShowAddForm(!showAddForm)}>
           <Plus className="w-4 h-4 mr-1.5" /> Add Watch
@@ -224,9 +226,15 @@ export default function AdminReleaseWatchesPage() {
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-300">Paused</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[#55556a]">
+                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-[#55556a]">
                     <span>Channel: <code className="text-[#9090a8]">{w.channelId}</code></span>
                     <span>Guild: <code className="text-[#9090a8]">{w.guildId}</code></span>
+                    {w.lastStarCount !== null && (
+                      <span className="inline-flex items-center gap-1 text-amber-300"><Star className="w-3 h-3 fill-current" /> {w.lastStarCount.toLocaleString()}</span>
+                    )}
+                    {w.lastForkCount !== null && (
+                      <span className="inline-flex items-center gap-1 text-teal-300"><GitFork className="w-3 h-3" /> {w.lastForkCount.toLocaleString()}</span>
+                    )}
                     {w.lastReleaseTag && (
                       <span>Last: <code className="text-green-400">{w.lastReleaseTag}</code></span>
                     )}

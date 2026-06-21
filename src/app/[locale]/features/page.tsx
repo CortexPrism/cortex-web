@@ -292,9 +292,9 @@ const features = [
     title: "Code Intelligence",
     subtitle: "Multi-Language Code Graph",
     description:
-      "Tree-sitter WASM parser for 40+ languages with call graph resolution, impact analysis, architecture extraction, and symbol search. Visualized via D3.js force-directed graph.",
+      "Tree-sitter WASM parser for 14+ languages with call graph resolution, impact analysis, architecture extraction, and symbol search. Visualized via D3.js force-directed graph.",
     benefits: [
-      "40+ languages: TS, JS, Python, Go, Rust, Java, Kotlin, C, C++, C#, Ruby, PHP, Swift, Scala, Lua, Bash, SQL, and more",
+      "14+ languages: TypeScript, JavaScript, Python, Go, Rust, Java, Kotlin, C, C++, Ruby, PHP, Swift, Lua, Bash",
       "7-strategy call target resolution with cross-file import analysis",
       "12 node labels and 18 edge types in the graph database",
       "D3.js Web UI with symbol search, impact analysis, and path tracing",

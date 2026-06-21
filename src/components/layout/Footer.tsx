@@ -35,6 +35,7 @@ export function Footer() {
       title: t("community"),
       links: [
         { href: "/changelog",  label: t("changelog")  },
+        { href: "/blog",       label: t("blog")       },
         { href: "/contribute", label: t("contribute") },
         { href: "https://discord.gg/wYxbmQeWY3",          label: t("discord"), external: true },
         { href: "https://github.com/CortexPrism/cortex",  label: t("github"),  external: true },

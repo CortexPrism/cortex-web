@@ -11,11 +11,11 @@ CortexPrism uses multiple SQLite databases, each serving a specific purpose. All
 | Lens | `lens.db` | Audit events (all system activity) | 003 |
 | Vault | `vault.db` | Encrypted credentials + access log | 004 |
 | Plugins | `plugins.db` | Plugin registry | 005 |
-| Session | `sess_*.db` | Per-session message history | 006 |
+| Session | `sessions/<id>.db` | Per-session message history | 006 |
 
 ## Migration History
 
-Core migrations (34+ total across all databases):
+Core migrations (37 total across all databases):
 
 | Migration | Database | Description |
 |-----------|----------|-------------|
@@ -24,11 +24,11 @@ Core migrations (34+ total across all databases):
 | 003_lens.sql | lens.db | Lens audit events table |
 | 004_vault.sql | vault.db | Vault entries + access log |
 | 005_plugins.sql | plugins.db | Plugin registry |
-| 006_session.sql | sess_*.db | Per-session message store |
+| 006_session.sql | sessions/<id>.db | Per-session message store |
 | 007_jobs_v2.sql | cortex.db | Job scheduler columns |
 | 008_memory_embeddings.sql | memory.db | Embedding + decay columns |
 | 009_policy.sql | cortex.db | Policy rules + default deny seeds |
-| 010-034 | Various | Hub nodes, agents, services, skills, channels, workflows, onboarding, evaluations, triggers, MQM, voice, computer use, sandboxes, memori checkpoints, supply chain verification, and more |
+| 010-037 | Various | Hub nodes, agents, services, skills, channels, workflows, onboarding, evaluations, triggers, MQM, voice, computer use, sandboxes, memori checkpoints, supply chain verification, compliance, and more |
 
 ## Data Directory Structure
 
@@ -41,7 +41,7 @@ Core migrations (34+ total across all databases):
 │   ├── lens.db
 │   ├── vault.db
 │   ├── plugins.db
-│   └── sess_*.db          (one per chat session)
+│   └── sessions/<id>.db  (one per chat session)
 ```
 
 ## Key Schemas

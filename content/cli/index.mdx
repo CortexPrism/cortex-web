@@ -18,55 +18,207 @@ cortex <command> [options]
 | `--help, -h` | — | Show help |
 | `--version, -V` | — | Show version |
 
-## Available Commands
+## Command Groups
+
+### Agent
 
 | Command | Description |
 |---------|-------------|
-| [`cortex chat`](/docs/cli/chat) | Interactive streaming chat session with LLM providers |
-| [`cortex setup`](/docs/cli/setup) | First-run setup wizard |
-| [`cortex migrate`](/docs/cli/migrate) | Initialize or migrate all databases |
-| [`cortex sessions`](/docs/cli/sessions) | List and manage chat sessions |
-| [`cortex jobs`](/docs/cli/jobs) | Manage scheduled cron jobs |
+| [`cortex agent chat`](/docs/cli/chat) | Interactive streaming chat session with LLM providers |
+| [`cortex agent exec`](/docs/cli/agent-exec) | Execute agent tasks non-interactively (one-shot) |
+| [`cortex agent tui`](/docs/cli/tui) | Terminal UI |
+| [`cortex agent sessions`](/docs/cli/sessions) | List and manage chat sessions |
+| [`cortex agent eval`](/docs/cli/eval) | Evaluation framework for benchmarking agent performance |
+| [`cortex agent reflect`](/docs/cli/reflect) | Inspect and consolidate reflection patterns |
+| [`cortex agent lint`](/docs/cli/agentlint) | Audit agent configs, tools, plugins, and prompts |
+| [`cortex agent voice`](/docs/cli/voice) | Voice mode management (enable, disable, set-voice, set-speed) |
+| [`cortex agent`](/docs/cli/agent) | Agent configuration management (create, update, delete, select, inspect) |
+
+### Server
+
+| Command | Description |
+|---------|-------------|
+| [`cortex server start`](/docs/cli/serve) | Start the HTTP + WebSocket server with web UI (was `cortex serve`) |
+| `cortex server stop` | Stop the HTTP server |
+| `cortex server restart` | Restart the HTTP server |
+
+### Daemon
+
+| Command | Description |
+|---------|-------------|
+| [`cortex daemon start`](/docs/cli/daemon) | Start background daemon processes (validator, executor, scheduler) |
+| `cortex daemon stop` | Stop the daemon |
+| `cortex daemon restart` | Restart the daemon |
+| `cortex daemon run` | Run the daemon in the foreground |
+| `cortex daemon status` | Show daemon status |
+
+### Self (Update & Version Info)
+
+| Command | Description |
+|---------|-------------|
+| [`cortex self update`](/docs/cli/update) | Check, apply, or rollback Cortex updates with channel support (was `cortex update`) |
+
+### DB (Database Management)
+
+| Command | Description |
+|---------|-------------|
+| [`cortex db migrate`](/docs/cli/migrate) | Initialize or migrate all databases (was `cortex migrate`) |
+
+### Sandbox
+
+| Command | Description |
+|---------|-------------|
+| [`cortex sandbox run`](/docs/cli/run) | Execute code files in sandboxed or direct subprocess mode (was `cortex run`) |
+
+### Service
+
+| Command | Description |
+|---------|-------------|
+| [`cortex service install`](/docs/cli/install) | Install Cortex as a system service |
+| [`cortex service uninstall`](/docs/cli/uninstall) | Uninstall Cortex system service |
+
+### Config
+
+| Command | Description |
+|---------|-------------|
+| [`cortex config`](/docs/cli/config) | Manage configuration (get, set, unset, list, validate) |
+
+### Memory
+
+| Command | Description |
+|---------|-------------|
 | [`cortex memory`](/docs/cli/memory) | Search and manage the 5-tier memory system |
-| [`cortex run`](/docs/cli/run) | Execute code files in sandboxed or direct subprocess mode |
-| [`cortex serve`](/docs/cli/serve) | Start the HTTP + WebSocket server with web UI |
-| [`cortex reflect`](/docs/cli/reflect) | Inspect and consolidate reflection patterns |
+
+### Vault
+
+| Command | Description |
+|---------|-------------|
 | [`cortex vault`](/docs/cli/vault) | Encrypted credential vault (AES-256-GCM) |
+
+### Policy
+
+| Command | Description |
+|---------|-------------|
 | [`cortex policy`](/docs/cli/policy) | Security policy rule management |
-| [`cortex daemon`](/docs/cli/daemon) | Manage background daemon processes (validator, executor, scheduler) |
+
+### Skills & Soul
+
+| Command | Description |
+|---------|-------------|
 | [`cortex soul`](/docs/cli/soul) | Agent soul/persona management |
-| [`cortex discord`](/docs/cli/discord) | Discord bot integration |
-| [`cortex log`](/docs/cli/log) | View and manage logging (show, tail, clear, set-level, status) |
+
+### Plugins & Marketplace
+
+| Command | Description |
+|---------|-------------|
 | [`cortex plugins`](/docs/cli/plugins) | Plugin management (install, enable, disable, remove, update, verify) |
 | [`cortex marketplace`](/docs/cli/marketplace) | Marketplace interaction (list, categories, stats, install) |
-| [`cortex import`](/docs/cli/import) | Import data from other sources (openclaw, json) |
-| [`cortex agent`](/docs/cli/agent) | Agent configuration management (create, update, delete, select, inspect) |
-| [`cortex service`](/docs/cli/service) | Micro-service mode management (list, create, start, stop) |
-| [`cortex stop`](/docs/cli/stop) | Stop server, daemons, or both |
-| [`cortex update`](/docs/cli/update) | Check, apply, or rollback Cortex updates with channel support |
+
+### Models
+
+| Command | Description |
+|---------|-------------|
+| [`cortex models`](/docs/cli/models) | Model management (list, show, set, available) |
+
+### Jobs
+
+| Command | Description |
+|---------|-------------|
+| [`cortex jobs`](/docs/cli/jobs) | Manage scheduled cron jobs |
+
+### Git & GitHub
+
+| Command | Description |
+|---------|-------------|
 | [`cortex git`](/docs/cli/git) | Full git porcelain via agent workspace (status, log, diff, commit, push, clone) |
 | [`cortex github`](/docs/cli/github) | GitHub integration (PRs, issues, repos, branches) |
+
+### Channels
+
+| Command | Description |
+|---------|-------------|
+| [`cortex channels`](/docs/cli/channels) | Communication channel adapters (Discord, Slack, Telegram, Teams, Mattermost, Rocket.Chat, WhatsApp, Google Chat, Lark) |
+
+### MCP
+
+| Command | Description |
+|---------|-------------|
+| [`cortex mcp`](/docs/cli/mcp) | MCP server management (serve, stdio transport, gateway) |
+| [`cortex mcp chrome`](/docs/cli/chrome-bridge) | Chrome Bridge MCP server (real-browser automation) |
+| [`cortex mcp a2a`](/docs/cli/a2a) | A2A Protocol bridge (agent card, skills) |
+
+### Distributed Nodes
+
+| Command | Description |
+|---------|-------------|
+| [`cortex node`](/docs/cli/node) | Hub node management (register, list, connect) |
+
+### Hooks & Triggers
+
+| Command | Description |
+|---------|-------------|
 | [`cortex hooks`](/docs/cli/hooks) | Git hooks management |
 | [`cortex triggers`](/docs/cli/triggers) | File watchers, webhooks, and git hook event triggers |
-| [`cortex channels`](/docs/cli/channels) | Communication channels (Discord integration) |
-| [`cortex mcp`](/docs/cli/mcp) | MCP server management (serve, stdio transport) |
-| [`cortex remote`](/docs/cli/remote) | Remote agent management (add, connect, remove) |
-| [`cortex tui`](/docs/cli/tui) | Terminal UI |
-| [`cortex projects`](/docs/cli/projects) | Project management (create, delete) |
+
+### Workflow
+
+| Command | Description |
+|---------|-------------|
 | [`cortex workflow`](/docs/cli/workflow) | Workflow engine (run, approve) |
+
+### Projects
+
+| Command | Description |
+|---------|-------------|
+| [`cortex projects`](/docs/cli/projects) | Project management (create, delete) |
+
+### Desktop
+
+| Command | Description |
+|---------|-------------|
 | [`cortex desktop`](/docs/cli/desktop) | Desktop app automation (screenshot, click, type, clipboard) |
-| [`cortex node`](/docs/cli/node) | Hub node management (register, list, connect) |
-| [`cortex eval`](/docs/cli/eval) | Evaluation framework for benchmarking agent performance |
-| [`cortex models`](/docs/cli/models) | Model management (list, show, set, available) |
-| [`cortex qm`](/docs/cli/qm) | Model Quartermaster (patterns, weights, stats, decisions, dashboard) |
-| [`cortex mqm`](/docs/cli/qm) | Model Quartermaster (model-level: stats, decisions, weights, accuracy) |
-| [`cortex install`](/docs/cli/install) | Install Cortex as a system service |
-| [`cortex uninstall`](/docs/cli/uninstall) | Uninstall Cortex system service |
-| [`cortex start`](/docs/cli/start) | Start Cortex server and daemon |
-| [`cortex restart`](/docs/cli/restart) | Restart Cortex server and daemon |
-| [`cortex voice`](/docs/cli/voice) | Voice mode management (enable, disable, set-voice, set-speed) |
-| [`cortex a2a`](/docs/cli/a2a) | A2A Protocol bridge (agent card, skills) |
-| [`cortex agentlint`](/docs/cli/agentlint) | Audit agent configs, tools, plugins, and prompts |
-| [`cortex mcp-gateway`](/docs/cli/mcp-gateway) | Managed MCP server health and status |
+
+### Operations
+
+| Command | Description |
+|---------|-------------|
+| [`cortex setup`](/docs/cli/setup) | First-run setup wizard |
+| [`cortex log`](/docs/cli/log) | View and manage logging (show, tail, clear, set-level, status) |
 | [`cortex memori`](/docs/cli/memori) | Persistent checkpointing and agent-state survival |
-| [`cortex chrome-bridge`](/docs/cli/chrome-bridge) | Chrome Bridge MCP server (real-browser automation) |
+
+### Compliance
+
+| Command | Description |
+|---------|-------------|
+| [`cortex compliance`](/docs/cli/compliance) | EU AI Act / ISO 42001 compliance metadata (session, export, risk, retention) |
+
+### Debug
+
+| Command | Description |
+|---------|-------------|
+| [`cortex debug`](/docs/cli/debug) | Live introspection and diagnostics (sessions, turn, health, metrics, memory) |
+
+## Command Renames (since v0.46+)
+
+Several top-level commands were reorganized into command groups for better discoverability. The old names still work as backward-compatible aliases (redirecting to the new path):
+
+| Old Command | New Command |
+|-------------|-------------|
+| `cortex chat` | [`cortex agent chat`](/docs/cli/chat) |
+| `cortex tui` | [`cortex agent tui`](/docs/cli/tui) |
+| `cortex serve` | `cortex server start` |
+| `cortex start` | `cortex daemon start` |
+| `cortex stop` | `cortex daemon stop` |
+| `cortex restart` | `cortex daemon restart` |
+| `cortex run` | [`cortex sandbox run`](/docs/cli/run) |
+| `cortex migrate` | [`cortex db migrate`](/docs/cli/migrate) |
+| `cortex sessions` | [`cortex agent sessions`](/docs/cli/sessions) |
+| `cortex eval` | [`cortex agent eval`](/docs/cli/eval) |
+| `cortex reflect` | [`cortex agent reflect`](/docs/cli/reflect) |
+| `cortex voice` | [`cortex agent voice`](/docs/cli/voice) |
+| `cortex agentlint` | [`cortex agent lint`](/docs/cli/agentlint) |
+| `cortex update` | [`cortex self update`](/docs/cli/update) |
+| `cortex install` | `cortex service install` |
+| `cortex uninstall` | `cortex service uninstall` |
+| `cortex a2a` | [`cortex mcp a2a`](/docs/cli/a2a) |
+| `cortex chrome-bridge` | [`cortex mcp chrome`](/docs/cli/chrome-bridge) |

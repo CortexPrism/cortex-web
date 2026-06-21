@@ -1,0 +1,27 @@
+# `cortex compliance`
+
+Manage compliance metadata for AI regulations including the EU AI Act and ISO 42001. Provides session-level record keeping, risk assessment, and data retention controls.
+
+## Usage
+
+```bash
+cortex compliance <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|-----------|-------------|
+| `session <id>` | View compliance metadata for a session |
+| `export` | Export compliance records (JSON format) |
+| `risk` | Run risk assessment on current configuration |
+| `retention` | Manage data retention policies |
+
+## Examples
+
+```bash
+cortex compliance session sess_abc123
+cortex compliance export --output compliance-report.json
+cortex compliance risk --check-level high
+cortex compliance retention --set 90d
+```

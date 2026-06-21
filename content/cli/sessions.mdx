@@ -1,4 +1,4 @@
-# `cortex sessions`
+# `cortex agent sessions`
 
 List and manage past chat sessions. Each session maintains its own message history in a dedicated per-session SQLite database.
 
@@ -25,7 +25,7 @@ cortex sessions --limit 50           # Show more sessions
 
 ## Per-Session Database
 
-Each session gets a dedicated SQLite database (`sess_<id>.db`) stored in the data directory. This keeps session data isolated and allows efficient loading of history when resuming.
+Each session gets a dedicated SQLite database (`sessions/<id>.db`) stored in the data directory. This keeps session data isolated and allows efficient loading of history when resuming.
 
 ## Examples
 

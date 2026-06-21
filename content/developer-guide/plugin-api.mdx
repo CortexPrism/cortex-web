@@ -93,7 +93,7 @@ interface MemoryAPI {
   get(id: string): Promise<MemoryEntry | null>;
 }
 
-type MemoryTier = "ephemeral" | "working" | "episodic" | "semantic" | "reflection";
+type MemoryTier = "episodic" | "semantic" | "reflection" | "graph" | "procedural";
 
 interface MemoryEntry {
   id: string;

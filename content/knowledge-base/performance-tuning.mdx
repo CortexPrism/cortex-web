@@ -105,7 +105,7 @@ sqlite3 ~/.cortex/data/cortex.db "VACUUM;"
 
 ### Connection Pooling
 
-The Prisma client handles connection pooling automatically. For high-throughput deployments:
+The `@libsql/client` library handles connection pooling automatically. For high-throughput deployments:
 
 ```bash
 # Set connection limits

@@ -1,11 +1,11 @@
 ---
 title: Pipeline System Architecture
-description: 10-stage hook-based processing pipeline for the agent turn lifecycle
+description: 12-stage hook-based processing pipeline for the agent turn lifecycle
 ---
 
 # Pipeline System
 
-The pipeline system provides a hook-based processing framework that wraps every stage of the agent turn lifecycle. Core and plugin hooks execute at 10 distinct pipeline stages with configurable priority, timeout protection, and rich modification capabilities.
+The pipeline system provides a hook-based processing framework that wraps every stage of the agent turn lifecycle. Core and plugin hooks execute at 12 distinct pipeline stages with configurable priority, timeout protection, and rich modification capabilities.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ The pipeline system provides a hook-based processing framework that wraps every 
 ┌──────────────────────────────────────────────────────────┐
 │                    Pipeline System                         │
 │                                                           │
-│  10 Pipeline Stages (in order):                            │
+│  12 Pipeline Stages (in order):                            │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
 │  │pre-assess│→│post-assess│→│pre-reason│→ ...             │
 │  └──────────┘  └──────────┘  └──────────┘               │
@@ -26,7 +26,7 @@ The pipeline system provides a hook-based processing framework that wraps every 
 └──────────────────────────────────────────────────────────┘
 ```
 
-## 10 Pipeline Stages
+## 12 Pipeline Stages
 
 | Stage | When | Purpose |
 |-------|------|---------|

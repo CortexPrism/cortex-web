@@ -48,7 +48,7 @@ AES-256-GCM encrypted storage for sensitive credentials:
 ```
 vaultStore(name, value):
   passphrase = Deno.env.get('CORTEX_VAULT_KEY')
-  key = PBKDF2(passphrase, salt='cortex-vault-salt-v1', 100000, SHA-256) → AES-256 key
+  key = PBKDF2(passphrase, salt='cortex-vault-salt-v1', 200000, SHA-256) → AES-256 key
   iv = crypto.getRandomValues(12 bytes)
   ciphertext = AES-GCM-256.encrypt(iv, key, value)
   store(iv || ciphertext) in vault_entries

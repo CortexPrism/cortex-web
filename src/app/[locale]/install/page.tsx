@@ -52,7 +52,7 @@ const howToSchema = generateHowToSchema({
     },
     {
       name: "Start chatting with your AI agent",
-      text: "Run 'cortex chat' to start an interactive session with your preferred LLM provider, or 'cortex serve' to launch the web UI and REST API.",
+      text: "Run 'cortex agent chat' to start an interactive session with your preferred LLM provider, or 'cortex server start' to launch the web UI and REST API.",
     },
   ],
 });
@@ -153,8 +153,8 @@ export default function InstallPage() {
           <h3 className="text-sm font-semibold text-[#e2e2ea] mb-2">After install</h3>
           <ul className="text-sm text-[#9090a8] space-y-1">
             <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Run <code className="text-xs">cortex setup</code></li>
-            <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Run <code className="text-xs">cortex chat</code></li>
-            <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Run <code className="text-xs">cortex serve</code></li>
+            <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Run <code className="text-xs">cortex agent chat</code></li>
+            <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Run <code className="text-xs">cortex server start</code></li>
             <li className="flex items-start gap-2"><span className="text-purple-400">◆</span>Visit docs for more</li>
           </ul>
         </div>
@@ -258,11 +258,11 @@ export default function InstallPage() {
               <span className="text-green-400">cortex setup</span>
               <span className="text-[#9090a8]">        # Interactive setup wizard — choose provider, enter API key</span>
               {"\n"}
-              <span className="text-green-400">cortex chat</span>
-              <span className="text-[#9090a8]">         # Start your first chat session</span>
+              <span className="text-green-400">cortex agent chat</span>
+              <span className="text-[#9090a8]">  # Start your first chat session</span>
               {"\n"}
-              <span className="text-green-400">cortex serve</span>
-              <span className="text-[#9090a8]">        # Open the Web UI at http://127.0.0.1:3000</span>
+              <span className="text-green-400">cortex server start</span>
+              <span className="text-[#9090a8]">  # Open the Web UI at http://127.0.0.1:3000</span>
             </code>
           </pre>
         </div>

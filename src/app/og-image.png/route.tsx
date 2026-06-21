@@ -67,7 +67,7 @@ export async function GET() {
           }}
         >
           Multi-provider LLM support &middot; 5-tier memory &middot; Parallax
-          security &middot; Plugin marketplace &middot; MIT licensed
+          security &middot; Plugin marketplace &middot; Apache 2.0 licensed
         </div>
         <div
           style={{

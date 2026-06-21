@@ -1,0 +1,28 @@
+# `cortex agent exec`
+
+Execute agent tasks non-interactively in one-shot mode. The agent processes the prompt, runs tools as needed, and returns the result — useful for scripting and automation.
+
+## Usage
+
+```bash
+cortex agent exec [options] "<prompt>"
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--provider, -p` | LLM provider to use |
+| `--model, -m` | Model name |
+| `--max-turns` | Maximum tool-call turns (default: 12) |
+| `--stream` | Enable streaming output |
+| `--session` | Resume an existing session by ID |
+| `--file, -f` | Read prompt from a file |
+
+## Examples
+
+```bash
+cortex agent exec "Analyze the performance of src/server/ and suggest optimizations"
+cortex agent exec -m claude-sonnet-4-5 "Review this codebase for security vulnerabilities"
+cortex agent exec -f ./tasks/weekly-report.md
+```

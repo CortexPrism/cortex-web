@@ -23,13 +23,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
     description:
-      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, Parallax + LLM supervisor security. MIT licensed.",
+      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, Parallax + LLM supervisor security. Apache 2.0 licensed.",
     url: `${SITE_URL}/about`,
   },
   twitter: {
     title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
     description:
-      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use. MIT licensed.",
+      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use. Apache 2.0 licensed.",
   },
 };
 
@@ -55,7 +55,7 @@ export default function AboutPage() {
             At its core, CortexPrism is an agent loop that orchestrates LLM calls, tool execution, memory operations, and reflection. It supports 24 LLM providers through a unified interface, with intelligent model routing via cascade and threshold strategies, plus a self-learning Model Quartermaster that predicts the optimal model for each task.
           </p>
           <p>
-            The system features a 5-tier memory architecture with hybrid FTS5 keyword + vector embedding retrieval, a self-learning skills system that auto-extracts reusable patterns, a code intelligence engine with tree-sitter WASM parsing across 40+ languages, voice interaction pipeline, GUI automation via virtual displays, browser automation, a defense-in-depth security model (Parallax + LLM supervisor) with encrypted credential vault and DLP guard, sandboxed code execution, a git workspace with agent-powered commits, a DSL-based workflow engine, and distributed remote agent execution via hub nodes — and it all ships as a single binary.
+            The system features a 5-tier memory architecture with hybrid FTS5 keyword + vector embedding retrieval, a self-learning skills system that auto-extracts reusable patterns, a code intelligence engine with tree-sitter WASM parsing across 14+ languages, voice interaction pipeline, GUI automation via virtual displays, browser automation, a defense-in-depth security model (Parallax + LLM supervisor) with encrypted credential vault and DLP guard, sandboxed code execution, a git workspace with agent-powered commits, a DSL-based workflow engine, and distributed remote agent execution via hub nodes — and it all ships as a single binary.
           </p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function AboutPage() {
           </div>
           <h3 className="text-lg font-semibold text-[#e2e2ea] mb-2">Why Open Source?</h3>
           <p className="text-sm text-[#9090a8] leading-relaxed">
-            We believe AI infrastructure should be transparent, auditable, and community-driven. The MIT license ensures CortexPrism remains free for everyone — individuals, startups, and enterprises alike.
+            We believe AI infrastructure should be transparent, auditable, and community-driven. The Apache 2.0 license ensures CortexPrism remains free for everyone — individuals, startups, and enterprises alike.
           </p>
         </div>
 
@@ -110,7 +110,7 @@ export default function AboutPage() {
             { title: "Security by Design", desc: "Defense-in-depth with Parallax security model. Every tool call validated, every access logged, credentials encrypted." },
             { title: "Provider Agnostic", desc: "Use any LLM provider. Switch freely. The unified interface means your workflows are portable." },
             { title: "Local by Default", desc: "Run entirely on your machine. No cloud dependency for core functionality. Optional connectivity for LLM APIs." },
-            { title: "Community Driven", desc: "MIT licensed. Contributions welcome. The roadmap is shaped by the community." },
+            { title: "Community Driven", desc: "Apache 2.0 licensed. Contributions welcome. The roadmap is shaped by the community." },
           ].map((principle) => (
             <div key={principle.title} className="flex items-start gap-3">
               <span className="text-indigo-400 mt-1">◆</span>

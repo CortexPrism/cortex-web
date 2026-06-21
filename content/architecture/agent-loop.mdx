@@ -8,7 +8,7 @@ The agent loop is the core execution engine of CortexPrism. `agentTurn()` handle
 agentTurn(opts)
   1. injectMemory(systemPrompt, hits)   ← prepend relevant memory
   2. persistMessage(userMessage)
-  3. [TOOL LOOP — up to MAX_TOOL_ROUNDS=8]
+  3. [TOOL LOOP — up to MAX_TOOL_ROUNDS=12]
      a. LLM call (stream or complete)
      b. parseToolCalls(response)        ← extract <tool_call>{...}</tool_call>
      c. for each call:

@@ -1,0 +1,31 @@
+# `cortex debug`
+
+Live introspection and diagnostics for troubleshooting CortexPrism sessions, turns, and system health.
+
+## Usage
+
+```bash
+cortex debug <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|-----------|-------------|
+| `sessions` | List active and recent sessions with metadata |
+| `session <id>` | Inspect a specific session (messages, tool calls, memory state) |
+| `turn <session-id> <turn-num>` | Inspect a specific turn within a session |
+| `health` | System health check (daemon status, memory usage, DB size) |
+| `metrics` | Print recent Prometheus-compatible metrics |
+| `memory` | Show memory stats by tier (episodic, semantic, graph, etc.) |
+
+## Examples
+
+```bash
+cortex debug sessions
+cortex debug session sess_abc123
+cortex debug turn sess_abc123 5
+cortex debug health
+cortex debug metrics
+cortex debug memory --tier episodic
+```

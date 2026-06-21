@@ -63,7 +63,7 @@ export async function handleReleaseWatchAdd(interaction: ChatInputCommandInterac
       new EmbedBuilder()
         .setColor(0x2ecc71)
         .setTitle("Release Watch Added")
-        .setDescription(`Now watching **${parsed.owner}/${parsed.repo}** for ${typeLabel}`)
+        .setDescription(`Now watching **${parsed.owner}/${parsed.repo}** for ${typeLabel}\nStar and fork changes are also monitored automatically.`)
         .addFields({ name: "Channel", value: `<#${channel.id}>`, inline: true })
         .setFooter({ text: `Added by ${interaction.user.tag}` })
         .setTimestamp(),
@@ -132,8 +132,10 @@ export async function handleReleaseWatchList(interaction: ChatInputCommandIntera
   const lines = watches.map((w) => {
     const typeLabel = w.watchType === "both" ? "releases & tags" : w.watchType === "tag" ? "tags" : "releases";
     const last = w.lastReleaseTag ? ` (last: \`${w.lastReleaseTag}\`)` : "";
+    const starsStr = w.lastStarCount !== null ? `⭐${w.lastStarCount.toLocaleString()}` : "";
+    const forksStr = w.lastForkCount !== null ? ` 🔱${w.lastForkCount.toLocaleString()}` : "";
     const status = w.isActive ? "🟢" : "🔴";
-    return `${status} **${w.owner}/${w.repo}** — ${typeLabel} → <#${w.channelId}>${last}`;
+    return `${status} **${w.owner}/${w.repo}** — ${typeLabel} → <#${w.channelId}>${last}${starsStr}${forksStr}`;
   });
 
   const embed = new EmbedBuilder()
@@ -184,7 +186,7 @@ export async function handleReleaseWatchCheck(interaction: ChatInputCommandInter
     if (found > 0) {
       await interaction.editReply({ content: `Check complete. Found and posted **${found}** new item(s) for **${parsed.owner}/${parsed.repo}**.` });
     } else {
-      await interaction.editReply({ content: `Check complete. No new releases/tags found for **${parsed.owner}/${parsed.repo}**.` });
+      await interaction.editReply({ content: `Check complete. No new releases, tags, stars, or forks found for **${parsed.owner}/${parsed.repo}**.` });
     }
   } else {
     await interaction.editReply({ content: "Checking all watched repos... This may take a moment." });

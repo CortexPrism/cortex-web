@@ -45,15 +45,14 @@ In-process Prometheus-compatible registry with three metric types:
 
 | Metric | Type | Labels |
 |--------|------|--------|
-| `agent_turns_total` | Counter | provider, model |
-| `agent_turn_duration_seconds` | Histogram | provider, model |
-| `token_input_total` | Counter | provider, model |
-| `token_output_total` | Counter | provider, model |
-| `cost_usd_total` | Counter | provider, model |
-| `tool_calls_total` | Counter | tool, status |
-| `errors_total` | Counter | type |
-| `validator_intents_total` | Counter | status (approved/rejected) |
-| `scheduler_jobs_total` | Counter | status |
+| `cortex_agent_turns_total` | Counter | provider, model |
+| `cortex_agent_turns_duration_ms` | Histogram | provider, model |
+| `cortex_agent_tokens_input` | Counter | provider, model |
+| `cortex_agent_tokens_output` | Counter | provider, model |
+| `cortex_agent_cost_usd` | Counter | provider, model |
+| `cortex_agent_errors_total` | Counter | type |
+| `cortex_validator_intents_total` | Counter | status (approved/rejected) |
+| `cortex_scheduler_jobs_total` | Counter | status |
 | `memory_consolidations_total` | Counter | tier |
 | `cpu_percent` | Gauge | — |
 | `memory_mb` | Gauge | — |

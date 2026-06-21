@@ -23,7 +23,7 @@ const SITE_TAGLINE = "Open-Source AI Agent Operating System — Powered by Deno"
  * Long-tail (low-volume, high intent):
  *   "TypeScript AI agent framework", "Deno AI operating system",
  *   "open source LangChain alternative", "self-hosted LLM platform",
- *   "AI agent workflow automation", "AI agent operating system MIT license"
+ *   "AI agent workflow automation", "AI agent operating system Apache 2.0 license"
  */
 export const SITE_KEYWORDS = [
   // Primary
@@ -113,7 +113,7 @@ export function generateSoftwareAppSchema() {
     },
     description: SITE_DESCRIPTION,
     url: SITE_URL,
-    license: "https://opensource.org/licenses/MIT",
+    license: "https://www.apache.org/licenses/LICENSE-2.0",
     keywords:
       "open source AI agent, AI agent framework, LLM orchestration, self-hosted AI, agent operating system, MCP plugin marketplace",
   };

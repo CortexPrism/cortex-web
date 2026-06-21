@@ -33,6 +33,7 @@ export function Navbar() {
         { href: "/features",                   label: t("allFeatures"),     desc: t("allFeaturesDesc") },
       ],
     },
+    { href: "/blog",         label: t("blog")         },
     { href: "/marketplace", label: t("marketplace") },
     { href: "/changelog",   label: t("changelog")   },
   ];

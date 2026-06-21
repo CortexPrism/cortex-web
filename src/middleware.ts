@@ -44,6 +44,8 @@ const staticPathPatterns = [
   "/fonts/",
   "/images/",
   "/indexnow-key.txt",
+  "/install.sh",
+  "/install.ps1",
   "/llms.txt",
   "/llms-full.txt",
   "/sitemap.md",

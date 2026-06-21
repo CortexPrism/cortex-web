@@ -160,7 +160,7 @@ export const commandDefinitions = [
     ],
   },
   {
-    name: "releasewatch", description: "Watch GitHub repos for new releases and tags",
+    name: "releasewatch", description: "Watch GitHub repos for releases, tags, stars, and forks",
     options: [
       { name: "add", description: "Add a repository to watch", type: 1, options: [
         { name: "repo", description: "Repository (owner/repo or URL)", type: 3, required: true },

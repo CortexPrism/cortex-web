@@ -1,0 +1,33 @@
+# `cortex config`
+
+Manage CortexPrism configuration. Read, write, and validate settings in `~/.cortex/config.json`.
+
+## Usage
+
+```bash
+cortex config <subcommand> [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|-----------|-------------|
+| `get <key>` | Read a config value (dot-notation for nested keys) |
+| `set <key> <value>` | Set a config value |
+| `unset <key>` | Remove a config key |
+| `list` | Print all current configuration |
+| `validate` | Validate the config file against the schema |
+
+## Examples
+
+```bash
+cortex config get providers.anthropic.model
+cortex config set router.enabled true
+cortex config get agent.maxTurns
+cortex config list
+cortex config validate
+```
+
+## Configuration Reference
+
+See the [Architecture: Databses](/docs/architecture/databases) page for the full configuration schema.
