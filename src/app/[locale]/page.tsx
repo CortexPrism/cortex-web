@@ -4,6 +4,7 @@ import { getGitHubStats } from "@/lib/github";
 import { Hero } from "@/components/landing/Hero";
 import { StatsBar } from "@/components/landing/StatsBar";
 import { FeatureGrid } from "@/components/landing/FeatureGrid";
+import { RecentBlogPosts } from "@/components/landing/RecentBlogPosts";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { generateSoftwareAppSchema, SITE_URL } from "@/lib/seo";
@@ -91,6 +92,7 @@ export default async function HomePage() {
         totalDownloads={totalDownloads}
       />
       <FeatureGrid />
+      <RecentBlogPosts />
       <CtaSection />
     </>
   );
