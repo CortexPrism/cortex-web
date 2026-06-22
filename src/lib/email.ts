@@ -17,17 +17,38 @@ function escapeHtml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-function buildEmail(to: string, subject: string, html: string) {
-  return { to, from: { email: FROM_EMAIL, name: FROM_NAME }, subject, html };
+function buildEmail(
+  to: string,
+  subject: string,
+  html: string,
+  customArgs?: Record<string, string>
+) {
+  return {
+    to,
+    from: { email: FROM_EMAIL, name: FROM_NAME },
+    subject,
+    html,
+    trackingSettings: {
+      openTracking: { enable: true },
+      clickTracking: { enable: true, enableText: false },
+      subscriptionTracking: { enable: true, substitutionTag: "[unsubscribe]", html: "", text: "" },
+    },
+    customArgs: customArgs || {},
+  };
 }
 
-export async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  customArgs?: Record<string, string>
+): Promise<boolean> {
   if (!isConfigured) {
     console.log(`[email] Skipping email to ${to}: "${subject}" (SendGrid not configured)`);
     return false;
   }
   try {
-    await sgMail.send(buildEmail(to, subject, html));
+    await sgMail.send(buildEmail(to, subject, html, customArgs));
     return true;
   } catch {
     console.error(`[email] Failed to send email to ${to}: "${subject}"`);
@@ -36,28 +57,151 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 }
 
 function wrapTemplate(title: string, bodyHtml: string, cta?: { text: string; url: string }, footerHtml?: string) {
+  const ctaBlock = cta ? `
+  <!--[if mso]>
+  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${escapeHtml(cta.url)}" style="height:48px;v-text-anchor:middle;width:200px;" arcsize="10%" strokecolor="#6366f1" fillcolor="#6366f1">
+    <w:anchorlock/>
+    <center style="color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:16px;font-weight:600;">${escapeHtml(cta.text)}</center>
+  </v:roundrect>
+  <![endif]-->
+  <!--[if !mso]><!-- -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0 0;width:100%">
+    <tr>
+      <td align="center" style="padding:0">
+        <a href="${escapeHtml(cta.url)}" target="_blank" class="cta-button" style="display:inline-block;padding:14px 36px;font-size:16px;font-weight:600;color:#ffffff;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;text-decoration:none;text-align:center;mso-hide:all;">${escapeHtml(cta.text)}</a>
+      </td>
+    </tr>
+  </table>
+  <!--<![endif]-->` : "";
+
   return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0f">
-    <tr><td align="center" style="padding:40px 16px">
-      <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%">
-        <tr><td style="padding:0 0 24px 0;text-align:center">
-          <span style="font-size:22px;font-weight:700;color:#e2e2ea;letter-spacing:-0.5px">CortexPrism</span>
-        </td></tr>
-        <tr><td style="background:#111118;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:32px">
-          <h1 style="margin:0 0 16px 0;font-size:20px;font-weight:600;color:#e2e2ea">${escapeHtml(title)}</h1>
-          <div style="font-size:14px;line-height:1.6;color:#9090a8">${bodyHtml}</div>
-          ${cta ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0 0 0"><tr><td><a href="${escapeHtml(cta.url)}" style="display:inline-block;padding:12px 24px;font-size:14px;font-weight:500;color:#fff;background:linear-gradient(135deg,#6366f1,#a855f7);border-radius:8px;text-decoration:none">${escapeHtml(cta.text)}</a></td></tr></table>` : ""}
-        </td></tr>
-        <tr><td style="padding:24px 16px 0;text-align:center;font-size:12px;color:#55556a">
-          <p style="margin:0 0 4px 0">CortexPrism — Open-Source Agentic Harness</p>
-          <p style="margin:0"><a href="${SITE_URL}" style="color:#6366f1;text-decoration:none">${SITE_URL}</a></p>
-          ${footerHtml || ""}
-        </td></tr>
-      </table>
-    </td></tr>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <style>
+    table { border-collapse: collapse; }
+    td { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+  </style>
+  <![endif]-->
+  <style type="text/css">
+    @media only screen and (max-width: 480px) {
+      .body-padding { padding: 20px 12px !important; }
+      .card-padding { padding: 28px 20px !important; }
+      .h1-mobile { font-size: 20px !important; }
+      .body-mobile { font-size: 15px !important; line-height: 1.6 !important; }
+      .cta-button { display: block !important; width: auto !important; padding: 14px 20px !important; font-size: 15px !important; }
+      .footer-links { font-size: 12px !important; }
+      .footer-links td { display: inline-block !important; padding: 2px 6px !important; }
+      .social-section { padding-top: 20px !important; }
+    }
+    @media only screen and (max-width: 375px) {
+      .card-padding { padding: 22px 14px !important; }
+      .h1-mobile { font-size: 18px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#050508;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#050508">
+    <!-- Preheader -->
+    <tr>
+      <td style="height:0;max-height:0;line-height:0;overflow:hidden;display:none;mso-hide:all" aria-hidden="true">
+        ${escapeHtml(title)} — from CortexPrism
+      </td>
+    </tr>
+    <!-- Main wrapper -->
+    <tr>
+      <td align="center" class="body-padding" style="padding:40px 20px 20px">
+        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center"><tr><td><![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">
+          <!-- Header / Logo -->
+          <tr>
+            <td style="padding:0 0 28px 0;text-align:center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto">
+                <tr>
+                  <td style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#a855f7);border-radius:10px;text-align:center">
+                    <span style="font-size:18px;font-weight:800;color:#ffffff;line-height:36px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;mso-line-height-rule:exactly;">C</span>
+                  </td>
+                  <td style="padding-left:10px">
+                    <span style="font-size:20px;font-weight:700;color:#e2e2ea;letter-spacing:-0.4px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">CortexPrism</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Accent bar -->
+          <tr>
+            <td style="height:3px;line-height:3px;font-size:0;background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899);border-radius:3px 3px 0 0;">&nbsp;</td>
+          </tr>
+          <!-- Content card -->
+          <tr>
+            <td class="card-padding" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:40px 48px">
+              <h1 class="h1-mobile" style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#f0f0f5;line-height:1.3;letter-spacing:-0.3px;">${escapeHtml(title)}</h1>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 24px 0">
+                <tr>
+                  <td style="width:40px;height:2px;line-height:2px;font-size:0;background:linear-gradient(90deg,#6366f1,transparent);">&nbsp;</td>
+                </tr>
+              </table>
+              <div class="body-mobile" style="font-size:16px;line-height:1.7;color:#a1a1b0;mso-line-height-rule:exactly;">
+                ${bodyHtml}
+              </div>
+              ${ctaBlock}
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr>
+            <td style="height:28px;line-height:28px;font-size:0;">&nbsp;</td>
+          </tr>
+          <!-- Social + Footer -->
+          <tr>
+            <td class="social-section" style="text-align:center;padding:0 0 16px 0;">
+              ${footerHtml ? `
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 12px auto;">
+                <tr><td style="font-size:12px;color:#55556a;line-height:1.5;padding:0 8px;">${footerHtml}</td></tr>
+              </table>` : ""}
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="footer-links" style="margin:0 auto;">
+                <tr>
+                  <td style="font-size:12px;color:#4a4a5e;padding:0 6px;">
+                    <a href="https://github.com/CortexPrism/cortex" target="_blank" style="color:#55556a;text-decoration:none;">GitHub</a>
+                  </td>
+                  <td style="font-size:12px;color:#2a2a36;padding:0 4px;">·</td>
+                  <td style="font-size:12px;color:#4a4a5e;padding:0 6px;">
+                    <a href="https://discord.gg/wYxbmQeWY3" target="_blank" style="color:#55556a;text-decoration:none;">Discord</a>
+                  </td>
+                  <td style="font-size:12px;color:#2a2a36;padding:0 4px;">·</td>
+                  <td style="font-size:12px;color:#4a4a5e;padding:0 6px;">
+                    <a href="${SITE_URL}/docs" target="_blank" style="color:#55556a;text-decoration:none;">Docs</a>
+                  </td>
+                  <td style="font-size:12px;color:#2a2a36;padding:0 4px;">·</td>
+                  <td style="font-size:12px;color:#4a4a5e;padding:0 6px;">
+                    <a href="${SITE_URL}" target="_blank" style="color:#55556a;text-decoration:none;">Website</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Tagline -->
+          <tr>
+            <td style="text-align:center;padding:0 0 20px 0;">
+              <p style="margin:0;font-size:11px;color:#3d3d50;font-family:-apple-system,BlinkMacSystemFont,sans-serif;">CortexPrism — Open-Source Agent Operating System</p>
+            </td>
+          </tr>
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
   </table>
 </body>
 </html>`;
@@ -139,8 +283,14 @@ export function renderNewsletterVerificationEmail(email: string, token: string) 
   };
 }
 
-export function renderNewsletterCampaignEmail(subject: string, content: string, unsubscribeToken: string) {
-  const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+export function renderNewsletterCampaignEmail(
+  subject: string,
+  content: string,
+  unsubscribeToken: string,
+  campaignId?: string
+) {
+  const cid = campaignId ? `&cid=${encodeURIComponent(campaignId)}` : "";
+  const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}${cid}`;
   return {
     subject,
     html: wrapTemplate(
@@ -156,6 +306,7 @@ export async function sendBulkEmails(
   recipients: { email: string; unsubscribeToken: string }[],
   subject: string,
   content: string,
+  campaignId?: string,
   onProgress?: (sent: number, total: number) => void
 ): Promise<{ sent: number; failed: number }> {
   let sent = 0;
@@ -163,8 +314,10 @@ export async function sendBulkEmails(
 
   for (let i = 0; i < recipients.length; i++) {
     const { email: to, unsubscribeToken } = recipients[i];
-    const emailHtml = renderNewsletterCampaignEmail(subject, content, unsubscribeToken).html;
-    const success = await sendEmail(to, subject, emailHtml);
+    const emailHtml = renderNewsletterCampaignEmail(subject, content, unsubscribeToken, campaignId).html;
+    const customArgs: Record<string, string> = { subscriber_email: to };
+    if (campaignId) customArgs.campaign_id = campaignId;
+    const success = await sendEmail(to, subject, emailHtml, customArgs);
     if (success) {
       sent++;
     } else {

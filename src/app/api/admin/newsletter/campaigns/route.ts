@@ -15,34 +15,45 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Admin access required" }, { status: 403 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+  try {
+    const { searchParams } = new URL(request.url);
+    const rawPage = parseInt(searchParams.get("page") || "1", 10);
+    const rawLimit = parseInt(searchParams.get("limit") || "20", 10);
+    const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : Math.min(rawPage, 1000);
+    const limit = Number.isNaN(rawLimit) || rawLimit < 1 ? 20 : Math.min(rawLimit, 50);
 
-  const [campaigns, total] = await Promise.all([
-    prisma.newsletterCampaign.findMany({
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
+    const [campaigns, total] = await Promise.all([
+      prisma.newsletterCampaign.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: {
         id: true,
         subject: true,
         status: true,
         sentCount: true,
         sentAt: true,
+        opens: true,
+        clicks: true,
+        unsubscribes: true,
+        bounces: true,
         createdAt: true,
       },
     }),
     prisma.newsletterCampaign.count(),
   ]);
 
-  return Response.json({
-    campaigns,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-  });
+    return Response.json({
+      campaigns,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    console.error("[newsletter] Failed to list campaigns:", error);
+    return Response.json({ error: "Failed to list campaigns" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {

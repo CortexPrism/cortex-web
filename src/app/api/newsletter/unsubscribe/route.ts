@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get("token");
+  const campaignId = searchParams.get("cid") || undefined;
 
   if (!token) {
     return Response.json({ error: "Missing token" }, { status: 400 });
@@ -55,6 +56,14 @@ export async function GET(request: NextRequest) {
         where: { id: sub.id },
         data: { status: "unsubscribed", unsubscribedAt: new Date(), unsubscribeTokenHash: null },
       });
+
+      if (campaignId) {
+        await prisma.newsletterCampaign.update({
+          where: { id: campaignId },
+          data: { unsubscribes: { increment: 1 } },
+        }).catch(() => {});
+      }
+
       return Response.redirect(new URL("/?unsubscribed=1", request.url));
     }
   }

@@ -70,7 +70,7 @@ export async function POST(
         unsubscribeToken: generateUnsubscribeToken(s.email),
       }));
 
-      const { sent, failed } = await sendBulkEmails(recipients, campaign.subject, campaign.content);
+      const { sent, failed } = await sendBulkEmails(recipients, campaign.subject, campaign.content, params.id);
       totalSent += sent;
       totalFailed += failed;
       cursor = batch[batch.length - 1].id;

@@ -8,38 +8,38 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  username        String           @unique
-  passwordHash    String
-  role            String           @default("user")
-  avatar          String?
-  bio             String?
-  website         String?
-  displayName     String?
-  location        String?
-  socialLinks     String?
-  preferences     String?
-  emailVerified   Boolean          @default(false)
-  isActive        Boolean          @default(true)
-  discordId       String?          @unique
-  discordUsername String?
-  githubId        String?          @unique
-  githubToken     String?
-  roleId          String?
-  userRole        Role?            @relation(fields: [roleId], references: [id])
-  plugins           Plugin[]
-  agents            AgentConfig[]
-  reviews           SubmissionReview[]
-  ratings           UserRating[]
-  auditLogs         AuditLog[]
-  githubConnections GitHubConnection[]
-  githubTopicScans  GitHubTopicScan[]
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  username              String                 @unique
+  passwordHash          String
+  role                  String                 @default("user")
+  avatar                String?
+  bio                   String?
+  website               String?
+  displayName           String?
+  location              String?
+  socialLinks           String?
+  preferences           String?
+  emailVerified         Boolean                @default(false)
+  isActive              Boolean                @default(true)
+  discordId             String?                @unique
+  discordUsername       String?
+  githubId              String?                @unique
+  githubToken           String?
+  roleId                String?
+  userRole              Role?                  @relation(fields: [roleId], references: [id])
+  plugins               Plugin[]
+  agents                AgentConfig[]
+  reviews               SubmissionReview[]
+  ratings               UserRating[]
+  auditLogs             AuditLog[]
+  githubConnections     GitHubConnection[]
+  githubTopicScans      GitHubTopicScan[]
   notifications         Notification[]
   knowledgeBaseArticles KnowledgeBaseArticle[]
-  blogPosts            BlogPost[]
-  createdAt             DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  blogPosts             BlogPost[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
 }
 
 model Permission {
@@ -50,6 +50,7 @@ model Permission {
   createdAt   DateTime @default(now())
 
   roles RolePermission[]
+
   @@map("Permission")
 }
 
@@ -63,6 +64,7 @@ model Role {
 
   permissions RolePermission[]
   users       User[]
+
   @@map("Role")
 }
 
@@ -78,125 +80,125 @@ model RolePermission {
 }
 
 model Plugin {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  slug            String           @unique
-  version         String
-  description     String
-  kind            String
-  entryPoint      String
-  capabilities    String
-  tags            String?
-  author          String?
-  authorUrl       String?
-  homepage        String?
-  repository      String?
-  license         String?
-  icon            String?
-  readme          String?
-  downloads       Int              @default(0)
-  rating          Float            @default(0)
-  githubStars     Int              @default(0)
-  githubForks     Int              @default(0)
-  githubTopics    String?
+  id               String             @id @default(cuid())
+  name             String             @unique
+  slug             String             @unique
+  version          String
+  description      String
+  kind             String
+  entryPoint       String
+  capabilities     String
+  tags             String?
+  author           String?
+  authorUrl        String?
+  homepage         String?
+  repository       String?
+  license          String?
+  icon             String?
+  readme           String?
+  downloads        Int                @default(0)
+  rating           Float              @default(0)
+  githubStars      Int                @default(0)
+  githubForks      Int                @default(0)
+  githubTopics     String?
   githubLastCommit DateTime?
-  githubImportId  String?
-  categoryId      String?
-  category        Category?        @relation(fields: [categoryId], references: [id])
-  status          String           @default("pending")
-  userId          String?
-  user            User?            @relation(fields: [userId], references: [id])
-  reviews         SubmissionReview[]
-  ratings         UserRating[]
-  screenshots     Screenshot[]
-  versions        PluginVersion[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  githubImportId   String?
+  categoryId       String?
+  category         Category?          @relation(fields: [categoryId], references: [id])
+  status           String             @default("pending")
+  userId           String?
+  user             User?              @relation(fields: [userId], references: [id])
+  reviews          SubmissionReview[]
+  ratings          UserRating[]
+  screenshots      Screenshot[]
+  versions         PluginVersion[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model AgentConfig {
-  id              String           @id @default(cuid())
-  name            String           @unique
-  slug            String           @unique
-  version         String
-  description     String
-  provider        String?
-  model           String?
-  temperature     Float?
-  tools           String?
-  tags            String?
-  systemPrompt    String?
-  soulContent     String?
-  author          String?
-  authorUrl       String?
-  homepage        String?
-  repository      String?
-  license         String?
-  icon            String?
-  readme          String?
-  downloads       Int              @default(0)
-  rating          Float            @default(0)
-  githubStars     Int              @default(0)
-  githubForks     Int              @default(0)
-  githubTopics    String?
+  id               String             @id @default(cuid())
+  name             String             @unique
+  slug             String             @unique
+  version          String
+  description      String
+  provider         String?
+  model            String?
+  temperature      Float?
+  tools            String?
+  tags             String?
+  systemPrompt     String?
+  soulContent      String?
+  author           String?
+  authorUrl        String?
+  homepage         String?
+  repository       String?
+  license          String?
+  icon             String?
+  readme           String?
+  downloads        Int                @default(0)
+  rating           Float              @default(0)
+  githubStars      Int                @default(0)
+  githubForks      Int                @default(0)
+  githubTopics     String?
   githubLastCommit DateTime?
-  githubImportId  String?
-  categoryId      String?
-  category        Category?        @relation(fields: [categoryId], references: [id])
-  status          String           @default("pending")
-  userId          String?
-  user            User?            @relation(fields: [userId], references: [id])
-  reviews         SubmissionReview[]
-  ratings         UserRating[]
-  screenshots     Screenshot[]
-  versions        AgentVersion[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  githubImportId   String?
+  categoryId       String?
+  category         Category?          @relation(fields: [categoryId], references: [id])
+  status           String             @default("pending")
+  userId           String?
+  user             User?              @relation(fields: [userId], references: [id])
+  reviews          SubmissionReview[]
+  ratings          UserRating[]
+  screenshots      Screenshot[]
+  versions         AgentVersion[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model Category {
-  id     String        @id @default(cuid())
-  name   String        @unique
-  slug   String        @unique
+  id      String        @id @default(cuid())
+  name    String        @unique
+  slug    String        @unique
   plugins Plugin[]
-  agents AgentConfig[]
+  agents  AgentConfig[]
 }
 
 model SubmissionReview {
-  id            String      @id @default(cuid())
-  pluginId      String?
-  plugin        Plugin?     @relation(fields: [pluginId], references: [id])
-  agentId       String?
-  agent         AgentConfig? @relation(fields: [agentId], references: [id])
-  reviewerId    String
-  reviewer      User        @relation(fields: [reviewerId], references: [id])
-  action        String      // "approved" | "rejected"
-  notes         String?
-  createdAt     DateTime    @default(now())
+  id         String       @id @default(cuid())
+  pluginId   String?
+  plugin     Plugin?      @relation(fields: [pluginId], references: [id])
+  agentId    String?
+  agent      AgentConfig? @relation(fields: [agentId], references: [id])
+  reviewerId String
+  reviewer   User         @relation(fields: [reviewerId], references: [id])
+  action     String // "approved" | "rejected"
+  notes      String?
+  createdAt  DateTime     @default(now())
 }
 
 model UserRating {
-  id            String      @id @default(cuid())
-  pluginId      String?
-  plugin        Plugin?     @relation(fields: [pluginId], references: [id])
-  agentId       String?
-  agent         AgentConfig? @relation(fields: [agentId], references: [id])
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  rating        Int         // 1-5
-  review        String?
-  createdAt     DateTime    @default(now())
+  id        String       @id @default(cuid())
+  pluginId  String?
+  plugin    Plugin?      @relation(fields: [pluginId], references: [id])
+  agentId   String?
+  agent     AgentConfig? @relation(fields: [agentId], references: [id])
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  rating    Int // 1-5
+  review    String?
+  createdAt DateTime     @default(now())
 }
 
 model Screenshot {
-  id        String      @id @default(cuid())
-  pluginId  String?
-  plugin    Plugin?     @relation(fields: [pluginId], references: [id])
-  agentId   String?
-  agent     AgentConfig? @relation(fields: [agentId], references: [id])
-  url       String
-  alt       String?
-  order     Int         @default(0)
+  id       String       @id @default(cuid())
+  pluginId String?
+  plugin   Plugin?      @relation(fields: [pluginId], references: [id])
+  agentId  String?
+  agent    AgentConfig? @relation(fields: [agentId], references: [id])
+  url      String
+  alt      String?
+  order    Int          @default(0)
 }
 
 model PluginVersion {
@@ -227,77 +229,77 @@ model AgentVersion {
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
-  action     String
-  entity     String?
-  entityId   String?
-  metadata   String?
-  ip         String?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  metadata  String?
+  ip        String?
+  createdAt DateTime @default(now())
 
   @@map("AuditLog")
 }
 
 model GitHubConnection {
-  id              String   @id @default(cuid())
-  owner           String
-  repo            String
-  branch          String   @default("main")
-  isActive        Boolean  @default(true)
-  lastSyncAt      DateTime?
-  webhookSecret   String?
-  syncPlugins     Boolean  @default(true)
-  syncAgents      Boolean  @default(false)
-  autoApprove     Boolean  @default(false)
-  manifestPath    String   @default("cortex.json")
-  createdById     String?
-  createdBy       User?    @relation(fields: [createdById], references: [id])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String    @id @default(cuid())
+  owner         String
+  repo          String
+  branch        String    @default("main")
+  isActive      Boolean   @default(true)
+  lastSyncAt    DateTime?
+  webhookSecret String?
+  syncPlugins   Boolean   @default(true)
+  syncAgents    Boolean   @default(false)
+  autoApprove   Boolean   @default(false)
+  manifestPath  String    @default("cortex.json")
+  createdById   String?
+  createdBy     User?     @relation(fields: [createdById], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@unique([owner, repo])
   @@map("GitHubConnection")
 }
 
 model GitHubTopicScan {
-  id         String   @id @default(cuid())
-  topic      String
-  status     String   @default("pending") // pending | running | completed | failed
-  resultCount Int     @default(0)
-  importedCount Int   @default(0)
-  error      String?
-  startedAt  DateTime?
-  completedAt DateTime?
-  createdById String?
-  createdBy  User?    @relation(fields: [createdById], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String    @id @default(cuid())
+  topic         String
+  status        String    @default("pending") // pending | running | completed | failed
+  resultCount   Int       @default(0)
+  importedCount Int       @default(0)
+  error         String?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdById   String?
+  createdBy     User?     @relation(fields: [createdById], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  results    DiscoveredRepo[]
+  results DiscoveredRepo[]
 
   @@map("GitHubTopicScan")
 }
 
 model DiscoveredRepo {
-  id             String   @id @default(cuid())
-  scanId         String
-  scan           GitHubTopicScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
-  owner          String
-  repo           String
-  fullName       String
-  description    String?
-  htmlUrl        String
-  stars          Int      @default(0)
-  topics         String   @default("[]") // JSON array
-  repoKind       String?  // "plugin" | "agent" | "unknown"
-  manifestFound  Boolean  @default(false)
-  manifestData   String?  // JSON of manifest if found
-  importStatus   String   @default("pending") // pending | imported | skipped | error
-  importedId     String?  // id of created Plugin or AgentConfig
-  error          String?
-  createdAt      DateTime @default(now())
+  id            String          @id @default(cuid())
+  scanId        String
+  scan          GitHubTopicScan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  owner         String
+  repo          String
+  fullName      String
+  description   String?
+  htmlUrl       String
+  stars         Int             @default(0)
+  topics        String          @default("[]") // JSON array
+  repoKind      String? // "plugin" | "agent" | "unknown"
+  manifestFound Boolean         @default(false)
+  manifestData  String? // JSON of manifest if found
+  importStatus  String          @default("pending") // pending | imported | skipped | error
+  importedId    String? // id of created Plugin or AgentConfig
+  error         String?
+  createdAt     DateTime        @default(now())
 
   @@unique([scanId, fullName])
   @@map("DiscoveredRepo")
@@ -307,7 +309,7 @@ model Notification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      String   // "submission_approved" | "submission_rejected" | "new_submission" | "system"
+  type      String // "submission_approved" | "submission_rejected" | "new_submission" | "system"
   title     String
   body      String?
   link      String?
@@ -353,21 +355,21 @@ model BlogPost {
 }
 
 model ReleaseWatch {
-  id                    String   @id @default(cuid())
-  owner                 String
-  repo                  String
-  watchType             String   @default("release") // "release" | "tag" | "both"
-  lastReleaseTag        String?
-  lastTagName           String?
+  id                     String    @id @default(cuid())
+  owner                  String
+  repo                   String
+  watchType              String    @default("release") // "release" | "tag" | "both"
+  lastReleaseTag         String?
+  lastTagName            String?
   lastReleasePublishedAt DateTime?
-  lastStarCount         Int?
-  lastForkCount         Int?
-  channelId             String
-  guildId               String
-  isActive              Boolean  @default(true)
-  createdBy             String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  lastStarCount          Int?
+  lastForkCount          Int?
+  channelId              String
+  guildId                String
+  isActive               Boolean   @default(true)
+  createdBy              String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   @@unique([owner, repo, guildId])
   @@index([isActive])
@@ -391,14 +393,18 @@ model NewsletterSubscription {
 }
 
 model NewsletterCampaign {
-  id        String    @id @default(cuid())
-  subject   String
-  content   String
-  status    String    @default("draft")
-  sentAt    DateTime?
-  sentCount Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  subject      String
+  content      String
+  status       String    @default("draft")
+  sentAt       DateTime?
+  sentCount    Int       @default(0)
+  opens        Int       @default(0)
+  clicks       Int       @default(0)
+  unsubscribes Int       @default(0)
+  bounces      Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@map("NewsletterCampaign")
 }
@@ -414,14 +420,14 @@ model Setting {
 }
 
 model AnalyticsSession {
-  id           String   @id @default(cuid())
-  sessionId    String   @unique
+  id           String              @id @default(cuid())
+  sessionId    String              @unique
   ipHash       String?
   userAgent    String?
   country      String?
   referrer     String?
-  firstVisitAt DateTime @default(now())
-  lastVisitAt  DateTime @default(now())
+  firstVisitAt DateTime            @default(now())
+  lastVisitAt  DateTime            @default(now())
   pageViews    AnalyticsPageView[]
 
   @@index([sessionId])
@@ -436,7 +442,7 @@ model AnalyticsPageView {
   path      String
   referrer  String?
   userAgent String?
-  timestamp DateTime        @default(now())
+  timestamp DateTime         @default(now())
 
   @@index([timestamp])
   @@index([sessionId])
@@ -445,58 +451,58 @@ model AnalyticsPageView {
 }
 
 model GuildConfig {
-  id                  String      @id @default(cuid())
-  guildId             String      @unique
-  guildName           String?
-  logChannelId        String?
-  modRoleId           String?
-  adminRoleId         String?
-  muteRoleId          String?
-  autoModEnabled      Boolean     @default(false)
-  welcomeEnabled      Boolean     @default(false)
-  welcomeMessage      String?
-  welcomeChannelId    String?
-  leaveEnabled        Boolean     @default(false)
-  leaveMessage        String?
-  leaveChannelId      String?
-  slowmodeDefault     Int         @default(0)
-  maxWarnsBeforeBan   Int         @default(3)
+  id                    String             @id @default(cuid())
+  guildId               String             @unique
+  guildName             String?
+  logChannelId          String?
+  modRoleId             String?
+  adminRoleId           String?
+  muteRoleId            String?
+  autoModEnabled        Boolean            @default(false)
+  welcomeEnabled        Boolean            @default(false)
+  welcomeMessage        String?
+  welcomeChannelId      String?
+  leaveEnabled          Boolean            @default(false)
+  leaveMessage          String?
+  leaveChannelId        String?
+  slowmodeDefault       Int                @default(0)
+  maxWarnsBeforeBan     Int                @default(3)
   announcementChannelId String?
-  ticketCategoryId    String?
-  ticketLogChannelId  String?
-  ticketStaffRoleId   String?
-  levelingEnabled     Boolean     @default(false)
-  levelingMessage     String?
-  levelingChannelId   String?
-  starboardEnabled    Boolean     @default(false)
-  starboardChannelId  String?
-  starboardThreshold  Int         @default(3)
-  moderationActions   ModerationAction[]
-  reactionRoles       ReactionRole[]
-  autoModRules        AutoModRule[]
-  polls               Poll[]
-  tickets             Ticket[]
-  channelConfigs      ChannelConfig[]
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  ticketCategoryId      String?
+  ticketLogChannelId    String?
+  ticketStaffRoleId     String?
+  levelingEnabled       Boolean            @default(false)
+  levelingMessage       String?
+  levelingChannelId     String?
+  starboardEnabled      Boolean            @default(false)
+  starboardChannelId    String?
+  starboardThreshold    Int                @default(3)
+  moderationActions     ModerationAction[]
+  reactionRoles         ReactionRole[]
+  autoModRules          AutoModRule[]
+  polls                 Poll[]
+  tickets               Ticket[]
+  channelConfigs        ChannelConfig[]
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
 
   @@map("GuildConfig")
 }
 
 model ModerationAction {
-  id          String      @id @default(cuid())
-  guildId     String
-  guildConfig GuildConfig? @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  actionType  String      // warn | mute | unmute | kick | ban | unban | purge | lockdown | unlock | nickname
-  moderatorId String
+  id           String       @id @default(cuid())
+  guildId      String
+  guildConfig  GuildConfig? @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  actionType   String // warn | mute | unmute | kick | ban | unban | purge | lockdown | unlock | nickname
+  moderatorId  String
   moderatorTag String?
-  targetId    String
-  targetTag   String?
-  reason      String?
-  duration    String?     // duration in ms for timed actions (mute)
-  expiresAt   DateTime?   // when a timed action expires
-  metadata    String?     // JSON for extra data (message count for purge, etc.)
-  createdAt   DateTime    @default(now())
+  targetId     String
+  targetTag    String?
+  reason       String?
+  duration     String? // duration in ms for timed actions (mute)
+  expiresAt    DateTime? // when a timed action expires
+  metadata     String? // JSON for extra data (message count for purge, etc.)
+  createdAt    DateTime     @default(now())
 
   @@index([guildId])
   @@index([targetId])
@@ -505,33 +511,33 @@ model ModerationAction {
 }
 
 model ReactionRole {
-  id            String      @id @default(cuid())
-  guildId       String
-  guildConfig   GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  channelId     String
-  messageId     String?
-  roleId        String
-  emoji         String
-  label         String?
-  type          String      @default("toggle") // toggle | single | verify
-  createdAt     DateTime    @default(now())
+  id          String      @id @default(cuid())
+  guildId     String
+  guildConfig GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  channelId   String
+  messageId   String?
+  roleId      String
+  emoji       String
+  label       String?
+  type        String      @default("toggle") // toggle | single | verify
+  createdAt   DateTime    @default(now())
 
   @@index([guildId])
   @@map("ReactionRole")
 }
 
 model AutoModRule {
-  id            String      @id @default(cuid())
-  guildId       String
-  guildConfig   GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  type          String      // keyword_filter | invite_filter | spam_filter | link_filter | mention_limit | caps_filter
-  name          String
-  enabled       Boolean     @default(true)
-  action        String      @default("warn") // warn | mute | kick | ban | delete
-  duration      Int?        // mute duration in minutes (for mute action)
-  config        String?     // JSON config (keywords, threshold, excluded channels/roles, etc.)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id          String      @id @default(cuid())
+  guildId     String
+  guildConfig GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  type        String // keyword_filter | invite_filter | spam_filter | link_filter | mention_limit | caps_filter
+  name        String
+  enabled     Boolean     @default(true)
+  action      String      @default("warn") // warn | mute | kick | ban | delete
+  duration    Int? // mute duration in minutes (for mute action)
+  config      String? // JSON config (keywords, threshold, excluded channels/roles, etc.)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([guildId])
   @@map("AutoModRule")
@@ -545,7 +551,7 @@ model Poll {
   messageId     String?
   title         String
   description   String?
-  options       String      // JSON array of {emoji, label, votes}
+  options       String // JSON array of {emoji, label, votes}
   allowMultiple Boolean     @default(false)
   isActive      Boolean     @default(true)
   createdBy     String
@@ -558,24 +564,24 @@ model Poll {
 }
 
 model Ticket {
-  id              String      @id @default(cuid())
-  guildId         String
-  guildConfig     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
-  channelId       String      @unique
-  userId          String
-  userTag         String?
-  subject         String
-  status          String      @default("open") // open | claimed | closed | deleted
-  claimedBy       String?
-  claimedByTag    String?
-  closedAt        DateTime?
-  closedBy        String?
-  closeReason     String?
-  transcriptUrl   String?
-  priority        String      @default("normal") // low | normal | high | urgent
-  messages        TicketMessage[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id            String          @id @default(cuid())
+  guildId       String
+  guildConfig   GuildConfig     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  channelId     String          @unique
+  userId        String
+  userTag       String?
+  subject       String
+  status        String          @default("open") // open | claimed | closed | deleted
+  claimedBy     String?
+  claimedByTag  String?
+  closedAt      DateTime?
+  closedBy      String?
+  closeReason   String?
+  transcriptUrl String?
+  priority      String          @default("normal") // low | normal | high | urgent
+  messages      TicketMessage[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   @@index([guildId])
   @@index([userId])
@@ -584,15 +590,15 @@ model Ticket {
 }
 
 model TicketMessage {
-  id            String      @id @default(cuid())
-  ticketId      String
-  ticket        Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  userId        String
-  userTag       String?
-  content       String
-  attachments   String?     // JSON array of URLs
-  isStaffReply  Boolean     @default(false)
-  createdAt     DateTime    @default(now())
+  id           String   @id @default(cuid())
+  ticketId     String
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId       String
+  userTag      String?
+  content      String
+  attachments  String? // JSON array of URLs
+  isStaffReply Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
   @@index([ticketId])
   @@map("TicketMessage")
