@@ -6,12 +6,11 @@
     "qdrant": {
       "url": "http://10.10.20.31:6333/"
     },
-    "model": "qwen3-embedding-8b",
-    "provider": "openai-compatible",
+    "model": "mistralai/mistral-embed-2312",
+    "provider": "kilo",
     "openai-compatible": {
       "apiKey": "sk-KmQgHl5YIXqwg-CssP2BUQ",
       "baseUrl": "http://10.10.20.21:4000/v1/"
-    },
-    "dimension": 4096
+    }
   }
 }

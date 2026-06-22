@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         client_secret: process.env.DISCORD_CLIENT_SECRET!,
         grant_type: "authorization_code",
         code,
-        redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/discord/callback`,
+        redirect_uri: `${process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL}/api/auth/discord/callback`,
       }),
     });
 

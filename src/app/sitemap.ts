@@ -6,7 +6,7 @@ import { STATIC_PATHS, DOCS_SECTIONS } from "@/lib/site-urls";
 import { routing } from "@/i18n/routing";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
+  process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
 
 interface StaticRoute {
   path: string;

@@ -2,6 +2,11 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.12.1] — 2026-06-22
+
+### Fixed
+- **Server-side URL construction** — all server-side `process.env.NEXT_PUBLIC_SITE_URL` references now prefer `process.env.SITE_URL` (7 files: `email.ts`, `submissions.ts`, `seo.ts`, `sitemap.ts`, `discord-webhook.ts`, Discord OAuth callback/link routes). `NEXT_PUBLIC_` variables are inlined by webpack at build time, causing runtime env overrides to be ignored. The non-public `SITE_URL` variable is read at runtime, fixing unsubscribe links, email CTAs, sitemap URLs, SEO metadata, Discord OAuth redirect URIs, and webhook links when rebuilt without the correct build-time env.
+
 ## [0.12.0] — 2026-06-21
 
 ### Fixed

@@ -18,7 +18,7 @@ export async function notifySubmissionAction(
   const prefs = user.preferences ? JSON.parse(user.preferences) : {};
   const notify = prefs.emailNotifications !== false;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
   const itemUrl = `${siteUrl}/marketplace/${type}s/${record.slug}`;
 
   if (action === "approved") {

@@ -1,5 +1,5 @@
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
+  process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
 
 export const SITE_NAME = "CortexPrism";
 

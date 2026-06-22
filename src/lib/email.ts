@@ -4,7 +4,7 @@ import crypto from "crypto";
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "";
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "noreply@cortexprism.io";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "CortexPrism";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
+const SITE_URL = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
 const NEWSLETTER_UNSUBSCRIBE_SECRET = process.env.NEWSLETTER_UNSUBSCRIBE_SECRET || process.env.JWT_SECRET || "";
 
 const isConfigured = !!SENDGRID_API_KEY;
@@ -279,6 +279,17 @@ export function renderNewsletterVerificationEmail(email: string, token: string) 
       "Confirm your subscription",
       `<p>Hi there,</p><p>Please confirm your newsletter subscription by clicking the button below:</p><p style="font-size:13px;color:#55556a">This email was requested for <strong style="color:#e2e2ea">${safeEmail}</strong>. If you didn't request this, you can safely ignore this email.</p>`,
       { text: "Confirm Subscription", url: verifyUrl }
+    ),
+  };
+}
+
+export function renderNewsletterWelcomeEmail() {
+  return {
+    subject: "Welcome to the CortexPrism newsletter",
+    html: wrapTemplate(
+      "You're subscribed!",
+      `<p>Thank you for subscribing to the CortexPrism newsletter.</p><p>You'll receive updates about:</p><ul style="padding-left:20px;margin:12px 0;font-size:14px;line-height:1.8;color:#9090a8"><li>New plugin and agent releases</li><li>Core platform features and improvements</li><li>Community highlights and tutorials</li><li>Major announcements and release notes</li></ul><p>Stay tuned — we keep emails concise and meaningful.</p>`,
+      { text: "Browse the Marketplace", url: `${SITE_URL}/marketplace` }
     ),
   };
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, Trash2, Users, Megaphone, AlertCircle, CheckCircle, XCircle, RefreshCw, Upload, Plus, Eye, EyeOff, Monitor, Pencil, FlaskConical } from "lucide-react";
+import { Send, Trash2, Users, Megaphone, AlertCircle, CheckCircle, XCircle, RefreshCw, Upload, Plus, Eye, EyeOff, Monitor, Pencil, FlaskConical, BarChart3, Download, TrendingUp, Percent, MousePointerClick } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import { RichTextEditor } from "@/components/shared/RichTextEditor";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 type Subscriber = {
   id: string;
@@ -27,7 +28,7 @@ type Campaign = {
   createdAt: string;
 };
 
-type Tab = "subscribers" | "campaigns";
+type Tab = "subscribers" | "campaigns" | "analytics";
 
 export default function AdminNewsletterPage() {
   const [tab, setTab] = useState<Tab>("subscribers");
@@ -70,9 +71,16 @@ export default function AdminNewsletterPage() {
         >
           <Megaphone className="w-4 h-4 inline mr-1.5" /> Campaigns
         </button>
+        <button
+          onClick={() => setTab("analytics")}
+          className={"px-4 py-2 rounded-md text-sm font-medium transition-colors " +
+            (tab === "analytics" ? "bg-indigo-500/20 text-indigo-300" : "text-[#9090a8] hover:text-[#e2e2ea]")}
+        >
+          <BarChart3 className="w-4 h-4 inline mr-1.5" /> Analytics
+        </button>
       </div>
 
-      {tab === "subscribers" ? <SubscribersPanel showMsg={showMsg} /> : <CampaignsPanel showMsg={showMsg} />}
+      {tab === "subscribers" ? <SubscribersPanel showMsg={showMsg} /> : tab === "campaigns" ? <CampaignsPanel showMsg={showMsg} /> : <AnalyticsPanel showMsg={showMsg} />}
     </div>
   );
 }
@@ -804,6 +812,266 @@ function CampaignsPanel({ showMsg }: { showMsg: (type: "success" | "error", text
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function AnalyticsPanel({ showMsg }: { showMsg: (type: "success" | "error", text: string) => void }) {
+  const [overview, setOverview] = useState<{
+    subscribers: { total: number; active: number; pending: number; unsubscribed: number; newToday: number; newWeek: number; newMonth: number };
+    campaigns: { total: number; sent: number; totalDelivered: number; totalOpens: number; totalClicks: number; totalUnsubscribes: number; totalBounces: number; openRate: number; clickRate: number; unsubscribeRate: number; bounceRate: number };
+    lastCampaign: { id: string; subject: string; sentAt: string; sentCount: number; opens: number; clicks: number } | null;
+  } | null>(null);
+  const [growth, setGrowth] = useState<{ date: string; newSubs: number; confirmed: number; unsubscribed: number; active: number }[]>([]);
+  const [campaigns, setCampaigns] = useState<{ id: string; subject: string; status: string; sentCount: number; opens: number; clicks: number; unsubscribes: number; bounces: number; openRate: number; clickRate: number; unsubscribeRate: number; bounceRate: number; ctr: number; sentAt: string | null; createdAt: string }[]>([]);
+  const [growthRange, setGrowthRange] = useState<"7d" | "30d" | "90d">("30d");
+  const [loading, setLoading] = useState(true);
+
+  const fetchAnalytics = () => {
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    const headers = { authorization: `Bearer ${token}` };
+
+    Promise.all([
+      fetch("/api/admin/newsletter/analytics/overview", { headers }).then(r => r.json()),
+      fetch(`/api/admin/newsletter/analytics/growth?range=${growthRange}`, { headers }).then(r => r.json()),
+      fetch("/api/admin/newsletter/analytics/campaigns?limit=20", { headers }).then(r => r.json()),
+    ])
+      .then(([ov, gr, cp]) => {
+        setOverview(ov);
+        setGrowth(gr.growth || []);
+        setCampaigns(cp.campaigns || []);
+      })
+      .catch(() => showMsg("error", "Failed to load analytics"))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchAnalytics(); }, [growthRange]);
+
+  const handleExport = () => {
+    const token = localStorage.getItem("token");
+    const a = document.createElement("a");
+    a.href = `/api/admin/newsletter/subscribers/export?status=active`;
+    a.download = "";
+    fetch(a.href, { headers: { authorization: `Bearer ${token}` } })
+      .then(r => r.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = `newsletter-subscribers-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch(() => showMsg("error", "Export failed"));
+  };
+
+  if (loading) {
+    return <div className="text-center py-12 text-[#55556a]">Loading analytics...</div>;
+  }
+
+  const statCards = [
+    { label: "Active Subscribers", value: overview?.subscribers.active ?? 0, icon: Users, color: "indigo" },
+    { label: "Campaigns Sent", value: overview?.campaigns.sent ?? 0, icon: Megaphone, color: "purple" },
+    { label: "Open Rate", value: `${overview?.campaigns.openRate ?? "0"}%`, icon: Percent, color: "green" },
+    { label: "Click Rate", value: `${overview?.campaigns.clickRate ?? "0"}%`, icon: MousePointerClick, color: "blue" },
+  ];
+
+  const statColors: Record<string, string> = {
+    indigo: "border-indigo-500/30",
+    purple: "border-purple-500/30",
+    green: "border-green-500/30",
+    blue: "border-blue-500/30",
+  };
+
+  const iconColors: Record<string, string> = {
+    indigo: "text-indigo-400",
+    purple: "text-purple-400",
+    green: "text-green-400",
+    blue: "text-blue-400",
+  };
+
+  return (
+    <div className="max-w-6xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex gap-1 bg-[#0a0a0f] rounded-lg p-1 border border-[rgba(255,255,255,0.07)]">
+            {(["7d", "30d", "90d"] as const).map(r => (
+              <button
+                key={r}
+                onClick={() => setGrowthRange(r)}
+                className={"px-3 py-1.5 rounded-md text-xs font-medium transition-colors " +
+                  (growthRange === r ? "bg-indigo-500/20 text-indigo-300" : "text-[#9090a8] hover:text-[#e2e2ea]")}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+        <Button onClick={handleExport} size="sm" variant="outline">
+          <Download className="w-4 h-4 mr-1.5" /> Export CSV
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((stat) => (
+          <div key={stat.label} className={`glass-card bg-[#0a0a0f] border ${statColors[stat.color]} rounded-xl p-4`}>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#9090a8]">{stat.label}</span>
+              <stat.icon className={`w-5 h-5 ${iconColors[stat.color]}`} />
+            </div>
+            <div className="text-2xl font-bold text-[#e2e2ea] mt-2">{stat.value.toLocaleString()}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <div className="flex flex-col items-center justify-center h-full py-4">
+            <span className="text-sm text-[#9090a8] mb-1">Total Emails Delivered</span>
+            <span className="text-3xl font-bold text-[#e2e2ea]">{(overview?.campaigns.totalDelivered ?? 0).toLocaleString()}</span>
+          </div>
+        </div>
+        <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <div className="flex flex-col items-center justify-center h-full py-4">
+            <span className="text-sm text-[#9090a8] mb-1">Bounce Rate</span>
+            <span className={`text-3xl font-bold ${(overview?.campaigns.bounceRate ?? 0) > 3 ? "text-red-400" : "text-green-400"}`}>{overview?.campaigns.bounceRate ?? "0"}%</span>
+          </div>
+        </div>
+        <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <div className="flex flex-col items-center justify-center h-full py-4">
+            <span className="text-sm text-[#9090a8] mb-1">Unsubscribe Rate</span>
+            <span className={`text-3xl font-bold ${(overview?.campaigns.unsubscribeRate ?? 0) > 1 ? "text-yellow-400" : "text-green-400"}`}>{overview?.campaigns.unsubscribeRate ?? "0"}%</span>
+          </div>
+        </div>
+        <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <div className="flex flex-col items-center justify-center h-full py-4">
+            <span className="text-sm text-[#9090a8] mb-1">New This Week</span>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold text-green-400">+{overview?.subscribers.newWeek ?? 0}</span>
+              <TrendingUp className="w-5 h-5 text-green-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <h3 className="text-sm font-medium text-[#9090a8] mb-4">Subscriber Growth ({growthRange})</h3>
+          <div className="h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={growth}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 11, fill: "#55556a" }}
+                  tickFormatter={(v) => new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                />
+                <YAxis tick={{ fontSize: 11, fill: "#55556a" }} />
+                <Tooltip
+                  contentStyle={{ background: "#0a0a0f", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", fontSize: "12px", color: "#e2e2ea" }}
+                />
+                <Bar dataKey="confirmed" fill="#22c55e" radius={[4, 4, 0, 0]} name="Confirmed" />
+                <Bar dataKey="unsubscribed" fill="#ef4444" radius={[4, 4, 0, 0]} name="Unsubscribed" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
+          <h3 className="text-sm font-medium text-[#9090a8] mb-4">Subscriber Breakdown</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-[#9090a8]">Active</span>
+                <span className="text-[#e2e2ea] font-medium">{overview?.subscribers.active ?? 0}</span>
+              </div>
+              <div className="w-full bg-[#111118] rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{ width: `${overview ? Math.round((overview.subscribers.active / Math.max(1, overview.subscribers.total)) * 100) : 0}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-[#9090a8]">Pending</span>
+                <span className="text-[#e2e2ea] font-medium">{overview?.subscribers.pending ?? 0}</span>
+              </div>
+              <div className="w-full bg-[#111118] rounded-full h-2">
+                <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${overview ? Math.round((overview.subscribers.pending / Math.max(1, overview.subscribers.total)) * 100) : 0}%` }} />
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-[#9090a8]">Unsubscribed</span>
+                <span className="text-[#e2e2ea] font-medium">{overview?.subscribers.unsubscribed ?? 0}</span>
+              </div>
+              <div className="w-full bg-[#111118] rounded-full h-2">
+                <div className="bg-red-500 h-2 rounded-full" style={{ width: `${overview ? Math.round((overview.subscribers.unsubscribed / Math.max(1, overview.subscribers.total)) * 100) : 0}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {overview?.lastCampaign && (
+            <div className="mt-6 pt-4 border-t border-[rgba(255,255,255,0.06)]">
+              <p className="text-xs text-[#55556a] mb-2">Latest Campaign</p>
+              <p className="text-sm text-[#e2e2ea] font-medium truncate">{overview.lastCampaign.subject}</p>
+              <div className="flex items-center gap-3 mt-2 text-xs text-[#55556a]">
+                <span>👁 {overview.lastCampaign.opens} opens</span>
+                <span>🔗 {overview.lastCampaign.clicks} clicks</span>
+                <span>{new Date(overview.lastCampaign.sentAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="glass-card bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] rounded-xl overflow-hidden">
+        <div className="p-4 border-b border-[rgba(255,255,255,0.07)]">
+          <h3 className="text-sm font-medium text-[#9090a8]">Campaign Performance</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[rgba(255,255,255,0.04)] text-xs text-[#55556a]">
+                <th className="text-left px-4 py-3 font-medium">Subject</th>
+                <th className="text-right px-4 py-3 font-medium">Delivered</th>
+                <th className="text-right px-4 py-3 font-medium">Opens</th>
+                <th className="text-right px-4 py-3 font-medium">Clicks</th>
+                <th className="text-right px-4 py-3 font-medium">Open Rate</th>
+                <th className="text-right px-4 py-3 font-medium">CTR</th>
+                <th className="text-right px-4 py-3 font-medium">Unsub</th>
+                <th className="text-right px-4 py-3 font-medium">Bounces</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
+              {campaigns.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-center py-8 text-[#55556a]">No campaigns sent yet</td>
+                </tr>
+              ) : (
+                campaigns.map((c) => (
+                  <tr key={c.id} className="hover:bg-[#0a0a14] transition-colors">
+                    <td className="px-4 py-3 text-[#e2e2ea] max-w-[200px] truncate">{c.subject}</td>
+                    <td className="px-4 py-3 text-right text-[#e2e2ea]">{c.sentCount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right text-[#9090a8]">{c.opens.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right text-[#9090a8]">{c.clicks.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={c.openRate > 30 ? "text-green-400" : c.openRate > 15 ? "text-yellow-400" : "text-red-400"}>
+                        {c.openRate}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={c.ctr > 5 ? "text-green-400" : c.ctr > 2 ? "text-yellow-400" : "text-red-400"}>
+                        {c.ctr}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-[#55556a]">{c.unsubscribes}</td>
+                    <td className="px-4 py-3 text-right text-[#55556a]">{c.bounces}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

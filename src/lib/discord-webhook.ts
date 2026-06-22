@@ -2,7 +2,7 @@ export function sendSubmissionWebhook(type: "plugin" | "agent", name: string, au
   const webhookUrl = process.env.DISCORD_SUBMISSION_WEBHOOK_URL;
   if (!webhookUrl) return;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+  const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "";
   const isPlugin = type === "plugin";
   const color = isPlugin ? 0x9B59B6 : 0x3498DB;
   const emoji = isPlugin ? "🟣" : "🤖";

@@ -10,6 +10,7 @@ Environment=NODE_ENV=production
 Environment=PORT=3001
 Environment=DATABASE_URL=file:/root/cortex-web/prisma/marketplace.db
 Environment=NEXT_PUBLIC_SITE_URL=https://cortexprism.io
+Environment=SITE_URL=https://cortexprism.io
 ExecStart=/root/.nvm/versions/node/v24.15.0/bin/node server.js
 Restart=always
 RestartSec=10
