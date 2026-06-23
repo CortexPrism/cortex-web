@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "オープンソース AI OS — 永続的な5階層メモリ、60以上のツール、フルWeb UI、階層型 Parallax セキュリティを備えたエージェントオペレーティングシステム。セルフホスト対応、Deno 搭載。Apache 2.0 ライセンス。",
+    "siteDescription": "オープンソース エージェントオペレーティングシステム — 永続的な5階層メモリ、60以上のツール、フルWeb UI、階層型 Parallax セキュリティを備えたAI OS。セルフホスト対応、Deno 搭載。Apache 2.0 ライセンス。",
     "copyright": "© {year} CortexPrism. Apache 2.0 ライセンス。",
     "poweredBy": "Deno 搭載",
     "loading": "読み込み中...",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — オープンソース AI OS | エージェントオペレーティングシステム",
-    "defaultDescription": "CortexPrism はオープンソースの AI OS — 24の LLM プロバイダー、5階層メモリ、MCP プラグインマーケットプレイス、サンドボックスコード実行、エンタープライズ級 Parallax セキュリティを備えたエージェント OS です。自律型 AI エージェントをセルフホストで。Apache 2.0 ライセンス。"
+    "defaultTitle": "CortexPrism — オープンソース エージェントオペレーティングシステム | 自律AIエージェントのためのAI OS",
+    "defaultDescription": "CortexPrism はオープンソースのエージェントオペレーティングシステム — 24の LLM プロバイダー、5階層メモリ、MCP プラグインマーケットプレイス、サンドボックスコード実行、エンタープライズ級 Parallax セキュリティを備えた AI OS です。自律型 AI エージェントをセルフホストで。Apache 2.0 ライセンス。"
   }
 }

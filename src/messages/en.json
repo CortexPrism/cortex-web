@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "Open-source AI OS — an Agent Operating System with persistent 5-tier memory, 60+ tools, a full web UI, and layered Parallax security. Self-hosted, powered by Deno. Apache 2.0 licensed.",
+    "siteDescription": "Open-source Agent Operating System — an AI OS with persistent 5-tier memory, 60+ tools, a full web UI, and layered Parallax security. Self-hosted, powered by Deno. Apache 2.0 licensed.",
     "copyright": "© {year} CortexPrism. Apache 2.0 License.",
     "poweredBy": "Powered by Deno",
     "loading": "Loading...",
@@ -70,17 +70,17 @@
   },
   "home": {
     "heroHeadline1": "The Open-Source",
-    "heroHeadline2": "AI OS for Autonomous Agents",
-    "heroHeadline3": "with Memory, Tools & Web UI",
-    "heroDescription": "An open-source, self-hosted AI Agent Operating System that turns any LLM into a capable autonomous agent. This AI OS features persistent 5-tier memory, 60+ built-in tools, sandboxed code execution, a full-featured web UI, and enterprise-grade Parallax security — powered by Deno. Deploy your own Agent Operating System in one command.",
+    "heroHeadline2": "Agent Operating System",
+    "heroHeadline3": "for Autonomous AI Agents",
+    "heroDescription": "CortexPrism is an open-source, self-hosted Agent Operating System that turns any LLM into a capable autonomous agent. This AI OS features persistent 5-tier memory, 60+ built-in tools, sandboxed code execution, a full-featured web UI, and enterprise-grade Parallax security — powered by Deno. Deploy your own Agent Operating System in one command.",
     "getStarted": "Get Started",
     "browseMarketplace": "Browse Marketplace",
     "viewOnGitHub": "View on GitHub",
     "versionBadge": "v{version}",
     "capabilities": "Capabilities",
-    "featureSectionTitle1": "Everything you need to build",
-    "featureSectionTitle2": "AI agent applications",
-    "featureSectionDesc": "A comprehensive toolset for building, deploying, and managing AI agents at any scale.",
+    "featureSectionTitle1": "The Agent Operating System",
+    "featureSectionTitle2": "for building AI agent applications",
+    "featureSectionDesc": "A comprehensive Agent Operating System toolset for building, deploying, and managing AI agents at any scale.",
     "statsGitHubStars": "GitHub Stars",
     "statsPlugins": "Plugins Available",
     "statsAgentConfigs": "Agent Configs",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — Open-Source AI OS | Agent Operating System",
-    "defaultDescription": "CortexPrism is the open-source AI OS — an Agent Operating System with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise-grade Parallax security. Self-host your autonomous AI agents. Apache 2.0 licensed."
+    "defaultTitle": "CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous Agents",
+    "defaultDescription": "CortexPrism is the open-source Agent Operating System — an AI OS with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, and enterprise-grade Parallax security. Self-host your autonomous AI agents. Apache 2.0 licensed."
   }
 }

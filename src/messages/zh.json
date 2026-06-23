@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "开源 AI 操作系统——一个智能体操作系统，具备持久化五层记忆、60+ 工具、全功能 Web 界面和分层 Parallax 安全架构。自托管，基于 Deno 构建。Apache 2.0 许可证。",
+    "siteDescription": "开源智能体操作系统——一个 AI 操作系统，具备持久化五层记忆、60+ 工具、全功能 Web 界面和分层 Parallax 安全架构。自托管，基于 Deno 构建。Apache 2.0 许可证。",
     "copyright": "© {year} CortexPrism。Apache 2.0 许可证。",
     "poweredBy": "由 Deno 驱动",
     "loading": "加载中...",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — 开源 AI 操作系统 | 智能体操作系统",
-    "defaultDescription": "CortexPrism 是开源的 AI 操作系统——一个智能体操作系统，支持 24 种 LLM 提供商、五层记忆、MCP 插件市场、沙箱代码执行和企业级 Parallax 安全。自主托管你的 AI 智能体。Apache 2.0 许可证。"
+    "defaultTitle": "CortexPrism — 开源智能体操作系统 | 自主 AI 智能体 AI OS",
+    "defaultDescription": "CortexPrism 是开源的智能体操作系统——一个 AI OS，支持 24 种 LLM 提供商、五层记忆、MCP 插件市场、沙箱代码执行和企业级 Parallax 安全。自主托管你的 AI 智能体。Apache 2.0 许可证。"
   }
 }

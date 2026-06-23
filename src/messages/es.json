@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "SO de IA de código abierto — un Sistema Operativo para Agentes con memoria persistente de 5 niveles, más de 60 herramientas, una interfaz web completa y seguridad Paralaje en capas. Autogestionado, impulsado por Deno. Licencia Apache 2.0.",
+    "siteDescription": "Sistema Operativo para Agentes de código abierto — un SO de IA con memoria persistente de 5 niveles, más de 60 herramientas, una interfaz web completa y seguridad Paralaje en capas. Autogestionado, impulsado por Deno. Licencia Apache 2.0.",
     "copyright": "© {year} CortexPrism. Licencia Apache 2.0.",
     "poweredBy": "Impulsado por Deno",
     "loading": "Cargando...",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — SO de IA de código abierto | Sistema operativo para agentes",
-    "defaultDescription": "CortexPrism es el SO de IA de código abierto — un sistema operativo para agentes con 24 proveedores LLM, memoria de 5 niveles, mercado de complementos MCP, ejecución de código en entorno aislado y seguridad Paralaje de nivel empresarial. Autogestiona tus agentes de IA autónomos. Licencia Apache 2.0."
+    "defaultTitle": "CortexPrism — Sistema Operativo para Agentes de Código Abierto | SO de IA para Agentes Autónomos",
+    "defaultDescription": "CortexPrism es el Sistema Operativo para Agentes de código abierto — un SO de IA con 24 proveedores LLM, memoria de 5 niveles, mercado de complementos MCP, ejecución de código en entorno aislado y seguridad Paralaje de nivel empresarial. Autogestiona tus agentes de IA autónomos. Licencia Apache 2.0."
   }
 }

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
+  title: "CortexPrism Plugins — ESM, MCP & WASM Extensions for Your Agent Operating System",
   description:
-    "Browse and search the CortexPrism plugin marketplace. Discover ESM modules, MCP servers, and WASM plugins to extend your AI Agent Operating System. Filter by category and plugin type.",
+    "Browse and search the CortexPrism plugin marketplace. Discover ESM modules, MCP servers, and WASM plugins to extend your Agent Operating System. Filter by category and plugin type.",
   alternates: generateAlternates("/marketplace/plugins"),
   keywords: [
     "AI plugins",
@@ -17,9 +17,10 @@ export const metadata: Metadata = {
     "LLM plugins marketplace",
     "CortexPrism plugins",
     "AI tool extensions",
+    "agent operating system plugins",
   ],
   openGraph: {
-    title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
+    title: "CortexPrism Plugins — ESM, MCP & WASM Extensions for Your Agent Operating System",
     description:
       "Discover plugins for CortexPrism: ESM modules, MCP servers, and WASM runtimes. Filter by category and plugin type to find the perfect extension.",
     url: "https://cortexprism.io/marketplace/plugins",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   twitter: {
-    title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
+    title: "CortexPrism Plugins — ESM, MCP & WASM Extensions for Your Agent Operating System",
     description:
       "Discover plugins for CortexPrism: ESM modules, MCP servers, and WASM runtimes. Filter by category and plugin type.",
   },

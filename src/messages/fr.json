@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "OS IA open-source — un système d'exploitation d'agents avec mémoire persistante à 5 niveaux, plus de 60 outils, une interface web complète et une sécurité Parallax multicouche. Auto-hébergé, propulsé par Deno. Sous licence Apache 2.0.",
+    "siteDescription": "Système d'exploitation d'agents open-source — un OS IA avec mémoire persistante à 5 niveaux, plus de 60 outils, une interface web complète et une sécurité Parallax multicouche. Auto-hébergé, propulsé par Deno. Sous licence Apache 2.0.",
     "copyright": "© {year} CortexPrism. Licence Apache 2.0.",
     "poweredBy": "Propulsé par Deno",
     "loading": "Chargement…",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — OS IA open-source | Système d'exploitation d'agents",
-    "defaultDescription": "CortexPrism est l'OS IA open-source — un système d'exploitation d'agents avec 24 fournisseurs de LLM, mémoire à 5 niveaux, marketplace de plugins MCP, exécution de code en bac à sable et sécurité Parallax de niveau entreprise. Auto-hébergez vos agents IA autonomes. Sous licence Apache 2.0."
+    "defaultTitle": "CortexPrism — Système d'exploitation d'agents Open-Source | OS IA pour agents autonomes",
+    "defaultDescription": "CortexPrism est le système d'exploitation d'agents open-source — un OS IA avec 24 fournisseurs de LLM, mémoire à 5 niveaux, marketplace de plugins MCP, exécution de code en bac à sable et sécurité Parallax de niveau entreprise. Auto-hébergez vos agents IA autonomes. Sous licence Apache 2.0."
   }
 }

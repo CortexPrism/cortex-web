@@ -3,13 +3,14 @@ import { Shield, Lock, Eye, FileSearch, Server, Wrench, FileCode, Brain, Scan } 
 import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
+  title: "CortexPrism Security — Agent Operating System Defense Architecture | Parallax + LLM Supervisor",
   description:
-    "CortexPrism's Parallax security model with LLM supervisor provides defense-in-depth for AI agents: 3-stage tool validation, LLM-based sensitive data access control, AES-256-GCM encrypted vault, DLP Guard with 22 scanners, granular policy engine, Docker-sandboxed code execution, and immutable audit logging.",
+    "CortexPrism's Parallax security model provides defense-in-depth for your Agent Operating System: 3-stage tool validation, LLM-based sensitive data access control, AES-256-GCM encrypted vault, DLP Guard with 22 scanners, granular policy engine, Docker-sandboxed code execution, and immutable audit logging.",
   keywords: [
     "AI agent security",
     "enterprise AI security",
     "secure AI agent operating system",
+    "agent operating system security",
     "AES-256 credential vault",
     "AI tool validation",
     "sandboxed AI execution",
@@ -23,15 +24,15 @@ export const metadata: Metadata = {
   ],
   alternates: generateAlternates("/security"),
   openGraph: {
-    title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
+    title: "CortexPrism Security — Agent Operating System Defense Architecture | Parallax + LLM Supervisor",
     description:
-      "Defense-in-depth for AI agents: 3-stage tool validation, LLM security supervisor, AES-256-GCM vault, DLP Guard with 22 scanners, policy engine, Docker-isolated sandboxes, and immutable audit trail.",
+      "Defense-in-depth for your Agent Operating System: 3-stage tool validation, LLM security supervisor, AES-256-GCM vault, DLP Guard with 22 scanners, policy engine, Docker-isolated sandboxes, and immutable audit trail.",
     url: "https://cortexprism.io/security",
   },
   twitter: {
-    title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
+    title: "CortexPrism Security — Agent Operating System Defense Architecture | Parallax + LLM Supervisor",
     description:
-      "Defense-in-depth for AI agents: 3-stage validation, LLM security supervisor, AES-256-GCM vault, DLP Guard, policy engine, and Docker-isolated sandboxes.",
+      "Defense-in-depth for your Agent Operating System: 3-stage validation, LLM security supervisor, AES-256-GCM vault, DLP Guard, policy engine, and Docker-isolated sandboxes.",
   },
 };
 

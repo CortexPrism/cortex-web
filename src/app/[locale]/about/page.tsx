@@ -4,13 +4,15 @@ import { ArrowRight, Shield, Zap, Globe, Github, Heart, Code2 } from "lucide-rea
 import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
+  title: "About CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous Agents",
   description:
-    "CortexPrism is an open-source, self-hosted AI OS — an Agent Operating System built with TypeScript and Deno 2.x. Features 24 LLM providers, 5-tier memory, 60+ built-in tools, self-learning skills, code intelligence, voice pipeline, computer use, browser automation, Parallax + LLM supervisor security, A2A protocol, MCP gateway, and an extensible plugin marketplace. Apache 2.0 licensed, privacy-first, no telemetry.",
+    "CortexPrism is an open-source, self-hosted Agent Operating System — an AI OS built with TypeScript and Deno 2.x. Features 24 LLM providers, 5-tier memory, 60+ built-in tools, self-learning skills, code intelligence, voice pipeline, computer use, browser automation, Parallax + LLM supervisor security, A2A protocol, MCP gateway, and an extensible plugin marketplace. Apache 2.0 licensed, privacy-first, no telemetry.",
   keywords: [
     "about CortexPrism",
+    "open source Agent Operating System",
     "open source AI OS",
     "open source AI agent operating system",
+    "agentic operating system",
     "Agent OS",
     "TypeScript AI framework",
     "Deno AI operating system",
@@ -18,18 +20,19 @@ export const metadata: Metadata = {
     "privacy-first AI agent",
     "self-hosted AI platform",
     "no vendor lock-in LLM",
+    "self-hosted agent operating system",
   ],
   alternates: generateAlternates("/about"),
   openGraph: {
-    title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
+    title: "About CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous Agents",
     description:
-      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, browser automation, Parallax + LLM supervisor security, A2A protocol, MCP gateway. Apache 2.0 licensed.",
+      "Open-source, self-hosted Agent Operating System — an AI OS in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, browser automation, Parallax + LLM supervisor security, A2A protocol, MCP gateway. Apache 2.0 licensed.",
     url: "https://cortexprism.io/about",
   },
   twitter: {
-    title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
+    title: "About CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous Agents",
     description:
-      "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, browser automation. Apache 2.0 licensed.",
+      "Open-source, self-hosted Agent Operating System — an AI OS in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, browser automation. Apache 2.0 licensed.",
   },
 };
 
@@ -41,7 +44,7 @@ export default function AboutPage() {
           About <span className="gradient-text">CortexPrism</span>
         </h1>
         <p className="mt-4 text-lg text-[#9090a8] max-w-4xl mx-auto">
-          The open-source AI OS — a self-hosted Agent Operating System, privacy-first, and powered by Deno 2.x.
+          The open-source Agent Operating System — a self-hosted AI OS, privacy-first, and powered by Deno 2.x.
         </p>
       </div>
 

@@ -6,12 +6,13 @@ import { generateAlternates } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "CortexPrism Changelog — Release History & Commits",
+  title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
   description:
-    "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history. Stay up to date with the latest features and fixes.",
+    "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history. Stay up to date with the latest features and fixes in the open-source Agent Operating System.",
   alternates: generateAlternates("/changelog"),
   keywords: [
     "CortexPrism changelog",
+    "Agent Operating System release history",
     "AI OS release history",
     "Agent OS changelog",
     "open source AI agent updates",
@@ -22,13 +23,13 @@ export const metadata: Metadata = {
     "what's new CortexPrism",
   ],
   openGraph: {
-    title: "CortexPrism Changelog — Release History & Commits",
+    title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
     description:
-      "Recent commits from cortex engine and cortex-web repositories. Track changes, new features, bug fixes, and improvements in the open-source AI Agent Operating System.",
+      "Recent commits from cortex engine and cortex-web repositories. Track changes, new features, bug fixes, and improvements in the open-source Agent Operating System.",
     url: "https://cortexprism.io/changelog",
   },
   twitter: {
-    title: "CortexPrism Changelog — Release History & Commits",
+    title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
     description:
       "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history.",
   },

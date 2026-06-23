@@ -12,16 +12,19 @@ import fs from "fs";
 import path from "path";
 
 export const metadata: Metadata = {
-  title: "CortexPrism — Open-Source AI OS | Agent Operating System with Memory, Tools & Web UI",
+  title: "CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous AI Agents",
   description:
-    "CortexPrism v0.51.0 is the open-source AI OS — a self-hosted Agent Operating System with 24 LLM providers, 5-tier persistent memory, 60+ built-in tools, MCP plugin marketplace, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security with LLM supervisor. Powered by Deno. Apache 2.0 licensed.",
+    "CortexPrism v0.51.0 is the open-source Agent Operating System — a self-hosted AI OS with 24 LLM providers, 5-tier persistent memory, 60+ built-in tools, MCP plugin marketplace, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security with LLM supervisor. Powered by Deno. Apache 2.0 licensed.",
   keywords: [
     "agent operating system",
-    "open source agent operating system",
     "AI agent operating system",
-    "open source AI OS",
+    "autonomous agent operating system",
+    "open source agent operating system",
+    "agentic operating system",
+    "self-hosted agent operating system",
     "Agent OS",
     "AI OS",
+    "open source AI OS",
     "open source AI agent",
     "self-hosted AI agent",
     "autonomous AI agents",
@@ -30,6 +33,7 @@ export const metadata: Metadata = {
     "multi-agent orchestration",
     "MCP plugin marketplace",
     "LLM orchestration",
+    "LLM agent operating system",
     "multi-provider LLM",
     "self-hosted AI",
     "AI agent security",
@@ -43,18 +47,20 @@ export const metadata: Metadata = {
     "TypeScript AI agent",
     "private AI agent",
     "autonomous agent platform",
+    "agent deployment platform",
+    "agent orchestration platform",
   ],
   alternates: generateAlternates("/"),
   openGraph: {
-    title: "CortexPrism — Open-Source AI OS | Agent Operating System with Memory, Tools & Web UI",
+    title: "CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous AI Agents",
     description:
-      "The open-source AI OS: a self-hosted Agent Operating System with 24 LLM providers, 5-tier persistent memory, 60+ tools, MCP plugin marketplace, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security with LLM supervisor. Powered by Deno. Apache 2.0 licensed.",
+      "The open-source Agent Operating System: a self-hosted AI OS with 24 LLM providers, 5-tier persistent memory, 60+ tools, MCP plugin marketplace, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security with LLM supervisor. Powered by Deno. Apache 2.0 licensed.",
     url: "https://cortexprism.io",
   },
   twitter: {
-    title: "CortexPrism — Open-Source AI OS | Agent Operating System with Memory, Tools & Web UI",
+    title: "CortexPrism — Open-Source Agent Operating System | AI OS for Autonomous AI Agents",
     description:
-      "The open-source AI OS: a self-hosted Agent Operating System with 24 LLM providers, 5-tier memory, 60+ tools, sandboxed code execution, and enterprise-grade Parallax security. Powered by Deno. Apache 2.0 licensed.",
+      "The open-source Agent Operating System: a self-hosted AI OS with 24 LLM providers, 5-tier memory, 60+ tools, sandboxed code execution, and enterprise-grade Parallax security. Powered by Deno. Apache 2.0 licensed.",
   },
 };
 

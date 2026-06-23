@@ -1,7 +1,7 @@
 {
   "common": {
     "siteName": "CortexPrism",
-    "siteDescription": "Open-Source KI-Betriebssystem — ein Agenten-Betriebssystem mit persistentem 5-stufigem Gedächtnis, über 60 Werkzeugen, einer vollständigen Web-UI und mehrschichtiger Parallaxe-Sicherheit. Selbst gehostet, angetrieben von Deno. Apache 2.0 lizenziert.",
+    "siteDescription": "Open-Source Agenten-Betriebssystem — ein KI-Betriebssystem mit persistentem 5-stufigem Gedächtnis, über 60 Werkzeugen, einer vollständigen Web-UI und mehrschichtiger Parallaxe-Sicherheit. Selbst gehostet, angetrieben von Deno. Apache 2.0 lizenziert.",
     "copyright": "© {year} CortexPrism. Apache 2.0-Lizenz.",
     "poweredBy": "Angetrieben von Deno",
     "loading": "Lädt...",
@@ -154,7 +154,7 @@
     "fr": "Français"
   },
   "seo": {
-    "defaultTitle": "CortexPrism — Open-Source KI-Betriebssystem | Agenten-Betriebssystem",
-    "defaultDescription": "CortexPrism ist das Open-Source KI-Betriebssystem – ein Agenten-Betriebssystem mit 24 LLM-Anbietern, 5-stufigem Gedächtnis, MCP-Plugin-Marktplatz, sandboxed Codeausführung und Parallaxe-Sicherheit auf Unternehmensniveau. Hosten Sie Ihre autonomen KI-Agenten selbst. Apache 2.0 lizenziert."
+    "defaultTitle": "CortexPrism — Open-Source Agenten-Betriebssystem | KI-Betriebssystem für autonome Agenten",
+    "defaultDescription": "CortexPrism ist das Open-Source Agenten-Betriebssystem – ein KI-Betriebssystem mit 24 LLM-Anbietern, 5-stufigem Gedächtnis, MCP-Plugin-Marktplatz, sandboxed Codeausführung und Parallaxe-Sicherheit auf Unternehmensniveau. Hosten Sie Ihre autonomen KI-Agenten selbst. Apache 2.0 lizenziert."
   }
 }
