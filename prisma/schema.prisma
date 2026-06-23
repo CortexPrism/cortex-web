@@ -37,6 +37,7 @@ model User {
   githubTopicScans      GitHubTopicScan[]
   notifications         Notification[]
   knowledgeBaseArticles KnowledgeBaseArticle[]
+  kbArticleComments     KbArticleComment[]
   blogPosts             BlogPost[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
@@ -321,19 +322,38 @@ model Notification {
 }
 
 model KnowledgeBaseArticle {
-  id          String   @id @default(cuid())
+  id          String               @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String               @unique
+  section     String               @default("knowledge-base")
   content     String
   description String?
-  published   Boolean  @default(true)
-  sortOrder   Int      @default(0)
+  tags        String               @default("[]")
+  published   Boolean              @default(true)
+  sortOrder   Int                  @default(0)
+  viewCount   Int                  @default(0)
   createdBy   String?
-  author      User?    @relation(fields: [createdBy], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  author      User?                @relation(fields: [createdBy], references: [id])
+  comments    KbArticleComment[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
 
+  @@index([section])
   @@map("KnowledgeBaseArticle")
+}
+
+model KbArticleComment {
+  id        String               @id @default(cuid())
+  articleId String
+  article   KnowledgeBaseArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId    String?
+  author    User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  content   String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([articleId])
+  @@map("KbArticleComment")
 }
 
 model BlogPost {

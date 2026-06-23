@@ -7,9 +7,11 @@ import { getKbArticleById } from "@/lib/knowledge-base";
 
 const updateSchema = z.object({
   title: z.string().min(1).optional(),
-  slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens").optional(),
+  slug: z.string().min(1).regex(/^[a-z0-9-/]+$/, "Slug must be lowercase alphanumeric with hyphens and slashes").optional(),
+  section: z.string().optional(),
   content: z.string().min(1).optional(),
   description: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   published: z.boolean().optional(),
   sortOrder: z.number().int().optional(),
 });
@@ -59,9 +61,15 @@ export async function PUT(
     }
   }
 
+  const { tags, ...rest } = parsed.data;
+  const updateData: Record<string, unknown> = { ...rest };
+  if (tags !== undefined) {
+    updateData.tags = JSON.stringify(tags);
+  }
+
   const article = await prisma.knowledgeBaseArticle.update({
     where: { id: params.id },
-    data: parsed.data,
+    data: updateData,
   });
 
   await createAuditLog({
@@ -72,7 +80,7 @@ export async function PUT(
     metadata: { title: article.title, slug: article.slug },
   });
 
-  return NextResponse.json(article);
+  return NextResponse.json({ ...article, tags: JSON.parse(article.tags) });
 }
 
 export async function DELETE(

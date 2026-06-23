@@ -7,6 +7,8 @@ import { getContentBySlug, getContentSlugs, extractH1FromMdx } from "@/lib/markd
 import { getAllKbArticles, getKbArticleBySlug, getKbSlugs } from "@/lib/knowledge-base";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
+import { KbArticleComments } from "@/components/docs/KbArticleComments";
+import { KbViewTracker } from "@/components/docs/KbViewTracker";
 import { generateBreadcrumbSchema, generateArticleSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
@@ -194,20 +196,35 @@ export default async function DocsPage({ params }: Props) {
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
-                {articles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/docs/knowledge-base/${article.slug}`}
-                    className="glass-card p-5 hover:border-indigo-500/20 transition-colors group"
-                  >
-                    <h2 className="font-semibold text-[#e2e2ea] group-hover:text-indigo-400 transition-colors mb-1">
-                      {article.title}
-                    </h2>
-                    {article.description && (
-                      <p className="text-sm text-[#55556a] line-clamp-2">{article.description}</p>
-                    )}
-                  </Link>
-                ))}
+                {articles.map((article) => {
+                  const articleTags = (article.tags as string[]) || [];
+                  return (
+                    <Link
+                      key={article.id}
+                      href={`/docs/knowledge-base/${article.slug}`}
+                      className="glass-card p-5 hover:border-indigo-500/20 transition-colors group"
+                    >
+                      <h2 className="font-semibold text-[#e2e2ea] group-hover:text-indigo-400 transition-colors mb-1">
+                        {article.title}
+                      </h2>
+                      {article.description && (
+                        <p className="text-sm text-[#55556a] line-clamp-2 mb-2">{article.description}</p>
+                      )}
+                      {articleTags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {articleTags.slice(0, 3).map((tag) => (
+                            <span key={tag} className="inline-flex items-center px-2 py-0.5 text-[10px] rounded-full bg-[#18181f] text-[#55556a] border border-[rgba(255,255,255,0.05)]">
+                              {tag}
+                            </span>
+                          ))}
+                          {articleTags.length > 3 && (
+                            <span className="text-[10px] text-[#55556a]">+{articleTags.length - 3}</span>
+                          )}
+                        </div>
+                      )}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </article>
@@ -217,6 +234,8 @@ export default async function DocsPage({ params }: Props) {
 
     const article = await getKbArticleBySlug(fileSlug);
     if (!article || !article.published) notFound();
+
+    const tags = article.tags as string[];
 
     const breadcrumbItems = [
       { name: "Home", url: SITE_URL },
@@ -238,9 +257,24 @@ export default async function DocsPage({ params }: Props) {
       <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16 py-12 flex gap-8">
         <StructuredData data={breadcrumbSchema} />
         <StructuredData data={articleSchema} />
+        <KbViewTracker slug={article.slug} />
         <Sidebar />
         <article className="flex-1 min-w-0 max-w-page-content">
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {tags.map((tag) => (
+                <span key={tag} className="inline-flex items-center px-2.5 py-1 text-xs rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-4 text-xs text-[#55556a] mb-6 pb-6 border-b border-[rgba(255,255,255,0.07)]">
+            <span>{new Date(article.updatedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+            <span>{article.viewCount.toLocaleString()} views</span>
+          </div>
           <MdxContent content={article.content} />
+          <KbArticleComments slug={article.slug} />
         </article>
         <TableOfContents />
       </div>
