@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Bot, Beaker, TestTube, GitBranch, Search, Shield, Mic, Monitor, Code2 } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "AI OS Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",
@@ -24,12 +24,12 @@ export const metadata: Metadata = {
     "GUI automation AI",
     "computer use AI agent",
   ],
-  alternates: { canonical: `${SITE_URL}/use-cases` },
+  alternates: generateAlternates("/use-cases"),
   openGraph: {
     title: "AI OS Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",
     description:
       "The open-source AI OS in action: voice-enabled assistants, self-hosted personal AI with persistent memory, GUI automation, and enterprise-grade secure agent deployments — CortexPrism adapts to any workflow.",
-    url: `${SITE_URL}/use-cases`,
+    url: "https://cortexprism.io/use-cases",
   },
   twitter: {
     title: "AI OS Use Cases — Voice Agents, Dev Assistants, Automation & Enterprise AI",

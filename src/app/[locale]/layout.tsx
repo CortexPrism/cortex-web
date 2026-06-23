@@ -12,6 +12,7 @@ import { routing } from "@/i18n/routing";
 import {
   generateOrganizationSchema,
   generateWebSiteSchema,
+  generateAlternates,
   SITE_URL,
   SITE_KEYWORDS,
 } from "@/lib/seo";
@@ -73,15 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "The open-source AI OS: an Agent Operating System with 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, overhauled web UI, and Parallax security. Apache 2.0 licensed.",
       images: [`${SITE_URL}/og-image.png`],
     },
-    alternates: {
-      canonical: locale === "en" ? SITE_URL : `${SITE_URL}/${locale}`,
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [
-          l,
-          l === "en" ? SITE_URL : `${SITE_URL}/${l}`,
-        ])
-      ),
-    },
+    alternates: generateAlternates("/", locale, routing.locales, "en"),
     robots: {
       index: true,
       follow: true,

@@ -1,16 +1,28 @@
 import type { Metadata } from "next";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
   description:
     "Browse and search the CortexPrism plugin marketplace. Discover ESM modules, MCP servers, and WASM plugins to extend your AI Agent Operating System. Filter by category and plugin type.",
-  alternates: { canonical: `${SITE_URL}/marketplace/plugins` },
+  alternates: generateAlternates("/marketplace/plugins"),
+  keywords: [
+    "AI plugins",
+    "MCP server plugins",
+    "ESM AI plugins",
+    "WASM AI plugins",
+    "Model Context Protocol servers",
+    "AI agent extensions",
+    "open source AI plugins",
+    "LLM plugins marketplace",
+    "CortexPrism plugins",
+    "AI tool extensions",
+  ],
   openGraph: {
     title: "CortexPrism Plugins — ESM, MCP & WASM Extensions",
     description:
       "Discover plugins for CortexPrism: ESM modules, MCP servers, and WASM runtimes. Filter by category and plugin type to find the perfect extension.",
-    url: `${SITE_URL}/marketplace/plugins`,
+    url: "https://cortexprism.io/marketplace/plugins",
   },
   robots: {
     index: true,

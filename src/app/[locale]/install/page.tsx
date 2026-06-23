@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Terminal, Cpu, Package } from "lucide-react";
-import { SITE_URL, generateHowToSchema } from "@/lib/seo";
+import { generateAlternates, generateHowToSchema, SITE_URL } from "@/lib/seo";
 import { StructuredData } from "@/components/seo/StructuredData";
 
 export const metadata: Metadata = {
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
     "local AI agent install",
     "Agent OS install",
   ],
-  alternates: { canonical: `${SITE_URL}/install` },
+  alternates: generateAlternates("/install"),
   openGraph: {
     title: "Install CortexPrism — Self-Host Your AI OS in One Command",
     description:
       "One command to install the open-source AI OS on Linux, macOS, or Windows. curl -fsSL https://cortexprism.io/install.sh | bash — fully self-hosted, no cloud required.",
-    url: `${SITE_URL}/install`,
+    url: "https://cortexprism.io/install",
   },
   twitter: {
     title: "Install CortexPrism — Self-Host Your AI OS in One Command",

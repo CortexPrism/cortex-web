@@ -7,7 +7,7 @@ import { FeatureGrid } from "@/components/landing/FeatureGrid";
 import { RecentBlogPosts } from "@/components/landing/RecentBlogPosts";
 import { CtaSection } from "@/components/landing/CtaSection";
 import { StructuredData } from "@/components/seo/StructuredData";
-import { generateSoftwareAppSchema, SITE_URL } from "@/lib/seo";
+import { generateSoftwareAppSchema, generateAlternates } from "@/lib/seo";
 import fs from "fs";
 import path from "path";
 
@@ -32,14 +32,12 @@ export const metadata: Metadata = {
     "Deno AI operating system",
     "AI OS powered by Deno",
   ],
-  alternates: {
-    canonical: SITE_URL,
-  },
+  alternates: generateAlternates("/"),
   openGraph: {
     title: "CortexPrism — Open-Source AI OS | Agent Operating System with Memory, Tools & Web UI",
     description:
       "The open-source AI OS: a self-hosted Agent Operating System with 24 LLM providers, 5-tier memory, 60+ tools, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and Parallax security. Powered by Deno. Apache 2.0 licensed.",
-    url: SITE_URL,
+    url: "https://cortexprism.io",
   },
   twitter: {
     title: "CortexPrism — Open-Source AI OS | Agent Operating System with Memory, Tools & Web UI",

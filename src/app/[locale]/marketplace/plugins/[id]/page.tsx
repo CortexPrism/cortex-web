@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getRepoMetadata, getRepoReadme } from "@/lib/github";
 import { PluginDetailView } from "@/components/marketplace/PluginDetail";
 import { StructuredData } from "@/components/seo/StructuredData";
-import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, SITE_URL } from "@/lib/seo";
+import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
   params: { id: string };
@@ -23,15 +23,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${plugin.name} — CortexPrism Plugin`,
     description: desc,
-    alternates: { canonical: `${SITE_URL}/marketplace/plugins/${plugin.slug}` },
+    alternates: generateAlternates(`/marketplace/plugins/${plugin.slug}`),
+    keywords: [
+      plugin.name,
+      `${plugin.kind.toUpperCase()} plugin`,
+      "CortexPrism plugin",
+      "AI agent extension",
+      "open source AI plugin",
+      plugin.kind === "mcp" ? "Model Context Protocol" : "",
+      "AI plugin marketplace",
+    ].filter(Boolean),
     openGraph: {
       title: `${plugin.name} — CortexPrism Plugin`,
       description: desc,
-      url: `${SITE_URL}/marketplace/plugins/${plugin.slug}`,
+      url: `https://cortexprism.io/marketplace/plugins/${plugin.slug}`,
       type: "article",
       images: [
         {
-          url: `${SITE_URL}/marketplace/plugins/${plugin.slug}/opengraph-image`,
+          url: `https://cortexprism.io/marketplace/plugins/${plugin.slug}/opengraph-image`,
           width: 1200,
           height: 630,
           alt: `${plugin.name} plugin on CortexPrism`,

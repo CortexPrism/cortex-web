@@ -1,18 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Bug, BookOpen, Puzzle, MessageCircle, ExternalLink } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Contribute to CortexPrism — Open Source AI Agent Operating System",
   description:
     "Contribute to the open-source CortexPrism project. Report issues, submit pull requests, develop plugins, or join the community. Apache 2.0 licensed and community-driven.",
-  alternates: { canonical: `${SITE_URL}/contribute` },
+  alternates: generateAlternates("/contribute"),
+  keywords: [
+    "contribute to AI OS",
+    "open source AI agent contribution",
+    "AI agent operating system contributor",
+    "CortexPrism contribution guide",
+    "Apache 2.0 AI project",
+    "AI plugin development",
+    "open source AI community",
+    "report AI agent bugs",
+    "contribute to Agent OS",
+  ],
   openGraph: {
     title: "Contribute to CortexPrism — Open Source AI Agent Operating System",
     description:
       "Help build the future of AI agent technology. Report bugs, submit PRs, develop plugins for the marketplace, or join the Discord community.",
-    url: `${SITE_URL}/contribute`,
+    url: "https://cortexprism.io/contribute",
   },
   twitter: {
     title: "Contribute to CortexPrism — Open Source AI Agent Operating System",

@@ -5,7 +5,7 @@ import { MdxContent } from "@/components/docs/MdxContent";
 import { getContentBySlug, getContentSlugs, extractH1FromMdx } from "@/lib/markdown";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
-import { generateBreadcrumbSchema, SITE_URL } from "@/lib/seo";
+import { generateBreadcrumbSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
   params: { slug?: string[] };
@@ -23,11 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const rawTitle = (frontmatter.title as string) || extractedTitle || "Getting Started";
   const title = rawTitle.includes("CortexPrism") ? rawTitle : `${rawTitle} — CortexPrism`;
   const desc = (frontmatter.description as string) || `Step-by-step guide for ${extractedTitle.toLowerCase()}. Learn how to get the most out of the CortexPrism AI Agent Operating System.`;
-  const url = `${SITE_URL}/getting-started/${slug === "index" ? "" : slug}`;
+  const url = `https://cortexprism.io/getting-started/${slug === "index" ? "" : slug}`;
   return {
     title,
     description: desc,
-    alternates: { canonical: url },
+    alternates: generateAlternates(`/getting-started/${slug === "index" ? "" : slug}`),
     openGraph: {
       title: `${title} — CortexPrism`,
       description: desc,

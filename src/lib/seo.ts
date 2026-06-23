@@ -61,6 +61,35 @@ export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
 
 export const TWITTER_HANDLE = "@CortexPrism";
 
+export function generateAlternates(
+  path: string,
+  locale?: string,
+  locales?: readonly string[],
+  defaultLocale?: string
+): {
+  canonical: string;
+  languages: Record<string, string>;
+} {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const defLocale = defaultLocale || "en";
+  const canonical =
+    locale && locale !== defLocale
+      ? `${SITE_URL}/${locale}${normalizedPath}`
+      : `${SITE_URL}${normalizedPath}`;
+
+  const languages: Record<string, string> = {};
+  const locs = locales || ["en"];
+  for (const l of locs) {
+    languages[l] =
+      l === defLocale
+        ? `${SITE_URL}${normalizedPath}`
+        : `${SITE_URL}/${l}${normalizedPath}`;
+  }
+  languages["x-default"] = `${SITE_URL}${normalizedPath}`;
+
+  return { canonical, languages };
+}
+
 export interface BreadcrumbItem {
   name: string;
   url: string;
@@ -245,9 +274,14 @@ export function generateArticleSchema({
   return schema;
 }
 
-export function generateMetaBase(): {
+export function generateMetaBase(
+  path = "/",
+  locale?: string,
+  locales?: readonly string[],
+  defaultLocale?: string
+): {
   metadataBase: URL;
-  alternates: { canonical: string };
+  alternates: { canonical: string; languages: Record<string, string> };
   openGraph: {
     siteName: string;
     locale: string;
@@ -274,9 +308,7 @@ export function generateMetaBase(): {
   const baseUrl = new URL(SITE_URL);
   return {
     metadataBase: baseUrl,
-    alternates: {
-      canonical: "/",
-    },
+    alternates: generateAlternates(path, locale, locales, defaultLocale),
     openGraph: {
       siteName: SITE_NAME,
       locale: "en_US",

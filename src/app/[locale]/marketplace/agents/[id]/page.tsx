@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getRepoMetadata, getRepoReadme } from "@/lib/github";
 import { AgentDetailView } from "@/components/marketplace/AgentDetail";
 import { StructuredData } from "@/components/seo/StructuredData";
-import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, SITE_URL } from "@/lib/seo";
+import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
   params: { id: string };
@@ -23,15 +23,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${agent.name} — CortexPrism Agent`,
     description: desc,
-    alternates: { canonical: `${SITE_URL}/marketplace/agents/${agent.slug}` },
+    alternates: generateAlternates(`/marketplace/agents/${agent.slug}`),
+    keywords: [
+      agent.name,
+      "CortexPrism agent",
+      "AI agent profile",
+      "pre-configured agent",
+      "LLM agent configuration",
+      "open source AI agent",
+      "Agent OS profile",
+    ],
     openGraph: {
       title: `${agent.name} — CortexPrism Agent`,
       description: desc,
-      url: `${SITE_URL}/marketplace/agents/${agent.slug}`,
+      url: `https://cortexprism.io/marketplace/agents/${agent.slug}`,
       type: "article",
       images: [
         {
-          url: `${SITE_URL}/marketplace/agents/${agent.slug}/opengraph-image`,
+          url: `https://cortexprism.io/marketplace/agents/${agent.slug}/opengraph-image`,
           width: 1200,
           height: 630,
           alt: `${agent.name} agent on CortexPrism`,

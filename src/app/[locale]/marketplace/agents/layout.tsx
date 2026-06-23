@@ -1,16 +1,27 @@
 import type { Metadata } from "next";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "CortexPrism Agents — Pre-Configured AI Agent Profiles",
   description:
     "Browse and discover pre-configured agent profiles for the CortexPrism AI Agent Operating System. Filter by category and provider to find specialized AI agents for coding, analysis, and more.",
-  alternates: { canonical: `${SITE_URL}/marketplace/agents` },
+  alternates: generateAlternates("/marketplace/agents"),
+  keywords: [
+    "AI agent profiles",
+    "pre-configured AI agents",
+    "AI agent configurations",
+    "LLM agent profiles",
+    "CortexPrism agents",
+    "specialized AI agents",
+    "open source agent configs",
+    "AI coding agent",
+    "agent operating system profiles",
+  ],
   openGraph: {
     title: "CortexPrism Agents — Pre-Configured AI Agent Profiles",
     description:
       "Find pre-configured agent profiles for CortexPrism. Specialized agents for coding, data analysis, research, and more. Filter by provider and category.",
-    url: `${SITE_URL}/marketplace/agents`,
+    url: "https://cortexprism.io/marketplace/agents",
   },
   robots: {
     index: true,

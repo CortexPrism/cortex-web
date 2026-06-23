@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Shield, Lock, Eye, FileSearch, Server, Wrench, FileCode, Brain, Scan } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
     "DLP data loss prevention AI",
     "data classification AI",
   ],
-  alternates: { canonical: `${SITE_URL}/security` },
+  alternates: generateAlternates("/security"),
   openGraph: {
     title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",
     description:
       "Defense-in-depth for AI agents: 3-stage tool validation, LLM security supervisor, AES-256-GCM vault, DLP Guard with 22 scanners, policy engine, Docker-isolated sandboxes, and immutable audit trail.",
-    url: `${SITE_URL}/security`,
+    url: "https://cortexprism.io/security",
   },
   twitter: {
     title: "CortexPrism Security — Parallax + LLM Supervisor Defense Architecture",

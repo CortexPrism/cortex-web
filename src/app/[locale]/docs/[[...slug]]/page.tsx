@@ -7,7 +7,7 @@ import { getContentBySlug, getContentSlugs, extractH1FromMdx } from "@/lib/markd
 import { getAllKbArticles, getKbArticleBySlug, getKbSlugs } from "@/lib/knowledge-base";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
-import { generateBreadcrumbSchema, generateArticleSchema, SITE_URL } from "@/lib/seo";
+import { generateBreadcrumbSchema, generateArticleSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
   params: { slug?: string[] };
@@ -52,12 +52,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: "CortexPrism Documentation — Guides, CLI & Architecture",
       description:
         "Comprehensive documentation for CortexPrism: CLI reference, architecture deep-dives, knowledge base, design docs, and developer guides for building AI agent applications.",
-      alternates: { canonical: `${SITE_URL}/docs` },
+      alternates: generateAlternates("/docs"),
       openGraph: {
         title: "CortexPrism Documentation — Guides, CLI & Architecture",
         description:
           "CLI reference, architecture deep-dives, knowledge base, design docs, and developer guides. Everything you need to build with the CortexPrism AI Agent Operating System.",
-        url: `${SITE_URL}/docs`,
+        url: "https://cortexprism.io/docs",
       },
       twitter: {
         title: "CortexPrism Documentation — Guides, CLI & Architecture",
@@ -76,12 +76,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: "Knowledge Base — CortexPrism",
         description:
           "Guides, best practices, troubleshooting, and reference materials for CortexPrism. Browse articles on configuration, plugins, agents, and more.",
-        alternates: { canonical: `${SITE_URL}/docs/knowledge-base` },
+        alternates: generateAlternates("/docs/knowledge-base"),
         openGraph: {
           title: "CortexPrism Knowledge Base — Guides & Troubleshooting",
           description:
             "Browse CortexPrism knowledge base articles: FAQ, troubleshooting, migration guides, performance tuning, and security guidelines.",
-          url: `${SITE_URL}/docs/knowledge-base`,
+          url: "https://cortexprism.io/docs/knowledge-base",
         },
         twitter: {
           title: "CortexPrism Knowledge Base — Guides & Troubleshooting",
@@ -98,15 +98,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const desc = article.description || article.title;
     const truncatedDesc = desc.length > 160 ? desc.slice(0, 157) + "..." : desc;
-    const url = `${SITE_URL}/docs/knowledge-base/${article.slug}`;
     return {
       title: `${article.title} — CortexPrism Knowledge Base`,
       description: truncatedDesc,
-      alternates: { canonical: url },
+      alternates: generateAlternates(`/docs/knowledge-base/${article.slug}`),
       openGraph: {
         title: `${article.title} — CortexPrism Knowledge Base`,
         description: desc,
-        url,
+        url: `https://cortexprism.io/docs/knowledge-base/${article.slug}`,
         type: "article",
       },
       twitter: {
@@ -124,13 +123,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const slug = fileSlug || "index";
     const { content } = getContentBySlug(sectionMap[section], slug);
     const h1 = extractH1FromMdx(content) || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    const url = `${SITE_URL}/docs/${section}${slug === "index" ? "" : `/${slug}`}`;
+    const docPath = `/docs/${section}${slug === "index" ? "" : `/${slug}`}`;
     return {
       title: `${h1} — ${sectionLabel} | CortexPrism`,
-      alternates: { canonical: url },
+      alternates: generateAlternates(docPath),
       openGraph: {
         title: `${h1} — CortexPrism ${sectionLabel}`,
-        url,
+        url: `https://cortexprism.io${docPath}`,
         type: "article",
       },
       twitter: {

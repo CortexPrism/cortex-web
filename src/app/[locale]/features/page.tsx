@@ -22,7 +22,7 @@ import {
   Globe,
   Network,
 } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "CortexPrism Features — AI OS Capabilities | Agent Operating System",
@@ -47,12 +47,12 @@ export const metadata: Metadata = {
     "computer use AI agent",
     "A2A protocol",
   ],
-  alternates: { canonical: `${SITE_URL}/features` },
+  alternates: generateAlternates("/features"),
   openGraph: {
     title: "CortexPrism Features — AI OS Capabilities | Agent Operating System",
     description:
       "The open-source AI OS: 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice pipeline, computer use, browser automation, A2A protocol, MCP & ESM plugins, Parallax security, sandboxed code execution, overhauled UI with dark/light theme, multi-agent orchestration.",
-    url: `${SITE_URL}/features`,
+    url: "https://cortexprism.io/features",
   },
   twitter: {
     title: "CortexPrism Features — AI OS Capabilities | Agent Operating System",

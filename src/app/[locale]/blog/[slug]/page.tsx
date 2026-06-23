@@ -11,6 +11,7 @@ import {
   generateBreadcrumbSchema,
   generateArticleSchema,
   generateMetaBase,
+  generateAlternates,
 } from "@/lib/seo";
 import { MdxContent } from "@/components/docs/MdxContent";
 import { BlogViewTracker } from "@/components/blog/BlogViewTracker";
@@ -48,14 +49,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : post.excerpt
     : `Read "${post.title}" — a blog post from the CortexPrism AI Agent Operating System.`;
 
-  const base = generateMetaBase();
+  const base = generateMetaBase(`/blog/${post.slug}`);
   const url = `${SITE_URL}/blog/${post.slug}`;
 
   return {
     ...base,
     title: `${post.title} — CortexPrism Blog`,
     description: desc,
-    alternates: { canonical: url },
+    alternates: generateAlternates(`/blog/${post.slug}`),
+    keywords: [
+      post.title,
+      "CortexPrism blog",
+      "AI agent tutorial",
+      "Agent OS guide",
+      "open source AI agent",
+      "LLM agent development",
+    ],
     openGraph: {
       ...base.openGraph,
       title: `${post.title} — CortexPrism Blog`,

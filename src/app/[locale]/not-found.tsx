@@ -1,13 +1,7 @@
 "use client";
 
-import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-
-export const metadata: Metadata = {
-  title: "Page Not Found — CortexPrism",
-  robots: { index: false, follow: false },
-};
 
 export default function NotFound() {
   const t = useTranslations("notFound");

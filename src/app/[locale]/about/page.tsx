@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Shield, Zap, Globe, Github, Heart, Code2 } from "lucide-react";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
@@ -19,12 +19,12 @@ export const metadata: Metadata = {
     "self-hosted AI platform",
     "no vendor lock-in LLM",
   ],
-  alternates: { canonical: `${SITE_URL}/about` },
+  alternates: generateAlternates("/about"),
   openGraph: {
     title: "About CortexPrism — Open-Source AI OS | Agent Operating System",
     description:
       "Open-source, self-hosted AI OS — an Agent Operating System in TypeScript/Deno 2.x. 24 LLM providers, 5-tier memory, 60+ tools, self-learning skills, code intelligence, voice, computer use, browser automation, Parallax + LLM supervisor security, A2A protocol, MCP gateway. Apache 2.0 licensed.",
-    url: `${SITE_URL}/about`,
+    url: "https://cortexprism.io/about",
   },
   twitter: {
     title: "About CortexPrism — Open-Source AI OS | Agent Operating System",

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { SITE_URL } from "@/lib/seo";
+import { generateAlternates } from "@/lib/seo";
 import { ProfileActions } from "@/components/profile/ProfileActions";
 import { Badge } from "@/components/shared/Badge";
 import { StarRating } from "@/components/shared/StarRating";
@@ -26,13 +26,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${displayName} — CortexPrism Profile`,
       description: user.bio || `${displayName}'s published plugins and agents`,
-      url: `${SITE_URL}/profile/${user.username}`,
+      url: `https://cortexprism.io/profile/${user.username}`,
     },
     twitter: {
       title: `${displayName} — CortexPrism Profile`,
       description: user.bio || `${displayName} on CortexPrism Marketplace`,
     },
-    alternates: { canonical: `${SITE_URL}/profile/${user.username}` },
+    alternates: generateAlternates(`/profile/${user.username}`),
   };
 }
 
