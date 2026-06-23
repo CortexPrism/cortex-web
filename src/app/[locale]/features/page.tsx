@@ -166,12 +166,13 @@ const features = [
     title: "Plugin System",
     subtitle: "ESM, MCP & WASM",
     description:
-      "Extend CortexPrism with a powerful plugin system supporting ESM modules, Model Context Protocol servers, and WebAssembly plugins.",
+      "Extend CortexPrism with a powerful plugin system supporting ESM modules, Model Context Protocol servers, and WebAssembly plugins with supply-chain verification.",
     benefits: [
       "Three plugin types: ESM, MCP, WASM",
+      "Supply-chain verification (SHA-256, signatures, malware scanning)",
       "Plugin marketplace for discovery",
       "Version management with dependency resolution",
-      "Isolated plugin sandboxes",
+      "Isolated sandboxes with 3 trust levels",
     ],
     example: "cortex plugins install marketplace:cortexprism.io/plugins/python-executor",
   },
@@ -192,14 +193,15 @@ const features = [
   {
     icon: Bot,
     title: "Agent Manager",
-    subtitle: "Multi-Agent Orchestration",
+    subtitle: "10 Built-in + Custom Agents",
     description:
-      "Create, configure, and manage multiple specialized agents with different personalities, tools, and provider configurations.",
+      "10 built-in specialized agents (Assistant, Developer, Researcher, Architect, Analyst, Writer, DevOps, Security, Code Reviewer, QA) plus custom agent profiles with different personalities, tools, and provider configurations.",
     benefits: [
-      "Multiple agent profiles with custom configurations",
+      "10 pre-configured agent personalities",
+      "13 typed sub-agents for delegation",
       "Agent-specific system prompts and souls",
+      "AgentLint auditing with 33+ checks",
       "Per-agent tool and provider assignments",
-      "Agent-to-agent collaboration",
     ],
     example: 'cortex agent create code-reviewer -m claude-sonnet-4-5 -d "Reviews pull requests" --tools file_read,web_search,shell',
   },

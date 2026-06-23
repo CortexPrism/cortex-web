@@ -1,56 +1,139 @@
 # Agent Loop
 
-The agent loop is the core execution engine of CortexPrism. `agentTurn()` handles one complete user→agent exchange.
+The agent loop is the core execution engine of CortexPrism. The `agentTurn()` orchestrator calls 7 pipeline stages sequentially through a shared `TurnContext`, with supporting modules for post-turn processing.
 
 ## Execution Flow
 
 ```
 agentTurn(opts)
-  1. injectMemory(systemPrompt, hits)   ← prepend relevant memory
-  2. persistMessage(userMessage)
-  3. [TOOL LOOP — up to MAX_TOOL_ROUNDS=12]
-     a. LLM call (stream or complete)
-     b. parseToolCalls(response)        ← extract <tool_call>{...}</tool_call>
-     c. for each call:
-        - validateToolCall()            ← Parallax policy check
-        - tool.execute()
-        - logEvent(tool_call)
-     d. formatToolResults() → re-prompt
-  4. persistMessage(agentResponse)
-  5. incrementTurn(sessionId)
-  6. writeEpisodic(summary)             ← fire-and-forget
-  7. reflectOnTurn() [if enabled]       ← fire-and-forget
-  8. logEvent(llm_call)
+  1. pipeline hooks (pre-assess stage)
+  2. injectMemory(systemPrompt, hits)   ← prepend relevant memory with category, tags, entities
+  3. MQM model selection (pre-llm hook) ← enforce/suggest/defer based on confidence
+  4. persistMessage(userMessage)
+  5. [TOOL LOOP — up to MAX_TOOL_ROUNDS=12]
+      a. LLM call (buffered stream when tools registered)
+      b. parseToolCalls(response)        ← extract <tool_call> XML + bare JSON fallback (5 formats)
+      c. for each call:
+         - validateToolCall()            ← Parallax policy regex check
+         - [if sensitive data] → LLM supervisor review → human approval gate
+         - tool.execute()
+         - logEvent(tool_call)
+      d. formatToolResults() → re-prompt with escalating deadline instruction
+  6. persistMessage(agentResponse, stripped of tool calls)
+  7. incrementTurn(sessionId)
+  8. pipeline hooks (post-output stage)
+  9. writeEpisodic(summary)             ← fire-and-forget
+  10. reflectOnTurn() [if enabled]       ← fire-and-forget
+  11. extractSkillFromSession()          ← fire-and-forget (≥2 tool calls)
   return AgentTurnResult
 ```
+
+## Pipeline Stages
+
+| Stage | Purpose |
+|-------|---------|
+| Setup | Initialize session state, load preferences |
+| History | Load and inject conversation history |
+| Assessment | Run metacognition, plan creation |
+| Prompt Builder | Build system prompt (soul + memory + skills + tools) |
+| Model Selector | MQM model selection + auto model pool |
+| LLM Stream | LLM call, tool parsing, tool execution loop |
+| Tool Executor | Tool validation, execution, result formatting |
 
 ## Agent Options
 
 | Option | Type | Purpose |
 |--------|------|---------|
 | `userMessage` | string | User input |
+| `userContentBlocks` | ContentBlock[] | Multimodal content (images, documents) |
 | `provider` | LLMProvider | Active LLM provider |
 | `model` | string | Model name |
 | `sessionDb` | Db | Per-session SQLite instance |
 | `sessionId` | string | Session identifier |
-| `systemPrompt` | string | System prompt (may have memory injected) |
+| `systemPrompt` | string | System prompt (with injected memory + skills) |
 | `stream` | boolean | Stream output chunks |
 | `onChunk` | function | Chunk callback for streaming |
 | `registry` | ToolRegistry | Registered tools |
-| `toolContext` | ToolContext | Working dir, approval gate |
+| `toolContext` | ToolContext | Working dir, approval gate, policy state |
 | `embedder` | EmbeddingProvider | For memory retrieval |
 | `enableReflection` | boolean | Post-turn reflection |
+| `reasoningEffort` | string | Extended thinking budget (low/medium/high) |
+| `signal` | AbortSignal | Request timeout (90s default for tool rounds) |
 
 ## Tool Loop Detail
 
-The tool loop runs up to 8 rounds per user turn. Each round:
+The tool loop runs up to 12 rounds per user turn. Each round:
+
 1. LLM generates a response (may contain tool calls)
-2. Tool calls are parsed from `<tool_call>{"tool":"x","args":{...}}</tool_call>` format
+2. Tool calls are parsed from 5 supported formats:
+   - JSON inside `<tool_call>` tags: `<tool_call>{"name": "...", "args": {...}}</tool_call>`
+   - Nested XML: `<tool_call_name>name</tool_call_name><tool_call_args>{...}</tool_call_args>`
+   - Attribute syntax: `<tool_call_name="name">...attributes...</tool_call_name>`
+   - Direct-tool-name-as-tag: `<file_read_enhanced><path>x</path></file_read_enhanced>`
+   - Parameter tag format: `<parameter name="key" string="true">value</parameter>`
 3. Each tool call is validated through the Parallax security gate
-4. Valid tool calls are executed; results are formatted and sent back to the LLM
+4. Valid tool calls are executed; results are formatted as `<tool_result>` XML blocks and sent back to the LLM
 5. The LLM can then respond or make additional tool calls
+6. When ≤2 rounds remain, an urgency nudge instruction stops tool calling
+7. Follow-up instructions escalate per round to prevent infinite tool loops
 
 This enables complex multi-step reasoning chains without returning control to the user.
+
+## Security Supervisor Integration
+
+When tools access sensitive data (`memory_search`, `db_query`, `browser`, `computer`):
+
+1. Results are classified for sensitivity (SECRET/SENSITIVE/NORMAL/PUBLIC)
+2. SENSITIVE/SECRET results trigger the LLM supervisor review
+3. Supervisor evaluates agent intent, data sensitivity, and operational context
+4. High-confidence decisions auto-approve; low-confidence escalate to human
+5. Human approval via CLI prompt or Web UI modal (60s timeout)
+6. Approved decisions cached per session (1-hour TTL) to prevent approval fatigue
+
+## Buffered Streaming
+
+When tools are registered, the LLM response is streamed into a buffer internally. After the full response:
+
+- Structured content blocks from compatible providers (Anthropic, OpenAI-compatible) are preserved
+- Tool calls are extracted via brace-depth walker or parsed from structured events
+- XML regions stripped before bare JSON fallback scan to prevent double-execution
+- Only clean prose is forwarded via `onChunk`
+- Reasoning content extracted separately
+- Client-side WebSocket handler double-checks stripping
+
+## Post-Turn Processing (Fire-and-Forget)
+
+| Operation | Purpose |
+|-----------|---------|
+| `writeEpisodic()` | Store turn summary in episodic memory |
+| `extractAndStoreEntities()` | Build knowledge graph from entities |
+| `detectAndPersistPreference()` | Capture user preferences in memory |
+| `reflectOnTurn()` → `storeReflection()` | Extract behavioral patterns |
+| `logEvent()` | Audit log entry (35+ event types) |
+| `extractSkillFromSession()` | Procedural knowledge (≥2 tool calls) |
+
+## Metacognition
+
+Before the LLM call, user messages are analyzed to determine the best execution strategy:
+
+| Pattern | Decision |
+|---------|----------|
+| Ambiguous intent | `ask_first` — request clarification |
+| Multi-step task with destructive actions | `plan_with_rollback` |
+| Complex code + exploration | `delegate` to sub-agents |
+| Research + independent subtasks | `parallelize` to concurrent sub-agents |
+
+### Confidence Escalation
+
+When confidence falls below 0.35 for a `direct` decision, the system auto-escalates to `ask_first` with a clarification prompt.
+
+### Adversarial Self-Critique
+
+After normal reflection (when enabled), a second adversarial pass runs with a critical system prompt, hunting for missed edge cases, validation gaps, and security concerns.
+
+### Parallel Sub-Agent Dispatcher
+
+When metacognition suggests `parallelize`, the system fans out to multiple sub-agents. Active tasks show pulsing indicators, completed/failed tasks have status badges, and the task board auto-refreshes every 3 seconds.
 
 ## Configuration
 

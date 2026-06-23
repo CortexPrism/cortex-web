@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import "../globals.css";
@@ -29,14 +29,15 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await Promise.resolve(params);
   const ogLocale = locale === "en" ? "en_US" : locale;
+  const t = await getTranslations({ locale, namespace: "seo" });
+  const tc = await getTranslations({ locale, namespace: "common" });
 
   return {
     title: {
-      default: "CortexPrism — Open-Source AI OS | Agent Operating System",
+      default: t("defaultTitle"),
       template: "%s",
     },
-    description:
-      "CortexPrism v0.50.0 is the open-source AI OS — an Agent Operating System with 24 LLM providers, 5-tier memory, MCP plugin marketplace, sandboxed code execution, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security. Self-host your autonomous AI agents. Apache 2.0 licensed.",
+    description: t("defaultDescription"),
     keywords: SITE_KEYWORDS,
     authors: [{ name: "CortexPrism", url: SITE_URL }],
     creator: "CortexPrism",
@@ -49,11 +50,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       telephone: false,
     },
     openGraph: {
-      title: "CortexPrism — Open-Source AI OS | Agent Operating System",
-      description:
-        "The open-source AI OS: an Agent Operating System with 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, overhauled web UI, and Parallax security. Self-host autonomous agents. Apache 2.0 licensed.",
+      title: t("defaultTitle"),
+      description: t("defaultDescription"),
       type: "website",
-      siteName: "CortexPrism",
+      siteName: tc("siteName"),
       locale: ogLocale,
       url: locale === "en" ? SITE_URL : `${SITE_URL}/${locale}`,
       images: [
@@ -69,9 +69,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       site: "@CortexPrism",
       creator: "@CortexPrism",
-      title: "CortexPrism — Open-Source AI OS | Agent Operating System",
-      description:
-        "The open-source AI OS: an Agent Operating System with 24 LLM providers, 5-tier memory, MCP plugins, sandboxed code execution, overhauled web UI, and Parallax security. Apache 2.0 licensed.",
+      title: t("defaultTitle"),
+      description: t("defaultDescription"),
       images: [`${SITE_URL}/og-image.png`],
     },
     alternates: generateAlternates("/", locale, routing.locales, "en"),

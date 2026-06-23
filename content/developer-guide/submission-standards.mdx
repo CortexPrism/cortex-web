@@ -270,8 +270,9 @@ Before submitting, verify each item:
 
 **Code**
 - [ ] Plugin installs and loads without errors (`cortex plugins install ./my-plugin`)
+- [ ] Supply-chain verification passes (`cortex plugins verify my-plugin`): SHA-256 hash, signatures, malware scan
+- [ ] AgentLint passes with no errors (`cortex agent lint check <agent-id>`)
 - [ ] All capabilities work in a chat session (`cortex chat --agent my-agent`)
-- [ ] The plugin works in a chat session (`cortex chat --agent my-agent`)
 - [ ] All permissions declared are actually used
 - [ ] Error handling covers expected failure modes
 - [ ] Input validation is implemented for all capability parameters

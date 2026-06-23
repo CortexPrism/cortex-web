@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { ArrowRight, Copy, Check } from "lucide-react";
 import { useState } from "react";
@@ -38,6 +39,8 @@ function InstallCommand() {
 }
 
 export function CtaSection() {
+  const t = useTranslations("home");
+
   return (
     <section className="py-20">
       <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16">
@@ -45,10 +48,10 @@ export function CtaSection() {
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 pointer-events-none" />
 
           <h2 className="text-3xl md:text-4xl font-bold text-[#e2e2ea] relative">
-            Install in one line
+            {t("ctaHeadline")}
           </h2>
           <p className="mt-4 text-lg text-[#9090a8] max-w-xl mx-auto relative">
-            Works on Linux, macOS, Windows, and WSL. Ships as a single Deno binary — no Docker required to get started.
+            {t("ctaDescription")}
           </p>
 
           <div className="mt-8 max-w-2xl mx-auto relative">
@@ -60,14 +63,14 @@ export function CtaSection() {
               href="/getting-started"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg accent-gradient text-white hover:opacity-90 transition-opacity"
             >
-              Setup Guide
+              {t("ctaSetupGuide")}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/install"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg border border-[rgba(255,255,255,0.15)] text-[#e2e2ea] hover:bg-[#111118] transition-colors"
             >
-              Install Details
+              {t("ctaInstallDetails")}
             </Link>
           </div>
         </div>

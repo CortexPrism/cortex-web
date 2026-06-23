@@ -13,16 +13,20 @@ CortexPrism is a single-process AI Agent Operating System written in TypeScript/
 │          ▼                                                      │
 │   ┌─────────────────────────────────────────────┐              │
 │   │              agent/loop.ts                  │              │
-│   │  userMessage → [memory inject] → LLM call   │              │
-│   │  → [tool parse] → [validator] → [execute]   │              │
+│   │  userMessage → [metacognition assess]       │              │
+│   │  → [memory inject] → [MQM model select]     │              │
+│   │  → LLM call → [tool parse] → [validator]    │              │
+│   │  → [LLM supervisor] → [execute]             │              │
 │   │  → [re-prompt loop] → response              │              │
-│   │  → [episodic write] → [reflection]          │              │
+│   │  → [adversarial critique] → [episodic]      │              │
+│   │  → [reflection] → [skill extract]           │              │
 │   └─────────────────────────────────────────────┘              │
 │          │                                                      │
 │   ┌──────┼──────────────────────────────────────┐              │
 │   │      │         Subsystems                   │              │
 │   │  memory/   tools/   sandbox/   security/    │              │
-│   │  llm/      server/  scheduler/              │              │
+│   │  llm/      server/  scheduler/  plugins/    │              │
+│   │  memori/   skills/  metacog/   qm/          │              │
 │   └──────────────────────────────────────────────┘             │
 │                                                                 │
 │   SQLite databases (WAL mode)                                   │
@@ -34,22 +38,28 @@ CortexPrism is a single-process AI Agent Operating System written in TypeScript/
 
 | Component | Description |
 |-----------|-------------|
-| **Agent Loop** | Core reasoning + tool loop that orchestrates LLM calls, tool execution, memory operations, and reflection |
+| **Agent Loop** | 7-stage orchestrator with metacognition assessment, memory injection, MQM model selection, LLM call, tool execution, adversarial critique, and post-turn processing |
+| **Metacognition** | Pre-execution task assessment with confidence scoring, decision classification (direct/ask_first/delegate/plan_with_rollback/parallelize), and low-confidence auto-escalation |
 | **Memory System** | 5-tier memory with hybrid FTS5 keyword + vector embedding retrieval and exponential decay scoring |
 | **LLM Layer** | 24 provider implementations with unified `LLMProvider` interface and CascadeRouter |
-| **Tool System** | Extensible tool registry with built-in tools for file I/O, shell, web search, and code execution |
-| **Security (Parallax)** | 3-stage policy validation gate with encrypted vault, regex deny rules, and full audit logging |
-| **Sandbox** | Docker container sandbox (subprocess fallback) with resource limits and auto-fix loop |
+| **Tool System** | 60+ built-in tools with 5-format tool call parsing (XML + bare JSON fallback) and extensible plugin registry |
+| **Security (Parallax)** | Multi-layer defense with policy validation gate, LLM supervisor review for sensitive data, encrypted vault, regex deny rules, and full audit logging |
+| **Security Supervisor** | 3-layer access control: data classification → LLM review of agent intent → human approval gate with 1-hour session caching |
+| **Sandbox** | Docker container sandbox (subprocess fallback) with resource limits, Deno Worker sandbox for plugins, and auto-fix loop |
+| **Pipeline System** | 12-stage hook-based processing pipeline (pre/post-assess, pre/post-reason, pre/post-llm, pre/post-tool, pre/post-reflect, pre/post-output) with 13 built-in hooks |
+| **Plugin System** | ESM, MCP, and WASM plugins with 3 trust levels, sandbox isolation, supply-chain verification (SHA-256, signatures, malware scanning), and `window.Cortex` UI panel API |
 | **Daemon Supervisor** | Background process manager for validator, executor, and scheduler daemons with auto-restart |
 | **HTTP Server** | Built-in web server with REST API, WebSocket streaming, and web UI dashboard |
 | **Scheduler** | SQLite-persisted cron job scheduler with retry |
 | **Model Quartermaster** | Adaptive 6-signal model selection engine with reinforcement learning and context fingerprinting |
+| **AgentLint** | Automated agent auditing with 33+ checks across agent configs, tool definitions, plugin manifests, and system prompts |
+| **Memori Checkpoints** | Persistent agent checkpointing with 6-dimension state capture (conversation, memory, tools, reasoning, workspace, metadata) for crash survival and session resumption |
 | **Git Workspace** | Agent-powered git porcelain with auto-commit messages, diff analysis, and branch management |
 | **GitHub Integration** | PR, issue, and repository management with agent-powered code review and triage |
-| **Pipeline System** | 10-stage hook-based processing pipeline for the agent turn lifecycle (pre/post-assess, pre/post-reason, pre/post-tool, pre/post-reflect, pre/post-output) |
+| **Sub-Agents** | 13 typed child agents (Explorer, Coder, Researcher, Planner, Generalist, Security Auditor, Debugger, Architect, DevOps, Data Analyst, UI/UX Designer, Code Reviewer, Technical Writer) with parallel dispatch |
 | **Trigger System** | File watchers, webhooks, and git hooks that launch agent tasks on external events |
 | **Workflow Engine** | DSL-based workflow execution with steps, branches, parallel execution, and approval gates |
-| **Communication Channels** | Plugin-based messaging platform integration (Discord, extensible) |
+| **Communication Channels** | 13 channel adapters (Discord, Slack, Teams, Telegram, WhatsApp, Google Chat, and more) |
 | **Remote Agents** | Distributed node execution via WebSocket hub with capability-based security tiers |
 | **MCP Server** | Model Context Protocol server exposing Cortex tools and agents to MCP clients |
 | **Update System** | Dual-mode updates (binary/source) with SHA-256 verification and rollback |
@@ -74,12 +84,15 @@ CortexPrism is a single-process AI Agent Operating System written in TypeScript/
 - [Security Parallax](/docs/architecture/security-parallax) — Defense-in-depth security model
 - [Model Router](/docs/architecture/model-router) — Intelligent LLM provider routing
 - [Daemon Supervisor](/docs/architecture/daemon-supervisor) — Background process management
-- [Plugin System](/docs/architecture/plugin-system) — Plugin architecture
+- [Plugin System](/docs/architecture/plugin-system) — ESM, MCP, and WASM plugin architecture
+- [Sub-Agents](/docs/architecture/sub-agents) — 13 typed child agent types and parallel dispatch
+- [AgentLint](/docs/cli/agentlint) — Automated agent auditing and linting
+- [Memori Checkpoints](/docs/cli/memori) — Persistent agent checkpointing and session resumption
 - [Databases](/docs/architecture/databases) — SQLite database schemas
 - [Quartermaster](/docs/architecture/quartermaster) — Model Quartermaster prediction engine
 - [Git Workspace](/docs/architecture/git-workspace) — Agent-powered git porcelain
 - [GitHub Integration](/docs/architecture/github-integration) — PR/issue/repo management
-- [Pipeline System](/docs/architecture/pipeline) — 10-stage hook-based pipeline
+- [Pipeline System](/docs/architecture/pipeline) — 12-stage hook-based pipeline
 - [Channels](/docs/architecture/channels) — Communication channel plugins
 - [Triggers](/docs/architecture/triggers) — Event-driven trigger system
 - [Workflow Engine](/docs/architecture/workflow) — DSL-based workflow execution

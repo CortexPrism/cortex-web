@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { ArrowRight, Github, Terminal } from "lucide-react";
 import { InstallCommand } from "./InstallCommand";
@@ -7,6 +10,8 @@ interface HeroProps {
 }
 
 export function Hero({ version }: HeroProps) {
+  const t = useTranslations("home");
+
   return (
     <section className="relative overflow-hidden" aria-label="Hero">
       {/* ── Background layers ── */}
@@ -42,23 +47,19 @@ export function Hero({ version }: HeroProps) {
           {/* Version badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-8 text-sm rounded-full border border-indigo-500/25 bg-indigo-500/8 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.12)]">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-            v{version}
+            {t("versionBadge", { version })}
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">
-            <span className="text-[#e2e2ea]">The Open-Source{" "}</span>
-            <span className="gradient-text">AI OS for Autonomous Agents</span>
+            <span className="text-[#e2e2ea]">{t("heroHeadline1")}{" "}</span>
+            <span className="gradient-text">{t("heroHeadline2")}</span>
             <br />
-            <span className="text-[#e2e2ea]">with Memory, Tools &amp; Web UI</span>
+            <span className="text-[#e2e2ea]">{t("heroHeadline3")}</span>
           </h1>
 
           <p className="mt-6 text-lg md:text-xl text-[#9090a8] max-w-2xl mx-auto leading-relaxed">
-            An open-source, self-hosted AI Agent Operating System that turns any LLM into a
-            capable autonomous agent. This AI OS features persistent 5-tier memory, 60+
-            built-in tools, sandboxed code execution, an overhauled web UI with dark/light theme and experience levels,
-            and enterprise-grade Parallax security — powered by Deno. Deploy your own
-            Agent Operating System in one command.
+            {t("heroDescription")}
           </p>
 
           {/* CTAs */}
@@ -67,14 +68,14 @@ export function Hero({ version }: HeroProps) {
               href="/getting-started"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-semibold rounded-lg accent-gradient text-white hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(99,102,241,0.35)]"
             >
-              Get Started
+              {t("getStarted")}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/marketplace"
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg border border-[rgba(255,255,255,0.12)] text-[#e2e2ea] hover:bg-[#111118] hover:border-[rgba(255,255,255,0.2)] transition-all"
             >
-              Browse Marketplace
+              {t("browseMarketplace")}
             </Link>
             <a
               href="https://github.com/CortexPrism/cortex"
@@ -83,7 +84,7 @@ export function Hero({ version }: HeroProps) {
               className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-[#9090a8] hover:text-[#e2e2ea] hover:bg-[#111118] transition-colors"
             >
               <Github className="w-5 h-5" />
-              View on GitHub
+              {t("viewOnGitHub")}
             </a>
           </div>
 

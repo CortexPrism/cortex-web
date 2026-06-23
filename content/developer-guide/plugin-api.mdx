@@ -1,108 +1,257 @@
 # Plugin API Reference
 
-Complete reference for the CortexPrism plugin system APIs, covering the lifecycle hooks, capability interface, permission model, and runtime APIs.
+Complete reference for the CortexPrism plugin system APIs: lifecycle hooks, capability interface, pipeline hooks, UI panel API, sandbox protocol, supply-chain verification, and manifest schema.
 
 ## Plugin Lifecycle Hooks
 
 Plugins can hook into lifecycle events to perform initialization and cleanup:
 
 ```typescript
-export default definePlugin({
-  name: "lifecycle-demo",
-  version: "1.0.0",
-
-  onInstall(ctx: LifecycleContext): void | Promise<void> {
-    // Called when the plugin is first installed
-    // Use for one-time setup: create directories, initialize state
-  },
-
-  onActivate(ctx: LifecycleContext): void | Promise<void> {
-    // Called when the plugin is activated (enabled)
-    // Use for per-session setup: connect to services, allocate resources
-  },
-
-  onDeactivate(ctx: LifecycleContext): void | Promise<void> {
-    // Called when the plugin is deactivated (disabled)
-    // Use for cleanup: close connections, release resources
-  },
-
-  onUninstall(ctx: LifecycleContext): void | Promise<void> {
-    // Called right before the plugin is removed
-    // Use for final cleanup: remove data, revoke permissions
-  },
-
-  onConfigChange(ctx: LifecycleContext, prev: Record<string, unknown>): void | Promise<void> {
-    // Called when plugin configuration changes at runtime
-    // Use to hot-reload settings without restart
-  },
-});
+export const onInstall   = async (ctx: PluginContext) => {};
+export const onLoad      = async (ctx: PluginContext) => {};
+export const onActivate  = async (ctx: PluginContext) => {};
+export const onDeactivate = async (ctx: PluginContext) => {};
+export const onUnload    = async (ctx: PluginContext) => {};
+export const onUninstall = async (ctx: PluginContext) => {};
+export const onConfigChange = async (key: string, value: unknown, ctx: PluginContext) => {};
 ```
 
-### LifecycleContext
+### Lifecycle Sequence
+
+```
+Install:     onInstall → onLoad → onActivate
+Enable:      onLoad → onActivate
+Disable:     onDeactivate → onUnload
+Remove:      onDeactivate → onUnload → onUninstall
+Reconfigure: onConfigChange (per key, non-blocking)
+```
+
+### Lifecycle Discipline
+
+| Hook | What to do | What NOT to do |
+|------|------------|----------------|
+| `onInstall` | Write default state, log first install | Make network calls |
+| `onLoad` | Subscribe to events, init in-memory state | Register tools |
+| `onActivate` | Register tools, start polling | Slow blocking initialization |
+| `onDeactivate` | Unregister tools, stop polling | Modify persisted state |
+| `onUnload` | Unsubscribe events, close connections | Throw — breaks the unload sequence |
+| `onUninstall` | Delete persisted state/config | Assume `onUnload` already ran |
+| `onConfigChange` | Apply the new config value | Block — called per-key on every change |
+
+## PluginContext API
+
+Every lifecycle hook and tool `execute` receives a `PluginContext`:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `pluginDir` | `string` | Plugin installation directory path |
-| `dataDir` | `string` | Plugin-scoped data directory for persistent storage |
-| `config` | `Record<string, unknown>` | Current plugin configuration |
-| `log` | `Logger` | Structured logger |
-| `db` | `KVStore` | Simple key-value store backed by plugins.db |
+| `pluginId` | `string` | Plugin name |
+| `pluginDir` | `string` | `~/.cortex/data/plugins/<name>/` |
+| `state` | `PluginStateStore` | Persistent SQLite-backed key-value store (survives reloads) |
+| `config` | `PluginConfigStore` | Typed access to `~/.cortex/config.json plugins.<name>` |
+| `logger` | `PluginLogger` | Scoped logger — prefixes `[plugin:<name>]` |
+| `host` | `HostApi` | Register/unregister tools at runtime |
 
-## Capability Definition
-
-### ESM Capabilities
+### PluginStateStore
 
 ```typescript
-type CapabilityFunction<TInput = unknown, TOutput = unknown> = (
-  input: TInput,
-  context: CapabilityContext
-) => TOutput | Promise<TOutput>;
+await ctx.state.set('counter', '0');
+const counter = await ctx.state.get('counter');   // string | null
+const all = await ctx.state.list();                // Record<string, string>
+await ctx.state.delete('counter');
 ```
 
-### CapabilityContext
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `sandbox` | `SandboxAPI` | Restricted file/network access |
-| `log` | `Logger` | Structured logger |
-| `memory` | `MemoryAPI` | Read-only memory access |
-| `config` | `Record<string, unknown>` | Plugin config scoped to this call |
-| `abortSignal` | `AbortSignal` | Signals timeout/cancellation |
-| `requestId` | `string` | Unique ID for this capability invocation |
-
-### SandboxAPI
+### PluginConfigStore
 
 ```typescript
-interface SandboxAPI {
-  readFile(path: string): Promise<string>;
-  writeFile(path: string, content: string): Promise<void>;
-  readDir(path: string): Promise<string[]>;
-  fetch(url: string, options?: RequestInit): Promise<Response>;
-  exec(command: string, args?: string[]): Promise<ExecResult>;
-  tempDir(): Promise<string>;
+const apiKey = await ctx.config.get<string>('apiKey');
+await ctx.config.set('lastInit', Date.now());
+```
+
+### PluginLogger
+
+Methods: `info`, `warn`, `error`, `debug`. Prefixes every message with `[plugin:<name>]`.
+
+## Tool Implementation
+
+### Tool Interface
+
+```typescript
+interface Tool {
+  definition: {
+    name: string;
+    description: string;
+    params: { name: string; type: string; description: string; required?: boolean; enum?: string[] }[];
+    capabilities: string[];  // per-tool permissions, subset of manifest capabilities
+  };
+  execute(args: Record<string, unknown>, ctx: ToolContext): Promise<ToolCallResult>;
+}
+
+interface ToolCallResult {
+  toolName: string;
+  success: boolean;
+  output: string;           // always a string — JSON.stringify objects
+  error?: string;
+  durationMs: number;
 }
 ```
 
-Each `SandboxAPI` method is gated by the Parallax policy engine. Access is denied unless the plugin manifest declares the required permission.
+### Tool Best Practices
 
-### MemoryAPI
+- Validate inputs first
+- Never throw from `execute()` — it breaks the tool loop. Always return a `ToolCallResult`.
+- Always return a string for `output` — use `JSON.stringify()` for structured data.
+- Match tool capabilities to manifest: tool capabilities must be a subset of manifest capabilities.
 
 ```typescript
-interface MemoryAPI {
-  search(query: string, options?: { limit?: number; tier?: MemoryTier }): Promise<MemoryEntry[]>;
-  get(id: string): Promise<MemoryEntry | null>;
-}
+// GOOD — always return a result
+execute: async (args) => {
+  const start = Date.now();
+  try {
+    const result = await doWork(args);
+    return { toolName: 'my_tool', success: true, output: result, durationMs: Date.now() - start };
+  } catch (err) {
+    return { toolName: 'my_tool', success: false, output: '', error: (err as Error).message, durationMs: Date.now() - start };
+  }
+},
+```
 
-type MemoryTier = "episodic" | "semantic" | "reflection" | "graph" | "procedural";
+## Pipeline Hooks
 
-interface MemoryEntry {
-  id: string;
-  content: string;
-  score: number;
-  tier: MemoryTier;
-  timestamp: number;
+Plugins can intercept the agent's 12-stage execution pipeline. Export `middlewarePre` and/or `middlewarePost` from your module and declare `middleware:pre` / `middleware:post` in capabilities.
+
+### Pipeline Stages
+
+```
+INPUT → pre-assess → ASSESS (metacognition) → post-assess
+  → pre-reason → REASON → post-reason
+  → pre-llm → LLM CALL → post-llm
+  → pre-tool → TOOL EXECUTE → post-tool
+  → pre-reflect → REFLECT → post-reflect
+  → pre-output → OUTPUT → post-output
+```
+
+| Stage | When | Available context fields |
+|-------|------|--------------------------|
+| `pre-assess` | Before metacognitive assessment | `input`, `messages` |
+| `post-assess` | After assessment | `assessment`, `messages` |
+| `pre-reason` | Before reasoning loop | `input`, `messages` |
+| `post-reason` | After reasoning loop | `output` |
+| `pre-llm` | Before LLM API call | `messages` |
+| `post-llm` | After LLM API call | `currentLLMResponse` |
+| `pre-tool` | Before each tool call | `toolCall` |
+| `post-tool` | After each tool call | `toolCall`, `toolResult` |
+| `pre-reflect` | Before reflection | `output` |
+| `post-reflect` | After reflection | `reflection` |
+| `pre-output` | Before final response | `output` |
+| `post-output` | After final response | `output` |
+
+### HookResult Fields
+
+```typescript
+interface HookResult {
+  abort?: { reason: string; message: string };           // abort the turn
+  modifyInput?: string;                                   // replace user input
+  modifyLLMResponse?: string;                            // replace raw LLM response text
+  modifyOutput?: string;                                 // replace final output
+  injectMessages?: Message[];                            // append to conversation history
+  sideEffects?: Array<{ type: 'log'|'metric'|'store'|'notify'; payload: unknown }>;
 }
 ```
+
+### Hook Best Practices
+
+```typescript
+// Always guard on stage
+export const middlewarePre = async (ctx: unknown) => {
+  const c = ctx as { stage: string; toolCall?: { name: string } };
+  if (c.stage !== 'pre-tool') return {};
+  if (!c.toolCall) return {};
+  // your logic here
+  return {};
+};
+
+// Provide clear abort messages
+return { abort: { reason: 'policy', message: 'File access is blocked outside ~/projects/.' } };
+
+// Keep hooks fast — offload slow work
+export const middlewarePost = async (ctx: unknown) => {
+  const c = ctx as { stage: string; toolResult?: { toolName: string } };
+  if (c.stage !== 'post-tool' || !c.toolResult) return {};
+  sendAuditLog(c.toolResult).catch(() => {});
+  return {};
+};
+
+// Use sideEffects for structured logging
+return {
+  sideEffects: [
+    { type: 'store', payload: { key: 'lastTool', value: c.toolCall?.name } },
+    { type: 'log', payload: { tool: c.toolCall?.name } },
+  ],
+};
+```
+
+Sync hooks time out after **5s**. Async hooks time out after **15s**. Plugin middleware hooks run at `priority: 50`.
+
+## Event Subscriptions
+
+Declare `events:listener` in capabilities and list event types in the manifest `events` field. Subscribe in `onLoad`, unsubscribe in `onUnload`.
+
+| Event | Payload |
+|-------|---------|
+| `session:start` | `{ sessionId }` |
+| `session:end` | `{ sessionId }` |
+| `tool:pre-execute` | `{ toolName, args }` |
+| `tool:post-execute` | `{ toolName, result }` |
+| `llm:pre-call` | `{ provider, model }` |
+| `llm:post-call` | `{ provider, model, tokensIn, tokensOut }` |
+| `agent:turn-start` | `{ sessionId, turnId }` |
+| `agent:turn-end` | `{ sessionId, turnId, response }` |
+| `config:change` | `{ key, value }` |
+| `daemon:status` | `{ daemon, status }` |
+
+## Sandbox Protocol (JSON-RPC over postMessage)
+
+`untrusted` and `signed` plugins run in a **Deno Worker sandbox** using JSON-RPC over `postMessage`:
+
+1. Host spawns `new Worker(entryPoint, { type: 'module', deno: { permissions: ... } })`
+2. Worker must post `{ type: 'ready' }` within **30 seconds**
+3. Host sends RPC: `{ id, method: 'getTools', params: {} }` → worker returns tool definitions
+4. On tool call: `{ id, method: 'executeTool', params: { toolName, args } }` → worker returns `ToolCallResult`
+
+### Sandbox Safety Rules
+
+If your plugin may run sandboxed:
+- Do not use `Deno.env` — env access is restricted in the Worker
+- Do not use `Deno.Command` — requires `shell:run` capability
+- Do not call `Deno.exit()` — terminates the Worker
+- Do not import from `https://` at runtime without `network:fetch`
+- Test with minimal permissions
+
+## `window.Cortex` Panel API
+
+Injected into every plugin panel iframe:
+
+| Method | Description |
+|--------|-------------|
+| `window.Cortex.fetch(path, init?)` | Authenticated fetch to CortexPrism API |
+| `window.Cortex.getConfig(key)` | Read plugin config value |
+| `window.Cortex.setConfig(key, value)` | Write plugin config value |
+| `window.Cortex.onEvent(event, handler)` | Subscribe to event bus |
+| `window.Cortex.emit(event, data)` | Emit event to host |
+| `window.Cortex.notify(msg, type)` | Show notification (type: 'info' \| 'warn' \| 'error') |
+
+### PostMessage Commands
+
+Structured commands panels can send to the host: `navigate`, `open-modal`, `notification`, `config-get`, `config-set`, `query`.
+
+### UI Panel Best Practices
+
+- Sanitize dynamic content — never render raw API data as HTML
+- Use `window.Cortex.getConfig()` instead of hardcoded values
+- Use `window.Cortex.notify()` for user feedback — avoid `alert()`
+- Handle fetch failures — `window.Cortex.fetch()` can fail
+- Design for narrow widths — sidebar panels may be as narrow as 240px
+- Never trust panel input — validate data from panels server-side
 
 ## Plugin Manifest Schema
 
@@ -110,74 +259,68 @@ Full schema for `manifest.json`:
 
 ### Required Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | `string` | Unique plugin identifier (kebab-case). Primary key in the plugin database. |
-| `version` | `string` | Semantic version (e.g. `1.0.0`). |
-| `description` | `string` | Short description shown in marketplace and plugin list. |
-| `kind` | `"esm" | "mcp" | "wasm"` | Plugin runtime kind. |
-| `entryPoint` | `string` | Path to module, URL, or WASM binary (relative to manifest). |
-| `runtime` | `"deno" | "wasm"` | Execution target. `deno` for ESM/MCP, `wasm` for WASM. |
-| `capabilities` | `string[]` | Declared extension points and permissions. |
+| Field | Type | Rules |
+|-------|------|-------|
+| `name` | `string` | kebab-case, unique across marketplace |
+| `version` | `string` | Valid semver, e.g. `1.2.3` |
+| `description` | `string` | Short one-line description |
+| `kind` | `"esm"` \| `"mcp"` \| `"wasm"` | Plugin runtime kind |
+| `entryPoint` | `string` | Relative path, absolute path, or URL |
+| `runtime` | `"deno"` \| `"wasm"` | Execution target |
+| `capabilities` | `string[]` | Declared permissions and extension points |
 
 ### Optional Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `author` | `string` | Author name or organization. |
-| `homepage` | `string` (url) | Plugin homepage URL. |
-| `license` | `string` | SPDX license identifier (e.g. `MIT`). |
-| `repository` | `string` (url) | Source repository URL. |
-| `hash` | `string` | SHA-256 hash of entry point for integrity verification. |
-| `signature` | `string` | Optional GPG/JWT signature for trust verification. |
-| `icon` | `string` | Path to icon file. |
-| `dependencies` | `Record<string, string>` | Other plugins required, keyed by name with semver constraints. |
-| `peerDependencies` | `Record<string, string>` | Host CortexPrism version constraint. |
-| `tools` | `ToolDeclaration[]` | Tool definitions (names, params). ESM plugins provide the implementation. |
-| `cliCommands` | `CliCommandDeclaration[]` | CLI subcommand specifications. |
-| `ui` | `UiContribution` | UI panels, widgets, and settings forms. |
-| `config` | `ConfigContribution` | Config schema extensions and defaults. |
-| `events` | `string[]` | Event types the plugin subscribes to. |
-| `permissions` | `object` | Granular sandbox permissions. |
-| `mcp` | `object` | MCP-specific transport and timeout settings. |
-| `wasm` | `object` | WASM-specific memory and allocator settings. |
+| `author` | `string` | Author username (forms the `@author/` namespace) |
+| `homepage` | `string` | Plugin homepage URL |
+| `license` | `string` | SPDX license identifier |
+| `repository` | `string` | Source repository URL |
+| `hash` | `string` | SHA-256 hash for supply-chain verification |
+| `signature` | `string` | Base64-encoded digital signature |
+| `dependencies` | `Record<string, string>` | Required plugin names → semver constraints |
+| `peerDependencies` | `Record<string, string>` | Compatible peer plugin names → constraints |
+| `events` | `string[]` | Event type names to subscribe to |
+| `tools` | `ToolDeclaration[]` | Tool declarations |
+| `cliCommands` | `CliCommandDeclaration[]` | CLI subcommand declarations |
+| `ui` | `UiContribution` | UI panels, widgets, settings fields |
+| `config` | `ConfigContribution` | LLM provider registrations and config defaults |
 
 ### Capabilities
 
-Capabilities serve dual purpose: they declare what extension points the plugin uses AND what permissions it needs.
-
 **Extension Point Capabilities:**
 
-| Value | Description |
-|-------|-------------|
-| `tools` | Plugin provides `Tool[]` |
-| `cli:commands` | Plugin provides CLI subcommands |
-| `ui:panel` | Plugin provides a Web UI panel/tab |
-| `ui:widget` | Plugin provides a dashboard widget |
-| `config:schema` | Plugin extends config schema |
-| `config:provider` | Plugin provides an LLM provider |
-| `memory:store` | Plugin provides a custom memory backend |
-| `memory:embedder` | Plugin provides an embedding provider |
-| `events:listener` | Plugin subscribes to event bus |
-| `middleware:pre` | Plugin provides pre-execution middleware |
-| `middleware:post` | Plugin provides post-execution middleware |
+| Capability | Module export required | Description |
+|------------|----------------------|-------------|
+| `tools` | `tools: Tool[]` | Register tools in the agent tool registry |
+| `cli:commands` | `cliCommands` or named handler | Add `cortex <name>` subcommands |
+| `ui:panel` | — (manifest `ui.panels`) | Add a Web UI panel/tab |
+| `ui:widget` | — (manifest `ui.widgets`) | Add a dashboard widget |
+| `config:schema` | — | Extend config schema with new settings |
+| `config:provider` | `providers: Record<string, ProviderFactory>` | Register LLM provider factories |
+| `memory:store` | — | Custom memory backend |
+| `memory:embedder` | — | Custom embedding provider |
+| `events:listener` | `globalEventBus.on(...)` in `onLoad` | Subscribe to the event bus |
+| `middleware:pre` | `middlewarePre` export | Hook into pipeline pre-execution |
+| `middleware:post` | `middlewarePost` export | Hook into pipeline post-execution |
 
 **Permission Capabilities:**
 
-| Value | Description |
-|-------|-------------|
-| `fs:read` | Read filesystem access |
-| `fs:write` | Write filesystem access |
-| `fs:list` | Directory listing |
-| `fs:edit` | File editing |
-| `fs:delete` | File deletion |
-| `fs:search` | File searching |
-| `shell:run` | Shell command execution |
-| `network:fetch` | Outbound HTTP requests |
-| `net:outbound` | General outbound network access |
-| `net:inbound` | Inbound network (listening) |
-| `db:read` | Database read access |
-| `db:write` | Database write access |
+| Capability | Deno Worker permission | What it grants |
+|------------|----------------------|----------------|
+| `fs:read` | `read: true` | Read files |
+| `fs:list` | `read: true` | List directory contents |
+| `fs:write` | `write: true` | Write files |
+| `fs:edit` | `write: true` | Edit existing files |
+| `fs:delete` | `write: true` | Delete files |
+| `fs:search` | — | Search file contents (policy-gated) |
+| `shell:run` | `run: true` | Execute shell commands |
+| `network:fetch` | `net: true` | Make outbound HTTP/HTTPS requests |
+| `net:outbound` | `net: true` | General outbound network access |
+| `net:inbound` | `net: true` | Accept inbound connections |
+| `db:read` | — | Read from internal databases (policy-gated) |
+| `db:write` | — | Write to internal databases (policy-gated) |
 
 ### ToolDeclaration
 
@@ -247,15 +390,7 @@ Capabilities serve dual purpose: they declare what extension points the plugin u
 }
 ```
 
-**UiSettingField Types:**
-
-| Type | Description |
-|------|-------------|
-| `text` | Single-line text input |
-| `number` | Numeric input |
-| `boolean` | Checkbox toggle |
-| `select` | Dropdown with `options` array |
-| `secret` | Password field (masked input) |
+**UiSettingField Types:** `text`, `number`, `boolean`, `select`, `secret`
 
 ### ConfigContribution
 
@@ -272,86 +407,64 @@ Capabilities serve dual purpose: they declare what extension points the plugin u
 }
 ```
 
-### Trust Levels
+## Trust Levels
 
-| Level | Sandbox | Permissions |
-|-------|---------|-------------|
-| `untrusted` | Worker sandbox | Limited to declared permissions |
-| `signed` | Worker sandbox | Broader permissions based on signature |
-| `trusted` | In-process | Full declared permissions |
+| Level | Sandbox | How Assigned |
+|-------|---------|--------------|
+| `untrusted` | Deno Worker sandbox (minimal perms) | No verification, or blocked/suspicious supply-chain result |
+| `signed` | Deno Worker sandbox | Supply-chain ran but no hash match (unverified) |
+| `trusted` | In-process (full declared perms) | Supply-chain verification passes |
 
 Trust level is set at install time and can be changed via `cortex plugins permissions <name>`.
 
-### Full Manifest Example
+## Supply-Chain Verification
 
-```json
-{
-  "name": "my-plugin",
-  "version": "1.0.0",
-  "description": "An example plugin with tools, UI panel, and settings",
-  "kind": "esm",
-  "entryPoint": "./mod.ts",
-  "runtime": "deno",
-  "capabilities": ["tools", "ui:panel", "network:fetch"],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": "https://github.com/you/my-plugin",
-  "tools": [
-    {
-      "name": "get_weather",
-      "description": "Get current weather for a city",
-      "params": [
-        { "name": "city", "type": "string", "description": "City name", "required": true }
-      ]
-    }
-  ],
-  "cliCommands": [
-    {
-      "name": "my-command",
-      "description": "My custom CLI command",
-      "options": [
-        { "name": "verbose", "type": "boolean", "flag": "-v" }
-      ]
-    }
-  ],
-  "ui": {
-    "panels": [
-      { "id": "weather", "title": "Weather", "icon": "cloud", "htmlPath": "./ui/panel.html" }
-    ],
-    "settings": [
-      {
-        "section": "API",
-        "fields": [
-          { "key": "apiKey", "label": "API Key", "type": "secret", "defaultValue": "" }
-        ]
-      }
-    ]
-  }
-}
+`verifyPluginIntegrity()` runs before every plugin install:
+
+- **SHA-256 hash** check against known-good hashes per `package@version`
+- **Blocked hash list** — known-malicious hashes are rejected outright
+- **Digital signature verification** — optional GPG signature validation
+- **Author reputation scoring** — 0–100 score; configurable blocked/allowed author lists
+- **Malware pattern scanning** — 6 default patterns
+
+`blockSuspicious` mode rejects suspicious plugins. `requireKnownHash` defaults to `false` for community compatibility.
+
+## Permission Overrides
+
+Admins can grant or deny capabilities per-plugin:
+
+```
+POST /api/plugins/:name/permissions
+{ "permission_path": "shell:run", "action": "deny" }
 ```
 
-## Runtime API (Available to ESM Plugins)
+Effective permissions: `declared − denied + granted`
 
-### Global Objects
+## Plugin Namespacing
 
-| Object | Description |
-|--------|-------------|
-| `CortexPrism` | Version info and build metadata |
-| `fetch` | Global fetch (limited by policy) |
-| `console` | Scoped console (prefixed with plugin name) |
+Marketplace plugins use `@author/name` scoping. Tool names from namespaced plugins follow `@author/plugin-name/tool_name`.
 
-### Importable SDK
+## MCP Plugin Development
 
-```typescript
-import {
-  definePlugin,        // Type-safe plugin definition
-  z,                   // Zod validation
-  HttpError,           // 400-level errors
-  PermissionError,     // Policy denial errors
-  PluginError,         // Generic plugin errors
-  TimeoutError,        // Capability timeout errors
-} from "@cortexprism/plugin-sdk";
-```
+MCP plugins wrap an external JSON-RPC 2.0 server. `entryPoint` must be an `https://` URL. CortexPrism creates a synthetic tool `mcp_<name>` that proxies calls.
+
+## WASM Plugin Development
+
+WASM plugins compile to `.wasm` and run in a WebAssembly sandbox. Required exports: `plugin_init`, `plugin_get_capabilities`, `plugin_execute_tool`, `memory`. Optional: `plugin_destroy`. Host import functions provided as `env.*`.
+
+Memory layout: `initial: 256 pages` (16 MiB), `maximum: 512 pages` (32 MiB).
+
+## Plugin Module Export Reference (`mod.ts`)
+
+| Export name | Type | Capability required |
+|-------------|------|---------------------|
+| `tools` | `Tool[]` | `tools` |
+| `providers` | `Record<string, ProviderFactory>` | `config:provider` |
+| `cliCommands` | `CliCommandDeclaration[]` | `cli:commands` |
+| `onInstall` / `onLoad` / `onActivate` / `onDeactivate` / `onUnload` / `onUninstall` | `(ctx) => Promise<void>` | — |
+| `onConfigChange` | `(key, value, ctx) => Promise<void>` | — |
+| `middlewarePre` | `(ctx: unknown) => Promise<HookResult>` | `middleware:pre` |
+| `middlewarePost` | `(ctx: unknown) => Promise<HookResult>` | `middleware:post` |
 
 ## Error Types
 
@@ -396,8 +509,25 @@ CREATE TABLE plugin_config (
 ## CLI Commands
 
 ```bash
-cortex plugins install <source>     # Install from marketplace, URL, or local path
-cortex plugins list                 # List installed plugins with status
-cortex plugins enable <name>        # Activate a plugin
-cortex plugins disable <name>       # Deactivate without removing
+cortex plugins install <source>      # Install from marketplace, URL, or local path
+cortex plugins list                  # List installed plugins with status
+cortex plugins enable <name>         # Activate a plugin
+cortex plugins disable <name>        # Deactivate without removing
+cortex plugins update <name>         # Update to latest version
+cortex plugins update --all          # Update all plugins
+cortex plugins verify <name>         # Run supply-chain verification
+cortex plugins permissions <name>    # View or modify plugin permissions
+cortex plugins remove <name>         # Uninstall and remove
 ```
+
+## Debugging
+
+| Symptom | Cause / Fix |
+|---------|-------------|
+| Status: `error` | Check `error_message` via `cortex plugins list` |
+| Tool not visible | Plugin must be `active`; tool must be in `tools` export |
+| Permission denied | Tool `capabilities` must be subset of manifest `capabilities` |
+| UI panel missing | Declare `ui:panel`; verify `htmlPath` is relative |
+| Events not firing | Declare `events:listener` AND list event types in manifest |
+| Sandbox not ready | Worker must post `{ type: 'ready' }` within 30s |
+| Config not reading | Key must match what was set via `ctx.config.set()` |

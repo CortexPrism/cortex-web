@@ -14,11 +14,17 @@ Before publishing, you need a marketplace account:
 
 ### Step 1: Prepare Your Plugin
 
-Ensure your plugin has a complete manifest and is tested:
+Ensure your plugin has a complete manifest and passes verification:
 
 ```bash
 # Test locally
 cortex plugins install ./my-plugin
+
+# Run supply-chain verification (SHA-256, signatures, malware scan)
+cortex plugins verify my-plugin
+
+# Run AgentLint to audit for issues and best-practice gaps
+cortex agent lint check my-agent
 
 # Ensure tool capabilities work in a chat session
 cortex chat --agent my-agent
@@ -93,6 +99,8 @@ Similar to plugins, but with agent-specific fields:
 | **Naming** | kebab-case, unique across marketplace |
 | **Version** | Valid semver (e.g., `1.0.0`, `2.3.1`) |
 | **Entry point** | Must be accessible and valid |
+| **Supply-chain** | Pass `cortex plugins verify` (SHA-256 hash, signature, malware scan) |
+| **AgentLint** | Pass `cortex agent lint check` with no errors |
 | **Capabilities** | At least one capability defined |
 | **License** | SPDX identifier required (MIT, Apache-2.0, etc.) |
 | **README** | Recommended: usage instructions |
@@ -139,11 +147,13 @@ See the [OpenAPI docs](/openapi) for the complete specification.
 3. **Include a README**: Provide detailed usage instructions within the plugin
 4. **Use screenshots**: Show the plugin in action
 5. **Version carefully**: Follow semantic versioning
-6. **Respond to reviews**: Engage with user feedback
-7. **Keep dependencies minimal**: Faster install, fewer conflicts
-8. **Test on multiple platforms**: Linux, macOS, Windows (WSL2)
-9. **Add a license**: Clearly state usage terms
-10. **Link to source**: If open source, link the repository
+6. **Run supply-chain checks**: Use `cortex plugins verify` before submitting
+7. **Run AgentLint**: Use `cortex agent lint check` to catch config issues
+8. **Respond to reviews**: Engage with user feedback
+9. **Keep dependencies minimal**: Faster install, fewer conflicts
+10. **Test on multiple platforms**: Linux, macOS, Windows (WSL2)
+11. **Add a license**: Clearly state usage terms
+12. **Link to source**: If open source, link the repository
 
 ## CLI Publishing (Future)
 

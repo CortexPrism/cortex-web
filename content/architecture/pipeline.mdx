@@ -5,7 +5,7 @@ description: 12-stage hook-based processing pipeline for the agent turn lifecycl
 
 # Pipeline System
 
-The pipeline system provides a hook-based processing framework that wraps every stage of the agent turn lifecycle. Core and plugin hooks execute at 12 distinct pipeline stages with configurable priority, timeout protection, and rich modification capabilities.
+The pipeline system provides a hook-based middleware architecture that wraps every stage of the agent turn lifecycle. Core and plugin hooks execute at 12 distinct pipeline stages with configurable priority, timeout protection, and rich modification capabilities.
 
 ## Architecture
 
@@ -28,18 +28,29 @@ The pipeline system provides a hook-based processing framework that wraps every 
 
 ## 12 Pipeline Stages
 
+```
+INPUT → pre-assess → ASSESS (metacognition) → post-assess
+  → pre-reason → REASON → post-reason
+  → pre-llm → LLM CALL → post-llm
+  → pre-tool → TOOL EXECUTE → post-tool
+  → pre-reflect → REFLECT → post-reflect
+  → pre-output → OUTPUT → post-output
+```
+
 | Stage | When | Purpose |
 |-------|------|---------|
-| `pre-assess` | Before assessment | Pre-filter, context preparation |
+| `pre-assess` | Before metacognitive assessment | Pre-filter, context preparation |
 | `post-assess` | After assessment | Validate assessment output |
-| `pre-reason` | Before reasoning | Modify reasoning context / LLM request |
-| `post-reason` | After reasoning | Validate reasoning / process LLM response |
-| `pre-tool` | Before tool execution | Tool call filtering |
-| `post-tool` | After tool execution | Tool result processing |
+| `pre-reason` | Before reasoning loop | Modify reasoning context, context compaction |
+| `post-reason` | After reasoning loop | Process reasoning output, completion checklists |
+| `pre-llm` | Before LLM API call | Model selection, request modification |
+| `post-llm` | After LLM API call | Response processing, model metrics |
+| `pre-tool` | Before tool execution | Tool call filtering, loop detection |
+| `post-tool` | After tool execution | Tool result processing, DLP scanning, cost tracking |
 | `pre-reflect` | Before reflection | Modify reflection context |
 | `post-reflect` | After reflection | Process reflection output |
-| `pre-output` | Before final output | Modify user-facing response |
-| `post-output` | After final output | Post-response side effects |
+| `pre-output` | Before final output | Content safety, DLP guard, modify response |
+| `post-output` | After final output | Audit logging, cost tracking, bias auditing |
 
 ## Hook Interface
 
@@ -68,9 +79,12 @@ interface HookResult {
 | Hook | Stage | Priority | Description |
 |------|-------|----------|-------------|
 | `@cortex/injection-guard` | pre-reason | 5 | Prompt injection detection |
-| `@cortex/model-quartermaster` | pre-reason, post-reason | 5 | MQM intelligent model selection |
+| `@cortex/model-quartermaster` | pre-llm, post-llm | 5 | MQM intelligent model selection |
+| `@cortex/dlp-guard` | pre-output, post-tool | 5 | 22-scanner data loss prevention |
 | `@cortex/quartermaster` | pre-tool, post-tool | 6 | Tool orchestration learning |
+| `@cortex/compliance` | pre-assess, post-tool, post-output | 7 | Compliance recording and export |
 | `@cortex/summarization` | pre-reason | 8 | Context compaction at 80K token threshold |
+| `@cortex/responsible-ai` | post-output | 8 | Bias, fairness, and safety auditing |
 | `@cortex/content-safety` | pre-output | 10 | Content filtering before output |
 | `@cortex/loop-detection` | pre-tool | 12 | Per-file edit tracking (warns after 5+ edits) |
 | `@cortex/tool-output-sandbox` | post-tool | 15 | Large output capture to session storage |
@@ -78,14 +92,33 @@ interface HookResult {
 | `@cortex/audit-log` | post-output | 150 | Session/turn logging (non-disableable) |
 | `@cortex/cost-tracker` | post-tool, post-output | 200 | Token/cost metrics |
 
+## Hook Actions
+
+| Action | Description |
+|--------|-------------|
+| `abort` | Stop the pipeline with a message |
+| `modifyInput` | Mutate the input before processing |
+| `modifyLLMResponse` | Modify the LLM's raw response text |
+| `modifyOutput` | Modify the final output |
+| `injectMessages` | Add messages to the conversation |
+| `sideEffects` | Log, emit metrics, store data, send notifications |
+
+## Execution Model
+
+- **Sync hooks** — block the pipeline; 5-second timeout per hook
+- **Async hooks** — fire-and-forget; 15-second timeout per hook
+- **Priority-ordered** — lower priority numbers execute first within each stage
+- **Abort support** — any hook can return `{ abort }` to stop the pipeline immediately
+- Plugin middleware hooks run at `priority: 50`
+
 ## Hook Registration
 
 Hooks can be registered by:
 - Core system on startup
-- Plugins via the plugin manager
+- Plugins via the plugin manager (export `middlewarePre` / `middlewarePost`)
 - Custom scripts via the hooks API
 
-Each hook has a priority (0–100) determining execution order within a stage. Hooks have timeout protection (5s sync, 15s async) to prevent pipeline stalls.
+Each hook has a priority determining execution order within a stage.
 
 ## Pipeline Context
 

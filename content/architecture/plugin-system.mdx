@@ -1,41 +1,174 @@
 # Plugin System
 
-CortexPrism supports three types of plugins: ESM modules, MCP (Model Context Protocol) servers, and WebAssembly modules. The plugin system is designed for extensibility and isolation.
+CortexPrism supports plugins that extend its capabilities with new tools, UI panels, CLI commands, LLM providers, and middleware. Plugins run in three modes: ESM modules, MCP (Model Context Protocol) servers, and WebAssembly modules.
 
 ## Plugin Types
 
-| Type | Technology | Use Case |
-|------|-----------|----------|
-| **ESM** | JavaScript/TypeScript modules | General-purpose plugins, extending agent capabilities |
-| **MCP** | Model Context Protocol servers | Tool providers following the MCP standard |
-| **WASM** | WebAssembly modules | Performance-critical tasks, cross-language support |
+| Kind | Technology | Best For |
+|------|------------|----------|
+| **ESM** | JavaScript/TypeScript modules | Most plugins — tools, UI, providers, middleware |
+| **MCP** | Model Context Protocol servers (JSON-RPC) | Wrapping existing MCP servers as tools |
+| **WASM** | WebAssembly modules (any language → WASM) | Performance-critical or multi-language plugins |
 
 ## Plugin Lifecycle
 
 ```
-1. Install   → Download and register the plugin in plugins.db
-2. Enable    → Activate the plugin for use in sessions
-3. Use       → Call plugin capabilities through the tool system
-4. Disable   → Deactivate without uninstalling
-5. Uninstall → Remove the plugin entirely from registry
+DISCOVERED → INSTALLED → LOADING → ACTIVE
+                                      ↓
+                                  UNLOADING → REMOVED
 ```
 
-## Plugin Registry
+Lifecycle hooks: `onInstall` → `onLoad` → `onActivate` → `onDeactivate` → `onUnload` → `onUninstall`
 
-Plugins are registered in `plugins.db` (SQLite) with:
+## Manifest Structure
 
-- Name and version
-- Plugin type (ESM/MCP/WASM)
-- Author and description
-- Permissions required
-- Dependencies
-- Download count (for marketplace tracking)
+```json
+{
+  "name": "my-plugin",
+  "version": "1.0.0",
+  "description": "An example plugin",
+  "kind": "esm",
+  "entryPoint": "./mod.ts",
+  "runtime": "deno",
+  "capabilities": ["tools", "network:fetch"],
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Get current weather for a city",
+      "params": [
+        { "name": "city", "type": "string", "description": "City name", "required": true }
+      ]
+    }
+  ]
+}
+```
 
-## Isolation
+## Extension Points
 
-- Plugins run in isolated sandboxes with restricted permissions
-- Resource limits are enforced per plugin
-- The policy engine controls what each plugin can access
+| Capability | Description |
+|------------|-------------|
+| `tools` | Register tools in the global agent tool registry |
+| `cli:commands` | Add `cortex <name>` subcommands |
+| `ui:panel` | Add a Web UI panel/tab |
+| `ui:widget` | Add a dashboard widget |
+| `config:schema` | Extend config schema with new settings |
+| `config:provider` | Register LLM provider factories |
+| `memory:store` | Custom memory backend |
+| `memory:embedder` | Custom embedding provider |
+| `events:listener` | Subscribe to the event bus |
+| `middleware:pre` | Pre-execution middleware |
+| `middleware:post` | Post-execution middleware |
+
+## Trust Levels
+
+| Level | Sandbox | How Assigned |
+|-------|---------|--------------|
+| `untrusted` | Deno Worker sandbox (minimal perms) | No verification, or blocked/suspicious supply-chain result |
+| `signed` | Deno Worker sandbox | Supply-chain ran but no hash match (unverified) |
+| `trusted` | In-process (full declared perms) | Supply-chain verification passes |
+
+## PluginContext API
+
+Every lifecycle hook and tool `execute` receives a `PluginContext`:
+
+- `pluginId: string` — Plugin name
+- `pluginDir: string` — `~/.cortex/data/plugins/<name>/`
+- `state: PluginStateStore` — Persistent SQLite-backed key-value store
+- `config: PluginConfigStore` — Typed access to `~/.cortex/config.json plugins.<name>`
+- `logger: PluginLogger` — Scoped logger, prefixes `[plugin:<name>]`
+- `host: HostApi` — Register/unregister tools at runtime
+
+## Pipeline Hooks
+
+Plugins can intercept the agent's 12-stage execution pipeline by exporting `middlewarePre` and/or `middlewarePost` from their module and declaring `middleware:pre` / `middleware:post` in capabilities.
+
+```
+pre-assess → post-assess → pre-reason → post-reason
+→ pre-llm → post-llm
+→ pre-tool (middlewarePre) → post-tool (middlewarePost)
+→ pre-reflect → post-reflect
+→ pre-output → post-output
+```
+
+Hooks receive a `PipelineContext` and return a `HookResult`:
+
+- `abort?: { reason, message }` — aborts the current turn
+- `modifyInput?: string` — replaces user input
+- `modifyLLMResponse?: string` — replaces raw LLM response
+- `modifyOutput?: string` — replaces final output
+- `injectMessages?: Message[]` — appends to conversation history
+- `sideEffects?: SideEffect[]` — log | metric | store | notify
+
+Sync hooks time out after **5s**. Async hooks time out after **15s**. Plugin middleware hooks run at `priority: 50`.
+
+## Event Subscriptions
+
+Declare `events:listener` capability and list event types in the manifest `events` field. Subscribe via `globalEventBus.on(type, handler)` in `onLoad`.
+
+Events: `session:start`, `session:end`, `tool:pre-execute`, `tool:post-execute`, `llm:pre-call`, `llm:post-call`, `agent:turn-start`, `agent:turn-end`, `config:change`, `daemon:status`
+
+## UI Slots
+
+| Slot | Description |
+|------|-------------|
+| `sidebar` | Left sidebar item |
+| `panel` | Full-page panel/tab |
+| `modal` | Modal overlay |
+| `timeline-item` | Timeline feed entry |
+| `widget` | Dashboard widget |
+
+Panel iframes receive the `window.Cortex` JavaScript API injected by the host:
+
+- `window.Cortex.fetch(path, init?)` — Authenticated fetch
+- `window.Cortex.getConfig(key)` / `window.Cortex.setConfig(key, value)`
+- `window.Cortex.onEvent(event, handler)` / `window.Cortex.emit(event, data)`
+- `window.Cortex.notify(msg, type)` — type: 'info' | 'warn' | 'error'
+
+## Sandbox Mechanics
+
+`untrusted` and `signed` plugins run in a **Deno Worker sandbox** using JSON-RPC over `postMessage`:
+
+1. Host spawns `new Worker(entryPoint, { type: 'module', deno: { permissions: ... } })`
+2. Worker must post `{ type: 'ready' }` within **30 seconds**
+3. Host sends RPC: `{ id, method: 'getTools', params: {} }` → worker returns tool definitions
+4. On tool call: `{ id, method: 'executeTool', params: { toolName, args } }` → worker returns `ToolCallResult`
+
+### Capability → Deno Worker Permission Mapping
+
+| Capability | Deno Permission |
+|------------|----------------|
+| `fs:read`, `fs:list` | `read: true` |
+| `fs:write`, `fs:edit`, `fs:delete` | `write: true` |
+| `shell:run` | `run: true` |
+| `network:fetch`, `net:outbound`, `net:inbound` | `net: true` |
+
+## Permission Overrides
+
+Admins can grant or deny capabilities per-plugin beyond manifest declarations. Overrides are stored in `plugins.db` and merged at load time:
+
+```
+effective = declared − denied + granted
+```
+
+## Plugin Namespacing
+
+Marketplace plugins use `@author/name` scoping. Tool names from namespaced plugins follow `@author/plugin-name/tool_name`.
+
+## Supply-Chain Verification
+
+`verifyPluginIntegrity()` runs before every plugin install:
+
+- **SHA-256 hash** check against known-good hashes per `package@version`
+- **Blocked hash list** — known-malicious hashes are rejected outright
+- **Digital signature verification** — optional GPG signature validation
+- **Author reputation scoring** — 0–100 score; configurable blocked/allowed author lists
+- **Malware pattern scanning** — 6 default patterns: `eval`, `child_process`, `rm -rf /`, `curl|sh`, `wget|sh`
+
+`blockSuspicious` mode rejects suspicious plugins. `requireKnownHash` defaults to `false` for community marketplace compatibility.
+
+## Plugin Dependency Resolution
+
+Semver constraint satisfaction, topological sort for install ordering, circular dependency detection, and transitive dependency traversal.
 
 ## Marketplace
 
@@ -50,16 +183,18 @@ Plugins can be published to and discovered through the [CortexPrism Marketplace]
 ## CLI Management
 
 ```bash
-# Install a plugin from the marketplace
-cortex plugins install marketplace:cortexprism.io/plugins/python-executor
+# Install a plugin
+cortex plugins install marketplace:cortexprism.io/plugins/my-plugin
+cortex plugins install https://example.com/my-plugin/manifest.json
+cortex plugins install ./my-plugin/manifest.json
 
-# List installed plugins
+# List, enable, disable, update, remove
 cortex plugins list
-
-# Enable/disable a plugin
-cortex plugins enable <name>
-cortex plugins disable <name>
-
-# Remove a plugin
-cortex plugins uninstall <name>
+cortex plugins enable my-plugin
+cortex plugins disable my-plugin
+cortex plugins update my-plugin
+cortex plugins update --all
+cortex plugins verify my-plugin
+cortex plugins permissions my-plugin
+cortex plugins remove my-plugin
 ```

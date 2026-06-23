@@ -4,57 +4,117 @@ export const SITE_URL =
 export const SITE_NAME = "CortexPrism";
 
 export const SITE_DESCRIPTION =
-  "CortexPrism v0.50.0 — the open-source AI Agent Operating System with persistent memory, 60+ built-in tools, an overhauled web UI with dark/light theme and experience levels, and layered security — powered by Deno. Self-host your AI agents with confidence.";
+  "CortexPrism v0.50.0 — the open-source AI Agent Operating System with 5-tier persistent memory, 60+ built-in tools, 24 LLM providers, MCP plugin marketplace, overhauled web UI with dark/light theme and experience levels, and enterprise-grade Parallax security with LLM supervisor — powered by Deno. Self-host your autonomous AI agents with confidence. Apache 2.0 licensed.";
 
 const SITE_TAGLINE = "Open-Source AI Agent Operating System — Powered by Deno";
 
 /**
- * Primary and secondary keyword targets for CortexPrism.
+ * Comprehensive keyword targets for CortexPrism across all tiers.
  *
- * Primary (high-volume, competitive):
- *   "open source AI agent", "AI agent framework", "LLM orchestration",
- *   "self-hosted AI", "agent operating system", "autonomous AI agents"
+ * Tier 1 — Primary category ownership (high-volume, competitive):
+ *   "agent operating system", "open source AI agent", "autonomous AI agents",
+ *   "self-hosted AI", "AI agent operating system", "open source agent operating system"
  *
- * Secondary (medium-volume, more specific):
- *   "AI agent operating system", "multi-agent system", "MCP plugin", "Model Context Protocol",
- *   "AI memory system", "AI plugin marketplace", "vector memory",
- *   "sandboxed code execution", "LLM agent tools"
+ * Tier 2 — Feature-led (high-intent, medium-volume):
+ *   "AI agent with memory", "AI agent memory system", "AI agent sandbox",
+ *   "AI agent security", "multi-agent orchestration", "MCP plugin marketplace",
+ *   "self-hosted AI agents", "private AI agent", "enterprise AI agent"
  *
- * Long-tail (low-volume, high intent):
- *   "TypeScript AI agent framework", "Deno AI operating system",
- *   "open source LangChain alternative", "self-hosted LLM platform",
- *   "AI agent workflow automation", "AI agent operating system Apache 2.0 license"
+ * Tier 3 — "Vs" / Alternative keywords (comparison intent):
+ *   "open source LangChain alternative", "OpenClaw alternative",
+ *   "CrewAI alternative", "open source Claude Code alternative",
+ *   "self-hosted ChatGPT alternative", "OpenFang alternative"
+ *
+ * Tier 4 — Stack-specific niches (CortexPrism unique):
+ *   "Deno AI operating system", "TypeScript AI agent",
+ *   "AI OS powered by Deno", "Apache 2.0 AI agent OS"
+ *
+ * Tier 5 — Answer Engine Optimization (AEO) / question-based:
+ *   "how to self host an AI agent", "what is an AI agent operating system",
+ *   "best open source AI agent platform", "AI agent security best practices",
+ *   "difference between AI agent framework and operating system"
  */
 export const SITE_KEYWORDS = [
-  // Primary
-  "open source AI agent",
-  "AI agent framework",
-  "LLM orchestration",
-  "self-hosted AI",
+  // Tier 1 — Primary category ownership
   "agent operating system",
-  "autonomous AI agents",
-  // Secondary
+  "open source agent operating system",
   "AI agent operating system",
   "AI agent operating system platform",
+  "autonomous agent operating system",
+  "open source AI OS",
+  "open source AI agent",
+  "autonomous AI agents",
+  "self-hosted AI",
+  "self-hosted AI agent",
+  "AI agent platform",
+  "AI agent runtime",
+  "agent OS",
+  // Tier 2 — Feature-led
+  "AI agent with memory",
+  "AI agent memory system",
+  "AI memory platform",
+  "multi-agent orchestration",
   "multi-agent system",
+  "multi-agent orchestration platform",
   "MCP plugin",
+  "MCP plugin marketplace",
   "Model Context Protocol",
-  "AI memory system",
   "AI plugin marketplace",
-  "vector memory AI",
+  "AI agent sandbox",
   "sandboxed code execution",
+  "AI agent security",
+  "enterprise AI agent security",
+  "AI agent framework",
+  "LLM orchestration",
   "LLM agent tools",
   "multi-provider LLM",
+  "AI agent marketplace",
+  "private AI agent",
+  "local AI agent",
+  "offline AI agent",
+  "self-hosted LLM agent",
+  "AI agent for developers",
+  "AI coding agent self-hosted",
+  "autonomous agent platform",
+  "enterprise AI agent deployment",
+  "secure AI agent operating system",
+  "AI agent with tools",
+  "vector memory AI",
   "open-source AI",
   "AI security",
-  // Long-tail
-  "TypeScript AI agent",
-  "Deno AI operating system",
+  // Tier 3 — Comparison / alternative keywords
   "open source LangChain alternative",
-  "self-hosted LLM platform",
+  "open source CrewAI alternative",
+  "OpenClaw alternative",
+  "OpenFang alternative",
+  "self-hosted ChatGPT alternative",
+  "open source Claude Code alternative",
+  "agent framework alternative",
+  "AI agent framework comparison",
+  // Tier 4 — Stack-specific niches
+  "Deno AI operating system",
+  "AI OS powered by Deno",
+  "TypeScript AI agent",
+  "TypeScript AI agent framework",
+  "TypeScript agent operating system",
+  "Apache 2.0 AI agent OS",
+  "TypeScript LLM orchestration",
+  // Tier 5 — AEO / question-based
+  "what is an AI agent operating system",
+  "how to self host an AI agent",
+  "best open source AI agent platform",
+  "AI agent security best practices",
+  "difference between AI agent framework and operating system",
+  "how to build autonomous AI agents",
+  "agent OS vs agent framework",
+  // Long-tail
   "AI agent workflow automation",
   "agent orchestration framework",
   "AI operating system for agents",
+  "self-hosted LLM platform",
+  "personal AI assistant with memory",
+  "autonomous agent examples",
+  "AI agent use cases",
 ];
 
 export const OG_IMAGE_URL = `${SITE_URL}/og-image.png`;
@@ -144,7 +204,7 @@ export function generateSoftwareAppSchema() {
     url: SITE_URL,
     license: "https://www.apache.org/licenses/LICENSE-2.0",
     keywords:
-      "open source AI agent, AI agent framework, LLM orchestration, self-hosted AI, agent operating system, MCP plugin marketplace",
+      "agent operating system, open source AI agent, self-hosted AI agent, AI agent memory system, multi-agent orchestration, MCP plugin marketplace, autonomous AI agents, AI agent security, enterprise AI agent deployment, Deno AI operating system, TypeScript AI agent",
   };
 }
 

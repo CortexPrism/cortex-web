@@ -1,6 +1,43 @@
 # Agent Development
 
-This guide covers creating custom agent configurations, defining agent personas (souls), and building specialized agents for specific use cases.
+This guide covers creating custom agent configurations, defining agent personas (souls), building specialized agents, and using the built-in agent roster.
+
+## Built-in Agents
+
+CortexPrism ships with **10 built-in agents** — pre-configured agent personalities available from the web UI. Each has a distinct soul (system prompt), a focused role, and curated behavioral guidelines.
+
+### Agent Roster
+
+| Agent | Category | Role |
+|-------|----------|------|
+| **Assistant** | assistant | General-purpose agent for everyday tasks. The default if no specialist is needed. |
+| **Developer** | specialist | Software engineer focused on writing, debugging, and refactoring production-quality code. |
+| **Researcher** | analytics | Research specialist for web research, documentation lookup, and information synthesis. |
+| **Architect** | specialist | Systems architect for design, planning, and quantified trade-off analysis. |
+| **Analyst** | analytics | Data analyst for SQL queries, data exploration, statistical analysis, and insights. |
+| **Writer** | creative | Technical writer for documentation, changelogs, READMEs, and API references. |
+| **DevOps** | ops | DevOps engineer for CI/CD, containers, infrastructure, and deployment automation. |
+| **Security** | specialist | Security engineer for vulnerability auditing, OWASP review, secret scanning, and compliance. |
+| **Code Reviewer** | specialist | Senior code reviewer for PRs, design feedback, and standards enforcement. |
+| **QA / Tester** | specialist | QA engineer for test generation, coverage analysis, and test strategy. |
+
+### Soul Structure
+
+Every built-in agent soul follows a consistent 7-block structure:
+
+1. **Identity** — who the agent is and how it thinks
+2. **Capabilities** — what it can do (tools, domains, delegations)
+3. **Behavior** — how it approaches work (decision rules)
+4. **Tool Usage** — which tools to use and when
+5. **Output Format** — how to structure responses
+6. **Guardrails** — what it must never do
+7. **Limitations** — honest boundaries (tools needed, scope)
+
+### Custom Agents
+
+- **Override a built-in soul** — create a custom `SOUL.md` in `.cortex/agents/<id>/SOUL.md`
+- **Create new agents** — via the web UI (Agents → New Agent) or `cortex agent create`
+- **Extend via plugins** — plugins can register new agent presets via the plugin API
 
 ## Agent Configuration
 
@@ -16,13 +53,11 @@ Agents are defined using JSON configuration files that specify the model, behavi
   "model": "claude-sonnet-4-5",
   "temperature": 0.3,
   "systemPrompt": "You are a senior code reviewer. Analyze code for bugs, security issues, and style violations. Suggest improvements.",
-  "tools": ["read_file", "search_code", "git_diff"],
-  "maxTurns": 50,
-  "streamOutput": true
+  "tools": ["read_file", "search_code", "git_diff"]
 }
 ```
 
-### Using soul (Persona) Configuration
+### Using Soul (Persona) Configuration
 
 The `soul` field defines the agent's personality, behavior patterns, and constraints:
 
@@ -56,6 +91,24 @@ The `soul` field defines the agent's personality, behavior patterns, and constra
 # Import from marketplace
 cortex agent import marketplace:research-assistant
 
+# Create a new agent
+cortex agent create my-agent --provider anthropic --model claude-sonnet-4-5
+
+# Select active agent
+cortex agent select assistant
+
+# List configured agents
+cortex agent list
+
+# Inspect agent configuration
+cortex agent inspect developer
+
+# Export agent to JSON
+cortex agent export my-agent
+
+# Remove an agent
+cortex agent remove my-agent
+
 # Use in chat
 cortex chat --agent research-assistant
 
@@ -69,13 +122,13 @@ Agents can be published to the marketplace for others to use:
 
 1. Create your agent configuration
 2. Test it locally: `cortex chat --agent my-agent`
-3. Publish via the [Publish Agent](/marketplace/publish/agent) page
+3. Publish via the [Publish Agent](/marketplace/publish/agent) page or API
 
 ## Agent Tools
 
 Agents can use built-in tools and plugin-provided tools:
 
-### Built-in Tools
+### Built-in Tools (60+)
 
 | Tool | Description |
 |------|-------------|
@@ -114,6 +167,24 @@ Any plugin capability is automatically available as a tool to agents. Install a 
   "tools": ["code_exec", "plugin:csv-analyzer/analyze", "plugin:chart-generator/generate"]
 }
 ```
+
+## AgentLint — Automated Agent Auditing
+
+AgentLint inspects agent configurations, tool definitions, plugin manifests, and system prompts for issues, violations, and best-practice gaps. It runs 33+ checks across 4 categories:
+
+| Category | Checks | Description |
+|----------|--------|-------------|
+| Agent Config | 7 | Name length, description, system prompt, tool count, maxTurns, provider validity, dangerous tool audit |
+| Tool Definitions | 5 | Name length, description quality, parameter validation, capability declarations |
+| Plugin Manifests | 3 | Version presence, capability scoping, WASM runtime warnings |
+| System Prompts | 4 | Instruction clarity, conflicting directives, token efficiency, unsafe patterns |
+
+```bash
+cortex agent lint check <agent-id>     # Audit agent config, tools, plugins
+cortex agent lint config               # Show lint configuration
+```
+
+Output shows pass/warning/error counts with per-issue suggestions and severity badges.
 
 ## Agent Best Practices
 
@@ -208,15 +279,4 @@ You are a [role] with expertise in [domain].
   },
   "tools": ["web_search", "memory_search", "memory_store", "code_exec", "read_file", "write_file"]
 }
-```
-
-## Managing Agents via CLI
-
-```bash
-cortex agent list                         # List configured agents
-cortex agent import <source>              # Import an agent from marketplace or file
-cortex agent export <name>                # Export agent to JSON
-cortex agent remove <name>                # Remove an agent
-cortex chat --agent <name>                # Chat with a specific agent
-cortex chat --list-agents                 # List available agents
 ```

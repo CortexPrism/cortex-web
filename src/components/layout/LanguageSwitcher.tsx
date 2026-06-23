@@ -8,19 +8,6 @@ import { cn } from "@/lib/utils";
 import { routing } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
-const localeNames: Record<string, string> = {
-  en: "English",
-  zh: "中文",
-  es: "Español",
-  hi: "हिन्दी",
-  ar: "العربية",
-  pt: "Português",
-  ru: "Русский",
-  ja: "日本語",
-  de: "Deutsch",
-  fr: "Français",
-};
-
 export function LanguageSwitcher() {
   const t = useTranslations("langSwitcher");
   const locale = useLocale();
@@ -44,8 +31,7 @@ export function LanguageSwitcher() {
     router.replace(pathname, { locale: nextLocale });
   }
 
-  const currentLabel =
-    localeNames[locale] || locale;
+  const currentLabel = t(locale) || locale;
 
   return (
     <div ref={ref} className="relative">
@@ -72,7 +58,7 @@ export function LanguageSwitcher() {
                   : "text-[#9090a8] hover:text-[#e2e2ea] hover:bg-[#18181f]"
               )}
             >
-              {localeNames[loc]}
+              {t(loc)}
             </button>
           ))}
         </div>
