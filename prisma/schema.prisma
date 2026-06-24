@@ -415,6 +415,7 @@ model NewsletterSubscription {
   @@index([status])
   @@index([status, subscribedAt])
   @@index([status, createdAt])
+  @@index([unsubscribeTokenHash])
   @@map("NewsletterSubscription")
 }
 

@@ -476,6 +476,10 @@ export function hashVerificationToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
+export function hashUnsubscribeToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
 function sanitizeHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, "")

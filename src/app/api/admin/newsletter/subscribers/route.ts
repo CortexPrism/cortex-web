@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
-import { sendEmail, renderNewsletterVerificationEmail, hashVerificationToken } from "@/lib/email";
+import { sendEmail, renderNewsletterVerificationEmail, hashVerificationToken, generateUnsubscribeToken, hashUnsubscribeToken } from "@/lib/email";
 import crypto from "crypto";
 
 export async function GET(request: NextRequest) {
@@ -94,19 +94,28 @@ export async function PUT(request: NextRequest) {
     const { action, id } = ActivateSchema.parse(body);
 
     if (action === "activate_all_pending") {
-      const result = await prisma.newsletterSubscription.updateMany({
+      const pending = await prisma.newsletterSubscription.findMany({
         where: { status: "pending" },
-        data: { status: "active", subscribedAt: new Date(), verificationTokenHash: null },
+        select: { id: true, email: true },
       });
+
+      for (const sub of pending) {
+        const unsubToken = generateUnsubscribeToken(sub.email);
+        const unsubTokenHash = hashUnsubscribeToken(unsubToken);
+        await prisma.newsletterSubscription.update({
+          where: { id: sub.id },
+          data: { status: "active", subscribedAt: new Date(), verificationTokenHash: null, unsubscribeTokenHash: unsubTokenHash },
+        });
+      }
 
       await createAuditLog({
         userId: authUser.userId,
         action: "newsletter_subscribers_activated_all",
         entity: "NewsletterSubscription",
-        metadata: { count: result.count },
+        metadata: { count: pending.length },
       });
 
-      return Response.json({ activated: result.count });
+      return Response.json({ activated: pending.length });
     }
 
     if (!id) {
@@ -120,9 +129,11 @@ export async function PUT(request: NextRequest) {
     }
 
     if (action === "activate") {
+      const unsubToken = generateUnsubscribeToken(sub.email);
+      const unsubTokenHash = hashUnsubscribeToken(unsubToken);
       await prisma.newsletterSubscription.update({
         where: { id },
-        data: { status: "active", subscribedAt: new Date(), verificationTokenHash: null },
+        data: { status: "active", subscribedAt: new Date(), verificationTokenHash: null, unsubscribeTokenHash: unsubTokenHash },
       });
 
       await createAuditLog({
@@ -243,21 +254,27 @@ export async function POST(request: NextRequest) {
 
       if (existing) {
         if (existing.status === "unsubscribed") {
+          const unsubToken = generateUnsubscribeToken(entry.email);
+          const unsubTokenHash = hashUnsubscribeToken(unsubToken);
           await prisma.newsletterSubscription.update({
             where: { email: entry.email },
             data: {
               status: "active",
               unsubscribedAt: null,
+              unsubscribeTokenHash: unsubTokenHash,
               firstName: entry.firstName ?? existing.firstName,
               lastName: entry.lastName ?? existing.lastName,
             },
           });
           created++;
         } else if (existing.status !== "active") {
+          const unsubToken = generateUnsubscribeToken(entry.email);
+          const unsubTokenHash = hashUnsubscribeToken(unsubToken);
           await prisma.newsletterSubscription.update({
             where: { email: entry.email },
             data: {
               status: "active",
+              unsubscribeTokenHash: unsubTokenHash,
               firstName: entry.firstName ?? existing.firstName,
               lastName: entry.lastName ?? existing.lastName,
             },
@@ -283,10 +300,13 @@ export async function POST(request: NextRequest) {
           }
         }
       } else {
+        const unsubToken = generateUnsubscribeToken(entry.email);
+        const unsubTokenHash = hashUnsubscribeToken(unsubToken);
         await prisma.newsletterSubscription.create({
           data: {
             email: entry.email,
             status: "active",
+            unsubscribeTokenHash: unsubTokenHash,
             firstName: entry.firstName,
             lastName: entry.lastName,
           },
