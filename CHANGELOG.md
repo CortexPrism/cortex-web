@@ -2,6 +2,32 @@
 
 All notable changes to the CortexPrism website will be documented in this file.
 
+## [0.15.0] — 2026-06-24
+
+### Added
+- **Newsletter campaign scheduling** — campaigns can now be scheduled for future delivery via a date picker in the admin UI; a new `scheduled` status with blue badge; dedicated `POST / DELETE /api/admin/newsletter/campaigns/[id]/schedule` endpoint; cron processor at `GET /api/cron/newsletter` checks for due campaigns and triggers their send; `scheduledAt` field added to `NewsletterCampaign` schema
+- **Newsletter automations** — new `NewsletterAutomation` model and full CRUD admin UI for automated email sequences; supports welcome (on subscribe), re-engagement (on inactive), and custom triggers with configurable delay; cron processor sends automation emails with deduplication; `renderAutomationEmail()` added to email lib
+- **Internal tracking independence** — campaign counters (opens, clicks, bounces, unsubscribes) now increment from internal tracking pixel and click-redirect endpoints, in addition to SendGrid webhooks; `trackEmailEvent()` unifies both paths with deduplication
+- **Campaign preview enhancement** — clicking preview on any campaign now shows subject, status badge, scheduled/sent date, delivery count, and recipient filter summary above the email iframe
+- **Cron endpoint** — `GET /api/cron/newsletter` with `CRON_SECRET` Bearer auth processes both scheduled campaigns and automation sequences
+
+### Changed
+- **Send endpoint** now accepts both `draft` and `scheduled` statuses for immediate send; reset endpoint also clears `scheduledAt`
+- **Campaign create/update APIs** accept `scheduledAt` field; if future-dated, campaign is created as `scheduled`
+- **Tracking endpoints** (`email/track/open`, `email/track/click`) now look up campaign association on each event and increment campaign-level counters
+- **SendGrid webhook** refactored to use unified `trackEmailEvent()` instead of inline counter increments
+- **Admin newsletter page** — added Automations tab with full CRUD UI; scheduled status badge and action buttons (Edit, Send Now, Unschedule, Delete); scheduling date picker in campaign form
+
+### Fixed
+- **Scheduled campaign UI** — action buttons were incorrectly nested inside the status badge span; now properly placed in the actions area with the Preview button
+- **Status transition deduplication** — `updateEmailStatus()` now handles terminal statuses (`bounced`, `spam`, `unsubscribed`) and returns a boolean for callers to gate counter increments
+- **Zero-delay automations** — welcome automations with `delayMinutes: 0` now correctly match all active subscribers instead of none
+- **Cron auth bypass** — endpoint now rejects requests when `CRON_SECRET` is not configured
+- **Tracking pixel hot path** — synchronous DB lookup replaced with fire-and-forget to avoid blocking pixel/redirect responses
+- **Duplicate batch-sending engine** — extracted shared `sendCampaignToSubscribers()` in `@/lib/email.ts`; both cron and manual send paths delegate to it
+- **Automation N+1 queries** — batched `alreadySent` check into single `findMany` + Set; coalesced per-subscriber `sendCount` UPDATEs into one after the loop
+- **Missing index** — `@@index([sendgridMessageId])` added to `EmailLog` model for webhook lookup performance
+
 ## [0.14.0] — 2026-06-23
 
 ### Changed

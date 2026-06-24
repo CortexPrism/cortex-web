@@ -51,10 +51,26 @@ export async function GET(request: NextRequest) {
     ]);
 
     return Response.json({
-      posts: posts.map((p) => ({
-        ...p,
-        tags: JSON.parse(p.tags),
-      })),
+      posts: posts.map((p) => {
+        const wordCount = p.content.trim().split(/\s+/).length;
+        const readTime = Math.max(1, Math.ceil(wordCount / 200));
+        return {
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          excerpt: p.excerpt,
+          coverImage: p.coverImage,
+          tags: JSON.parse(p.tags),
+          published: p.published,
+          publishedAt: p.publishedAt,
+          viewCount: p.viewCount,
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+          authorId: p.authorId,
+          author: p.author,
+          readTime,
+        };
+      }),
       total,
       page,
       limit,

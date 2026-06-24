@@ -172,19 +172,46 @@ const ImportSchema = z.object({
 });
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+const NAME_EMAIL_RE = /^\s*(.+?)\s*<([^>]+)>\s*$/;
 
-function extractValidEmails(raw: string[]): string[] {
+interface ParsedEntry {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+function extractValidEntries(raw: string[]): ParsedEntry[] {
   const seen = new Set<string>();
-  const valid: string[] = [];
+  const valid: ParsedEntry[] = [];
   for (const entry of raw) {
-    const match = entry.match(EMAIL_RE);
-    if (match) {
-      const email = match[0].toLowerCase();
-      if (!seen.has(email)) {
-        seen.add(email);
-        valid.push(email);
+    const trimmed = entry.trim();
+    if (!trimmed) continue;
+
+    let email = "";
+    let firstName: string | undefined;
+    let lastName: string | undefined;
+
+    const neMatch = trimmed.match(NAME_EMAIL_RE);
+    if (neMatch) {
+      const namePart = neMatch[1].trim();
+      email = neMatch[2].toLowerCase();
+      const nameParts = namePart.split(/\s+/);
+      if (nameParts.length >= 2) {
+        firstName = nameParts[0];
+        lastName = nameParts.slice(1).join(" ");
+      } else if (nameParts.length === 1) {
+        firstName = nameParts[0];
+      }
+    } else {
+      const emailMatch = trimmed.match(EMAIL_RE);
+      if (emailMatch) {
+        email = emailMatch[0].toLowerCase();
       }
     }
+
+    if (!email || seen.has(email)) continue;
+    seen.add(email);
+    valid.push({ email, firstName, lastName });
   }
   return valid;
 }
@@ -199,42 +226,70 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { emails: rawEmails } = ImportSchema.parse(body);
 
-    const emails = extractValidEmails(rawEmails);
+    const entries = extractValidEntries(rawEmails);
 
-    if (emails.length === 0) {
+    if (entries.length === 0) {
       return Response.json({ error: "No valid email addresses found in the input" }, { status: 400 });
     }
 
     let created = 0;
+    let updated = 0;
     let skipped = 0;
 
-    for (const email of emails) {
+    for (const entry of entries) {
       const existing = await prisma.newsletterSubscription.findUnique({
-        where: { email },
+        where: { email: entry.email },
       });
 
       if (existing) {
         if (existing.status === "unsubscribed") {
           await prisma.newsletterSubscription.update({
-            where: { email },
+            where: { email: entry.email },
             data: {
               status: "active",
               unsubscribedAt: null,
+              firstName: entry.firstName ?? existing.firstName,
+              lastName: entry.lastName ?? existing.lastName,
             },
           });
           created++;
         } else if (existing.status !== "active") {
           await prisma.newsletterSubscription.update({
-            where: { email },
-            data: { status: "active" },
+            where: { email: entry.email },
+            data: {
+              status: "active",
+              firstName: entry.firstName ?? existing.firstName,
+              lastName: entry.lastName ?? existing.lastName,
+            },
           });
           created++;
         } else {
-          skipped++;
+          const updateData: Record<string, string | null | undefined> = {};
+          if (entry.firstName && entry.firstName !== existing.firstName) {
+            updateData.firstName = entry.firstName;
+          }
+          if (entry.lastName && entry.lastName !== existing.lastName) {
+            updateData.lastName = entry.lastName;
+          }
+
+          if (Object.keys(updateData).length > 0) {
+            await prisma.newsletterSubscription.update({
+              where: { email: entry.email },
+              data: updateData as Record<string, string>,
+            });
+            updated++;
+          } else {
+            skipped++;
+          }
         }
       } else {
         await prisma.newsletterSubscription.create({
-          data: { email, status: "active" },
+          data: {
+            email: entry.email,
+            status: "active",
+            firstName: entry.firstName,
+            lastName: entry.lastName,
+          },
         });
         created++;
       }
@@ -244,10 +299,10 @@ export async function POST(request: NextRequest) {
       userId: authUser.userId,
       action: "newsletter_subscribers_imported",
       entity: "NewsletterSubscription",
-      metadata: { count: emails.length, rawCount: rawEmails.length, created, skipped },
+      metadata: { count: entries.length, rawCount: rawEmails.length, created, updated, skipped },
     });
 
-    return Response.json({ created, skipped, total: emails.length, rawTotal: rawEmails.length });
+    return Response.json({ created, updated, skipped, total: entries.length, rawTotal: rawEmails.length });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const messages = error.errors.map(e => `${e.path.join(".")}: ${e.message}`);

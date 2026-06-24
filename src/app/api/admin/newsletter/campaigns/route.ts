@@ -3,10 +3,13 @@ import { z } from "zod";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
+import { FilterCriteriaSchema } from "@/lib/schemas/newsletter";
 
 const CampaignSchema = z.object({
   subject: z.string().min(1).max(200),
   content: z.string().min(1).max(100_000),
+  filterCriteria: FilterCriteriaSchema,
+  scheduledAt: z.string().datetime().optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -31,6 +34,7 @@ export async function GET(request: NextRequest) {
         id: true,
         subject: true,
         status: true,
+        scheduledAt: true,
         sentCount: true,
         sentAt: true,
         opens: true,
@@ -66,11 +70,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = CampaignSchema.parse(body);
 
+    const scheduledDate = data.scheduledAt ? new Date(data.scheduledAt) : null;
+    const initialStatus = scheduledDate && scheduledDate > new Date() ? "scheduled" : "draft";
+    const scheduledAt = initialStatus === "scheduled" ? scheduledDate : null;
+
     const campaign = await prisma.newsletterCampaign.create({
       data: {
         subject: data.subject,
         content: data.content,
-        status: "draft",
+        status: initialStatus,
+        scheduledAt,
+        filterCriteria: data.filterCriteria ? JSON.stringify(data.filterCriteria) : null,
       },
     });
 
@@ -79,7 +89,7 @@ export async function POST(request: NextRequest) {
       action: "newsletter_campaign_created",
       entity: "NewsletterCampaign",
       entityId: campaign.id,
-      metadata: { subject: data.subject },
+      metadata: { subject: data.subject, scheduledAt: scheduledAt?.toISOString() || null },
     });
 
     return Response.json({ campaign }, { status: 201 });

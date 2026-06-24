@@ -7,6 +7,7 @@ const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || "";
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || "noreply@cortexprism.io";
 const FROM_NAME = process.env.SENDGRID_FROM_NAME || "CortexPrism";
 const SITE_URL = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://cortexprism.io";
+export const SITE_URL_ENV = SITE_URL;
 const NEWSLETTER_UNSUBSCRIBE_SECRET = process.env.NEWSLETTER_UNSUBSCRIBE_SECRET || process.env.JWT_SECRET || "";
 
 const isConfigured = !!SENDGRID_API_KEY;
@@ -77,7 +78,7 @@ export async function updateEmailStatus(params: {
   userAgent?: string;
   clickUrl?: string;
   occurredAt?: Date;
-}): Promise<void> {
+}): Promise<boolean> {
   try {
     const where: Record<string, unknown> = {};
     if (params.messageId) {
@@ -86,7 +87,7 @@ export async function updateEmailStatus(params: {
       where.to = params.to;
       where.campaignId = params.campaignId;
     } else {
-      return;
+      return false;
     }
 
     const existing = await prisma.emailLog.findMany({
@@ -96,14 +97,19 @@ export async function updateEmailStatus(params: {
       take: 1,
     });
 
-    if (existing.length === 0) return;
+    if (existing.length === 0) return false;
 
     const record = existing[0];
-    const statusOrder = ["sent", "deferred", "delivered", "opened", "clicked"];
+    const terminalStatuses = ["bounced", "spam", "unsubscribed"];
+    const statusOrder = ["sent", "deferred", "delivered", "opened", "clicked", ...terminalStatuses];
     const currentRank = statusOrder.indexOf(record.status);
     const newRank = statusOrder.indexOf(params.status);
 
-    if (newRank <= currentRank) return;
+    const isTerminal = terminalStatuses.includes(params.status);
+    const alreadyTerminal = terminalStatuses.includes(record.status);
+
+    if (!isTerminal && !alreadyTerminal && newRank <= currentRank) return false;
+    if (alreadyTerminal) return false;
 
     const data: Record<string, unknown> = { status: params.status };
 
@@ -132,8 +138,87 @@ export async function updateEmailStatus(params: {
       where: { id: record.id },
       data: data as Prisma.EmailLogUpdateInput,
     });
+
+    return true;
   } catch (e) {
     console.error("[email] Failed to update email status:", e);
+    return false;
+  }
+}
+
+export async function trackEmailEvent(params: {
+  messageId?: string;
+  to?: string;
+  campaignId?: string;
+  eventType: string;
+  ip?: string;
+  userAgent?: string;
+  clickUrl?: string;
+}): Promise<void> {
+  const status = (() => {
+    switch (params.eventType) {
+      case "delivered": return "delivered";
+      case "open": return "opened";
+      case "click": return "clicked";
+      case "bounce":
+      case "blocked": return "bounced";
+      case "spamreport": return "spam";
+      case "unsubscribe": return "unsubscribed";
+      case "deferred": return "deferred";
+      default: return null;
+    }
+  })();
+
+  let statusApplied = false;
+
+  if (status) {
+    statusApplied = await updateEmailStatus({
+      messageId: params.messageId,
+      to: params.to,
+      campaignId: params.campaignId,
+      status,
+      ip: params.ip,
+      userAgent: params.userAgent,
+      clickUrl: params.clickUrl,
+    });
+  }
+
+  if (params.campaignId && statusApplied) {
+    const campaign = await prisma.newsletterCampaign.findUnique({
+      where: { id: params.campaignId },
+      select: { id: true },
+    });
+
+    if (campaign) {
+      switch (params.eventType) {
+        case "open":
+          await prisma.newsletterCampaign.update({
+            where: { id: params.campaignId },
+            data: { opens: { increment: 1 } },
+          });
+          break;
+        case "click":
+          await prisma.newsletterCampaign.update({
+            where: { id: params.campaignId },
+            data: { clicks: { increment: 1 } },
+          });
+          break;
+        case "unsubscribe":
+          await prisma.newsletterCampaign.update({
+            where: { id: params.campaignId },
+            data: { unsubscribes: { increment: 1 } },
+          });
+          break;
+        case "bounce":
+        case "blocked":
+        case "spamreport":
+          await prisma.newsletterCampaign.update({
+            where: { id: params.campaignId },
+            data: { bounces: { increment: 1 } },
+          });
+          break;
+      }
+    }
   }
 }
 
@@ -325,9 +410,11 @@ function wrapTemplate(title: string, bodyHtml: string, cta?: { text: string; url
                   <td style="width:40px;height:2px;line-height:2px;font-size:0;background:linear-gradient(90deg,#6366f1,transparent);">&nbsp;</td>
                 </tr>
               </table>
-              <div class="body-mobile" style="font-size:16px;line-height:1.7;color:#a1a1b0;mso-line-height-rule:exactly;">
+              <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td style="font-size:16px;line-height:1.7;color:#a1a1b0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;"><![endif]-->
+              <div class="body-mobile" style="font-size:16px;line-height:1.7;color:#a1a1b0;">
                 ${bodyHtml}
               </div>
+              <!--[if mso]></td></tr></table><![endif]-->
               ${ctaBlock}
             </td>
           </tr>
@@ -469,15 +556,64 @@ export function renderNewsletterCampaignEmail(
   subject: string,
   content: string,
   unsubscribeToken: string,
-  campaignId?: string
+  campaignId?: string,
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string
 ) {
   const cid = campaignId ? `&cid=${encodeURIComponent(campaignId)}` : "";
   const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}${cid}`;
+
+  const fn = firstName || "";
+  const ln = lastName || "";
+  const fullName = [fn, ln].filter(Boolean).join(" ") || "";
+  const em = email || "";
+
+  const personalizedContent = content
+    .replace(/\{\{firstName\}\}/g, fn)
+    .replace(/\{\{lastName\}\}/g, ln)
+    .replace(/\{\{fullName\}\}/g, fullName)
+    .replace(/\{\{name\}\}/g, fn)
+    .replace(/\{\{email\}\}/g, em);
+
   return {
     subject,
     html: wrapTemplate(
       subject,
-      sanitizeHtml(content),
+      sanitizeHtml(personalizedContent),
+      undefined,
+      `<p style="margin:8px 0 0 0;font-size:11px"><a href="${unsubscribeUrl}" style="color:#55556a;text-decoration:underline">Unsubscribe</a> from the CortexPrism newsletter</p>`
+    ),
+  };
+}
+
+export function renderAutomationEmail(
+  subject: string,
+  content: string,
+  unsubscribeToken: string,
+  firstName?: string | null,
+  lastName?: string | null,
+  email?: string
+) {
+  const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+
+  const fn = firstName || "";
+  const ln = lastName || "";
+  const fullName = [fn, ln].filter(Boolean).join(" ") || "";
+  const em = email || "";
+
+  const personalizedContent = content
+    .replace(/\{\{firstName\}\}/g, fn)
+    .replace(/\{\{lastName\}\}/g, ln)
+    .replace(/\{\{fullName\}\}/g, fullName)
+    .replace(/\{\{name\}\}/g, fn)
+    .replace(/\{\{email\}\}/g, em);
+
+  return {
+    subject,
+    html: wrapTemplate(
+      subject,
+      sanitizeHtml(personalizedContent),
       undefined,
       `<p style="margin:8px 0 0 0;font-size:11px"><a href="${unsubscribeUrl}" style="color:#55556a;text-decoration:underline">Unsubscribe</a> from the CortexPrism newsletter</p>`
     ),
@@ -485,7 +621,7 @@ export function renderNewsletterCampaignEmail(
 }
 
 export async function sendBulkEmails(
-  recipients: { email: string; unsubscribeToken: string }[],
+  recipients: { email: string; unsubscribeToken: string; firstName?: string | null; lastName?: string | null }[],
   subject: string,
   content: string,
   campaignId?: string,
@@ -495,8 +631,8 @@ export async function sendBulkEmails(
   let failed = 0;
 
   for (let i = 0; i < recipients.length; i++) {
-    const { email: to, unsubscribeToken } = recipients[i];
-    const emailHtml = renderNewsletterCampaignEmail(subject, content, unsubscribeToken, campaignId).html;
+    const { email: to, unsubscribeToken, firstName, lastName } = recipients[i];
+    const emailHtml = renderNewsletterCampaignEmail(subject, content, unsubscribeToken, campaignId, firstName, lastName, to).html;
     const customArgs: Record<string, string> = { subscriber_email: to };
     if (campaignId) customArgs.campaign_id = campaignId;
     const success = await sendEmail(to, subject, emailHtml, customArgs, {
@@ -516,4 +652,60 @@ export async function sendBulkEmails(
   }
 
   return { sent, failed };
+}
+
+export async function sendCampaignToSubscribers(
+  campaignId: string,
+  subject: string,
+  content: string,
+  subscriberWhere: Record<string, unknown>,
+  batchSize: number = 100,
+  onProgress?: (sent: number, total: number) => void,
+): Promise<{ sent: number; failed: number }> {
+  let totalSent = 0;
+  let totalFailed = 0;
+  let cursor: string | undefined;
+
+  while (true) {
+    const campaign = await prisma.newsletterCampaign.findUnique({
+      where: { id: campaignId },
+      select: { status: true },
+    });
+
+    if (!campaign || campaign.status !== "sending") {
+      console.log(`[email] Campaign ${campaignId} aborted — status: ${campaign?.status}`);
+      return { sent: totalSent, failed: totalFailed };
+    }
+
+    const batch = await prisma.newsletterSubscription.findMany({
+      where: subscriberWhere,
+      select: { id: true, email: true, firstName: true, lastName: true },
+      take: batchSize,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      orderBy: { id: "asc" },
+    });
+
+    if (batch.length === 0) break;
+
+    const recipients = batch.map((s) => ({
+      email: s.email,
+      unsubscribeToken: generateUnsubscribeToken(s.email),
+      firstName: s.firstName,
+      lastName: s.lastName,
+    }));
+
+    const { sent, failed } = await sendBulkEmails(recipients, subject, content, campaignId);
+    totalSent += sent;
+    totalFailed += failed;
+    cursor = batch[batch.length - 1].id;
+
+    await prisma.newsletterCampaign.update({
+      where: { id: campaignId },
+      data: { sentCount: totalSent, updatedAt: new Date() },
+    });
+
+    onProgress?.(totalSent + totalFailed, recipients.length);
+  }
+
+  return { sent: totalSent, failed: totalFailed };
 }

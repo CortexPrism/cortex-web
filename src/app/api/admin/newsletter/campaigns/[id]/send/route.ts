@@ -1,11 +1,55 @@
 import { NextRequest } from "next/server";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 import { prisma } from "@/lib/prisma";
-import { generateUnsubscribeToken } from "@/lib/email";
-import { sendBulkEmails } from "@/lib/email";
+import { sendCampaignToSubscribers } from "@/lib/email";
 import { createAuditLog } from "@/lib/audit";
+import { buildSubscriberWhere } from "@/lib/newsletter-filters";
 
-const BATCH_SIZE = 100;
+async function processSend(campaignId: string, subject: string, content: string, filterCriteria: string | null, adminUserId: string) {
+  try {
+    const subscriberWhere = buildSubscriberWhere(filterCriteria);
+
+    const totalCount = await prisma.newsletterSubscription.count({
+      where: subscriberWhere,
+    });
+
+    if (totalCount === 0) {
+      await prisma.newsletterCampaign.update({
+        where: { id: campaignId },
+        data: { status: "draft" },
+      });
+      console.error(`[newsletter] No matching subscribers for campaign ${campaignId}`);
+      return;
+    }
+
+    const { sent, failed } = await sendCampaignToSubscribers(campaignId, subject, content, subscriberWhere);
+
+    await prisma.newsletterCampaign.update({
+      where: { id: campaignId },
+      data: {
+        status: "sent",
+        sentAt: new Date(),
+        sentCount: sent,
+      },
+    });
+
+    await createAuditLog({
+      userId: adminUserId,
+      action: "newsletter_campaign_sent",
+      entity: "NewsletterCampaign",
+      entityId: campaignId,
+      metadata: { subject, sent, failed, total: totalCount },
+    });
+
+    console.log(`[newsletter] Campaign ${campaignId} sent: ${sent} delivered, ${failed} failed, ${totalCount} total`);
+  } catch (error) {
+    console.error(`[newsletter] Failed to send campaign ${campaignId}:`, error);
+    await prisma.newsletterCampaign.update({
+      where: { id: campaignId },
+      data: { status: "error" },
+    }).catch(() => {});
+  }
+}
 
 export async function POST(
   request: NextRequest,
@@ -25,82 +69,49 @@ export async function POST(
       return Response.json({ error: "Campaign not found" }, { status: 404 });
     }
 
-    if (campaign.status !== "draft") {
-      return Response.json({ error: "Campaign can only be sent when in draft status" }, { status: 400 });
+    if (campaign.status === "sending") {
+      return Response.json({ error: "Campaign is already being sent. If stuck, reset it first." }, { status: 400 });
+    }
+
+    if (campaign.status !== "draft" && campaign.status !== "scheduled") {
+      return Response.json({ error: "Campaign can only be sent when in draft or scheduled status" }, { status: 400 });
     }
 
     const updateResult = await prisma.newsletterCampaign.updateMany({
-      where: { id: params.id, status: "draft" },
-      data: { status: "sending" },
+      where: {
+        id: params.id,
+        OR: [
+          { status: "draft" },
+          { status: "scheduled" },
+        ],
+      },
+      data: { status: "sending", scheduledAt: null },
     });
 
     if (updateResult.count === 0) {
       return Response.json({ error: "Campaign is already being sent or was already sent" }, { status: 400 });
     }
 
-    const totalCount = await prisma.newsletterSubscription.count({
-      where: { status: "active" },
-    });
+    const subscriberWhere = buildSubscriberWhere(campaign.filterCriteria);
+    const totalCount = await prisma.newsletterSubscription.count({ where: subscriberWhere });
 
     if (totalCount === 0) {
       await prisma.newsletterCampaign.update({
         where: { id: params.id },
         data: { status: "draft" },
       });
-      return Response.json({ error: "No active subscribers" }, { status: 400 });
+      return Response.json({ error: "No subscribers match the selected criteria" }, { status: 400 });
     }
 
-    let totalSent = 0;
-    let totalFailed = 0;
-    let cursor: string | undefined;
+    processSend(campaign.id, campaign.subject, campaign.content, campaign.filterCriteria, user.userId)
+      .catch((e) => console.error("[newsletter] Background send failed:", e));
 
-    while (true) {
-      const batch = await prisma.newsletterSubscription.findMany({
-        where: { status: "active" },
-        select: { id: true, email: true },
-        take: BATCH_SIZE,
-        ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        orderBy: { id: "asc" },
-      });
-
-      if (batch.length === 0) break;
-
-      const recipients = batch.map((s) => ({
-        email: s.email,
-        unsubscribeToken: generateUnsubscribeToken(s.email),
-      }));
-
-      const { sent, failed } = await sendBulkEmails(recipients, campaign.subject, campaign.content, params.id);
-      totalSent += sent;
-      totalFailed += failed;
-      cursor = batch[batch.length - 1].id;
-    }
-
-    await prisma.newsletterCampaign.update({
-      where: { id: params.id },
-      data: {
-        status: "sent",
-        sentAt: new Date(),
-        sentCount: totalSent,
-      },
-    });
-
-    await createAuditLog({
-      userId: user.userId,
-      action: "newsletter_campaign_sent",
-      entity: "NewsletterCampaign",
-      entityId: params.id,
-      metadata: { subject: campaign.subject, sent: totalSent, failed: totalFailed, total: totalCount },
-    });
-
-    return Response.json({ success: true, sent: totalSent, failed: totalFailed, total: totalCount });
+    return Response.json(
+      { success: true, message: `Campaign send started — ${totalCount} recipients queued` },
+      { status: 202 }
+    );
   } catch (error) {
-    console.error("[newsletter] Failed to send campaign:", error);
-    await prisma.newsletterCampaign.update({
-      where: { id: params.id },
-      data: { status: "error" },
-    }).catch(() => {});
-
-    return Response.json({ error: "Failed to send campaign" }, { status: 500 });
+    console.error("[newsletter] Failed to start campaign send:", error);
+    return Response.json({ error: "Failed to start sending campaign" }, { status: 500 });
   }
 }

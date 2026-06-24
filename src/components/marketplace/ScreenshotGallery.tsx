@@ -21,6 +21,7 @@ export function ScreenshotGallery({ screenshots, showThumbnails = false }: Scree
   return (
     <div className="glass-card p-6 mb-8">
       <div className="relative rounded-lg overflow-hidden bg-[#0a0a0f]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={screenshots[current].url}
           alt={screenshots[current].alt || `Screenshot ${current + 1}`}
@@ -60,6 +61,7 @@ export function ScreenshotGallery({ screenshots, showThumbnails = false }: Scree
               onClick={() => setCurrent(i)}
               className={`shrink-0 w-16 h-10 rounded-md overflow-hidden border-2 transition-colors ${i === current ? "border-indigo-500" : "border-transparent opacity-60 hover:opacity-100"}`}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={s.url} alt={s.alt || `Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
             </button>
           ))}

@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { updateEmailStatus } from "@/lib/email";
+import { prisma } from "@/lib/prisma";
+import { trackEmailEvent } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -9,11 +10,19 @@ export async function GET(request: NextRequest) {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || undefined;
     const userAgent = request.headers.get("user-agent") || undefined;
 
-    updateEmailStatus({
-      messageId: id,
-      status: "opened",
-      ip,
-      userAgent,
+    prisma.emailLog.findFirst({
+      where: { messageId: id },
+      select: { id: true, campaignId: true, status: true },
+    }).then((log) => {
+      if (log) {
+        return trackEmailEvent({
+          messageId: id,
+          eventType: "open",
+          campaignId: log.campaignId || undefined,
+          ip,
+          userAgent,
+        });
+      }
     }).catch(() => {});
   }
 

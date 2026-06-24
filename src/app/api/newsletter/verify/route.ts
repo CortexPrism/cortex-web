@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashVerificationToken, sendEmail, renderNewsletterWelcomeEmail } from "@/lib/email";
+import { hashVerificationToken, sendEmail, renderNewsletterWelcomeEmail, SITE_URL_ENV } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -28,5 +28,5 @@ export async function GET(request: NextRequest) {
   const welcome = renderNewsletterWelcomeEmail();
   sendEmail(sub.email, welcome.subject, welcome.html, undefined, { type: "newsletter_welcome" }).catch(() => {});
 
-  return Response.redirect(new URL("/?subscribed=1", request.url));
+  return Response.redirect(new URL("/?subscribed=1", SITE_URL_ENV));
 }

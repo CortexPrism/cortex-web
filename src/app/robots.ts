@@ -59,6 +59,7 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: [
       `${SITE_URL}/sitemap.xml`,
       `${SITE_URL}/sitemap.md`,
+      `${SITE_URL}/feed.xml`,
     ],
     host: SITE_URL,
   };

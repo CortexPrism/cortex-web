@@ -30,8 +30,8 @@ export async function POST(
       return Response.json({ error: "Campaign not found" }, { status: 404 });
     }
 
-    if (campaign.status !== "draft") {
-      return Response.json({ error: "Test sends are only available for draft campaigns" }, { status: 400 });
+    if (campaign.status !== "draft" && campaign.status !== "scheduled") {
+      return Response.json({ error: "Test sends are only available for draft or scheduled campaigns" }, { status: 400 });
     }
 
     const token = generateUnsubscribeToken(testEmail);

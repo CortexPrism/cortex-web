@@ -16,8 +16,11 @@ import {
 } from "@/lib/seo";
 import { MdxContent } from "@/components/docs/MdxContent";
 import { BlogViewTracker } from "@/components/blog/BlogViewTracker";
+import { ReadingProgress } from "@/components/blog/ReadingProgress";
+import { TableOfContents } from "@/components/blog/TableOfContents";
+import { BlogCard } from "@/components/blog/BlogCard";
 import { formatNumber } from "@/lib/utils";
-import { ArrowLeft, Calendar, User, Clock, Eye } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, User, Clock, Eye } from "lucide-react";
 
 interface Props {
   params: { slug: string };
@@ -100,6 +103,61 @@ export default async function BlogDetailPage({ params }: Props) {
 
   if (!post) notFound();
 
+  const [prevPost, nextPost, relatedPosts] = await Promise.all([
+    prisma.blogPost.findFirst({
+      where: { published: true, publishedAt: { lt: post.publishedAt ?? post.createdAt } },
+      orderBy: { publishedAt: "desc" },
+      select: { title: true, slug: true },
+    }),
+    prisma.blogPost.findFirst({
+      where: { published: true, publishedAt: { gt: post.publishedAt ?? post.createdAt } },
+      orderBy: { publishedAt: "asc" },
+      select: { title: true, slug: true },
+    }),
+    (async () => {
+      const parsedTags: string[] = JSON.parse(post.tags);
+      if (parsedTags.length === 0) return [];
+      const tagFilter = parsedTags[0];
+      const raw = await prisma.blogPost.findMany({
+        where: {
+          published: true,
+          id: { not: post.id },
+          tags: { contains: tagFilter },
+        },
+        orderBy: { publishedAt: "desc" },
+        take: 3,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          coverImage: true,
+          tags: true,
+          publishedAt: true,
+          content: true,
+          viewCount: true,
+          author: { select: { username: true, avatar: true, displayName: true } },
+        },
+      });
+      return raw.map((rp) => {
+        const wordCount = rp.content.trim().split(/\s+/).length;
+        const readTime = Math.max(1, Math.ceil(wordCount / 200));
+        return {
+          id: rp.id,
+          title: rp.title,
+          slug: rp.slug,
+          excerpt: rp.excerpt,
+          coverImage: rp.coverImage,
+          tags: JSON.parse(rp.tags),
+          publishedAt: rp.publishedAt?.toISOString() ?? null,
+          viewCount: rp.viewCount,
+          readTime,
+          author: rp.author,
+        };
+      });
+    })(),
+  ]);
+
   const tags: string[] = JSON.parse(post.tags);
   const authorName = post.author?.displayName || post.author?.username || "CortexPrism";
   const readTime = estimateReadTime(post.content);
@@ -125,6 +183,7 @@ export default async function BlogDetailPage({ params }: Props) {
     <>
       <StructuredData data={breadcrumbSchema} />
       <StructuredData data={articleSchema} />
+      <ReadingProgress />
 
       <article className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16 py-12">
         <BlogViewTracker slug={post.slug} />
@@ -146,7 +205,7 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         )}
 
-        <header className="max-w-page-content mx-auto mb-8">
+        <header className="mb-8">
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               {tags.map((tag: string) => (
@@ -198,13 +257,20 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         </header>
 
-        <div className="max-w-page-content mx-auto">
-          <MdxContent content={post.content} />
+        <div className="flex gap-12">
+          <div className="flex-1 min-w-0">
+            <MdxContent content={post.content} />
+          </div>
+          <aside className="hidden xl:block w-56 flex-shrink-0">
+            <div className="sticky top-24">
+              <TableOfContents content={post.content} />
+            </div>
+          </aside>
         </div>
 
-        <div className="max-w-page-content mx-auto mt-12 pt-8 border-t border-[rgba(255,255,255,0.07)]">
+        <div className="mt-12 pt-8 border-t border-[rgba(255,255,255,0.07)] max-w-page-content mx-auto">
           {post.author && (
-            <div className="flex items-center gap-4 p-5 rounded-xl bg-[#111118] border border-[rgba(255,255,255,0.07)]">
+            <div className="flex items-center gap-4 p-5 rounded-xl bg-[#111118] border border-[rgba(255,255,255,0.07)] mb-8">
               {post.author.avatar ? (
                 <img
                   src={post.author.avatar}
@@ -223,6 +289,50 @@ export default async function BlogDetailPage({ params }: Props) {
                 )}
               </div>
             </div>
+          )}
+
+          {(prevPost || nextPost) && (
+            <nav className="flex flex-col sm:flex-row gap-4 mb-12" aria-label="Previous and next posts">
+              {prevPost && (
+                <Link
+                  href={`/blog/${prevPost.slug}`}
+                  className="flex-1 group p-4 rounded-xl border border-[rgba(255,255,255,0.07)] hover:border-indigo-500/20 hover:bg-[#111118] transition-all"
+                >
+                  <span className="flex items-center gap-1.5 text-xs text-[#55556a] mb-1">
+                    <ArrowLeft className="w-3 h-3" />
+                    Previous post
+                  </span>
+                  <span className="text-sm font-medium text-[#e2e2ea] group-hover:text-indigo-400 transition-colors line-clamp-1">
+                    {prevPost.title}
+                  </span>
+                </Link>
+              )}
+              {nextPost && (
+                <Link
+                  href={`/blog/${nextPost.slug}`}
+                  className="flex-1 group p-4 rounded-xl border border-[rgba(255,255,255,0.07)] hover:border-indigo-500/20 hover:bg-[#111118] transition-all text-right"
+                >
+                  <span className="flex items-center justify-end gap-1.5 text-xs text-[#55556a] mb-1">
+                    Next post
+                    <ArrowRight className="w-3 h-3" />
+                  </span>
+                  <span className="text-sm font-medium text-[#e2e2ea] group-hover:text-indigo-400 transition-colors line-clamp-1">
+                    {nextPost.title}
+                  </span>
+                </Link>
+              )}
+            </nav>
+          )}
+
+          {relatedPosts.length > 0 && (
+            <section aria-label="Related posts">
+              <h2 className="text-xl font-bold text-[#e2e2ea] mb-5">Related posts</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {relatedPosts.map((rp) => (
+                  <BlogCard key={rp.id} post={rp} />
+                ))}
+              </div>
+            </section>
           )}
         </div>
       </article>

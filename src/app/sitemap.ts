@@ -130,5 +130,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  const blogPosts = await prisma.blogPost.findMany({
+    where: { published: true },
+    select: { slug: true, updatedAt: true },
+  });
+  for (const blogPost of blogPosts) {
+    for (const locale of routing.locales) {
+      entries.push({
+        url: localeUrl(`/blog/${blogPost.slug}`, locale),
+        lastModified: blogPost.updatedAt,
+        changeFrequency: "weekly",
+        priority: 0.65,
+      });
+    }
+  }
+
+  for (const locale of routing.locales) {
+    entries.push({
+      url: localeUrl("/blog", locale),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.85,
+    });
+  }
+
   return entries;
 }

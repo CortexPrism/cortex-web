@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { generateUnsubscribeToken } from "@/lib/email";
+import { generateUnsubscribeToken, SITE_URL_ENV } from "@/lib/email";
 
 const UnsubscribeSchema = z.object({
   token: z.string().optional(),
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         }).catch(() => {});
       }
 
-      return Response.redirect(new URL("/?unsubscribed=1", request.url));
+      return Response.redirect(new URL("/?unsubscribed=1", SITE_URL_ENV));
     }
   }
 

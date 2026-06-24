@@ -21,7 +21,12 @@ export const metadata: Metadata = {
     "agent operating system tutorials",
     "AI agent deep-dives",
   ],
-  alternates: generateAlternates("/blog"),
+  alternates: {
+    ...generateAlternates("/blog"),
+    types: {
+      "application/rss+xml": `${SITE_URL}/feed.xml`,
+    },
+  },
   openGraph: {
     ...base.openGraph,
     title: "CortexPrism Blog — Agent Operating System Insights & AI Tutorials",

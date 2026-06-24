@@ -19,13 +19,15 @@ export async function GET(request: NextRequest) {
 
     const subscribers = await prisma.newsletterSubscription.findMany({
       where,
-      select: { email: true, status: true, subscribedAt: true, createdAt: true },
+      select: { email: true, firstName: true, lastName: true, status: true, subscribedAt: true, createdAt: true },
       orderBy: { createdAt: "desc" },
     });
 
-    const header = "email,status,subscribed_at,created_at";
+    const header = "first_name,last_name,email,status,subscribed_at,created_at";
     const rows = subscribers.map((s) =>
       [
+        s.firstName ? `"${s.firstName.replace(/"/g, '""')}"` : "",
+        s.lastName ? `"${s.lastName.replace(/"/g, '""')}"` : "",
         `"${s.email.replace(/"/g, '""')}"`,
         s.status,
         s.subscribedAt?.toISOString() || "",

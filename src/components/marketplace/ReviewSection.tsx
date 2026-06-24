@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { StarRating } from "@/components/shared/StarRating";
 import { formatDate } from "@/lib/utils";
@@ -43,7 +43,7 @@ export function ReviewSection({ itemId, type }: ReviewSectionProps) {
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchRatings = async () => {
+  const fetchRatings = useCallback(async () => {
     try {
       const res = await fetch(`/api/marketplace/${type}s/${itemId}/reviews`);
       const data = await res.json();
@@ -51,11 +51,11 @@ export function ReviewSection({ itemId, type }: ReviewSectionProps) {
       setAverageRating(data.averageRating);
       setTotalRatings(data.totalRatings);
     } catch {}
-  };
+  }, [itemId, type]);
 
   useEffect(() => {
     fetchRatings();
-  }, [itemId, type]);
+  }, [fetchRatings]);
 
   const handleSubmit = async () => {
     if (userRating === 0) return;

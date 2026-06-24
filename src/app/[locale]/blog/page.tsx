@@ -16,6 +16,8 @@ interface BlogPost {
   coverImage: string | null;
   tags: string[];
   publishedAt: string | null;
+  readTime?: number;
+  viewCount?: number;
   author: { username: string; avatar: string | null; displayName: string | null } | null;
 }
 

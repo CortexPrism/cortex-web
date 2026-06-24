@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { Eye, Users, TrendingUp, Globe, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Users, TrendingUp, Globe, ChevronLeft, ChevronRight, AlertTriangle, RefreshCw } from "lucide-react";
 
 interface Overview {
   totalSessions: number;
@@ -46,11 +46,16 @@ interface HistoryEntry {
 
 const COLORS = ["#6366f1", "#8b5cf6", "#a855f7", "#d946ef", "#ec4899", "#f43f5e", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#06b6d4", "#3b82f6"];
 
-function apiFetch(path: string) {
+async function apiFetch(path: string) {
   const token = localStorage.getItem("token");
-  return fetch(path, {
+  const res = await fetch(path, {
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-  }).then((r) => r.json());
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Request failed with status ${res.status}`);
+  }
+  return res.json();
 }
 
 export default function AdminAnalyticsPage() {
@@ -64,26 +69,33 @@ export default function AdminAnalyticsPage() {
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotal, setHistoryTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [ov, tv, tp, rf, gd, hs] = await Promise.all([
-      apiFetch("/api/admin/analytics/overview"),
-      apiFetch(`/api/admin/analytics/pageviews?range=${range}`),
-      apiFetch(`/api/admin/analytics/pages?range=${range}&limit=10`),
-      apiFetch(`/api/admin/analytics/referrers?range=${range}&limit=10`),
-      apiFetch(`/api/admin/analytics/geo?range=${range}&limit=10`),
-      apiFetch("/api/admin/analytics/history?page=1&limit=20"),
-    ]);
-    setOverview(ov);
-    setTrends(tv.data || []);
-    setTopPages(tp.data || []);
-    setReferrers(rf.data || []);
-    setGeo(gd.data || []);
-    setHistory(hs.data || []);
-    setHistoryTotal(hs.pagination?.total || 0);
-    setHistoryPage(1);
-    setLoading(false);
+    setError(null);
+    try {
+      const [ov, tv, tp, rf, gd, hs] = await Promise.all([
+        apiFetch("/api/admin/analytics/overview"),
+        apiFetch(`/api/admin/analytics/pageviews?range=${range}`),
+        apiFetch(`/api/admin/analytics/pages?range=${range}&limit=10`),
+        apiFetch(`/api/admin/analytics/referrers?range=${range}&limit=10`),
+        apiFetch(`/api/admin/analytics/geo?range=${range}&limit=10`),
+        apiFetch("/api/admin/analytics/history?page=1&limit=20"),
+      ]);
+      setOverview(ov);
+      setTrends(tv.data || []);
+      setTopPages(tp.data || []);
+      setReferrers(rf.data || []);
+      setGeo(gd.data || []);
+      setHistory(hs.data || []);
+      setHistoryTotal(hs.pagination?.total || 0);
+      setHistoryPage(1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load analytics data");
+    } finally {
+      setLoading(false);
+    }
   }, [range]);
 
   useEffect(() => {
@@ -91,9 +103,13 @@ export default function AdminAnalyticsPage() {
   }, [fetchData]);
 
   const fetchHistory = async (page: number) => {
-    const hs = await apiFetch(`/api/admin/analytics/history?page=${page}&limit=20`);
-    setHistory(hs.data || []);
-    setHistoryPage(page);
+    try {
+      const hs = await apiFetch(`/api/admin/analytics/history?page=${page}&limit=20`);
+      setHistory(hs.data || []);
+      setHistoryPage(page);
+    } catch {
+      // silently fail for pagination
+    }
   };
 
   if (loading) {
@@ -104,11 +120,30 @@ export default function AdminAnalyticsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="glass-card bg-[#0a0a0f] border border-red-500/30 rounded-xl p-6 text-center">
+          <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-1">Failed to Load Analytics</h2>
+          <p className="text-sm text-[#9090a8] mb-4">{error}</p>
+          <button
+            onClick={() => fetchData()}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors text-sm"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const statCards = [
-    { label: "Page Views (Today)", value: overview?.today.pageViews ?? 0, icon: Eye, color: "indigo" },
-    { label: "Visitors (Today)", value: overview?.today.sessions ?? 0, icon: Users, color: "purple" },
-    { label: `Page Views (${range})`, value: range === "7d" ? overview?.week.pageViews ?? 0 : overview?.month.pageViews ?? 0, icon: TrendingUp, color: "green" },
-    { label: `Unique Visitors (${range})`, value: range === "7d" ? overview?.week.sessions ?? 0 : overview?.month.sessions ?? 0, icon: Globe, color: "blue" },
+    { label: "Page Views (Today)", value: overview?.today?.pageViews ?? 0, icon: Eye, color: "indigo" },
+    { label: "Visitors (Today)", value: overview?.today?.sessions ?? 0, icon: Users, color: "purple" },
+    { label: `Page Views (${range})`, value: range === "7d" ? overview?.week?.pageViews ?? 0 : overview?.month?.pageViews ?? 0, icon: TrendingUp, color: "green" },
+    { label: `Unique Visitors (${range})`, value: range === "7d" ? overview?.week?.sessions ?? 0 : overview?.month?.sessions ?? 0, icon: Globe, color: "blue" },
   ];
 
   const statColors: Record<string, string> = {

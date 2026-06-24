@@ -10,16 +10,34 @@ export async function RecentBlogPosts() {
     where: { published: true },
     orderBy: { publishedAt: "desc" },
     take: 3,
-    include: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      excerpt: true,
+      coverImage: true,
+      tags: true,
+      publishedAt: true,
+      content: true,
       author: { select: { username: true, avatar: true, displayName: true } },
     },
   });
 
-  const posts = rawPosts.map((p) => ({
-    ...p,
-    tags: JSON.parse(p.tags) as string[],
-    publishedAt: p.publishedAt?.toISOString() ?? null,
-  }));
+  const posts = rawPosts.map((p) => {
+    const wordCount = p.content.trim().split(/\s+/).length;
+    const readTime = Math.max(1, Math.ceil(wordCount / 200));
+    return {
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.excerpt,
+      coverImage: p.coverImage,
+      tags: JSON.parse(p.tags) as string[],
+      publishedAt: p.publishedAt?.toISOString() ?? null,
+      readTime,
+      author: p.author,
+    };
+  });
 
   if (posts.length === 0) return null;
 

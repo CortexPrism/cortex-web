@@ -10,7 +10,7 @@ import PlaceholderExtension from "@tiptap/extension-placeholder";
 import { useCallback, useState } from "react";
 import {
   Bold, Italic, Underline, Strikethrough, List, ListOrdered,
-  Link, Image, AlignLeft, AlignCenter, AlignRight,
+  Link, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight,
   Quote, Code, Undo2, Redo2, Heading1, Heading2, Heading3,
   Minus, Eye, Code2, Pilcrow,
 } from "lucide-react";
@@ -250,7 +250,7 @@ export function RichTextEditor({
             <Link className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton onClick={addImage} title="Insert image">
-            <Image className="w-4 h-4" />
+            <ImageIcon className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton
             onClick={() => editor.chain().focus().setHorizontalRule().run()}

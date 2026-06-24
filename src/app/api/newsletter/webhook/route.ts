@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { updateEmailStatus } from "@/lib/email";
+import { trackEmailEvent } from "@/lib/email";
 
 function parseCampaignId(event: Record<string, unknown>): string | undefined {
   if (typeof event.campaign_id === "string") return event.campaign_id;
@@ -21,21 +21,6 @@ function parseSendgridMessageId(event: Record<string, unknown>): string | undefi
   return undefined;
 }
 
-function mapEventToStatus(eventType: string): string | null {
-  switch (eventType) {
-    case "processed": return "sent";
-    case "delivered": return "delivered";
-    case "open": return "opened";
-    case "click": return "clicked";
-    case "bounce":
-    case "blocked": return "bounced";
-    case "spamreport": return "spam";
-    case "unsubscribe": return "unsubscribed";
-    case "deferred": return "deferred";
-    default: return null;
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     const events = await request.json();
@@ -46,116 +31,46 @@ export async function POST(request: NextRequest) {
       const campaignId = parseCampaignId(event);
       const email = typeof event.email === "string" ? event.email.toLowerCase().trim() : null;
       const sgMessageId = parseSendgridMessageId(event);
-      const status = mapEventToStatus(eventType);
+      const ip = typeof event.ip === "string" ? event.ip : undefined;
+      const userAgent = typeof event.useragent === "string" ? event.useragent : undefined;
+      const url = typeof event.url === "string" ? event.url : undefined;
 
-      if (campaignId) {
-        const campaign = await prisma.newsletterCampaign.findUnique({
-          where: { id: campaignId },
-          select: { id: true },
-        });
-
-        if (campaign) {
-          switch (eventType) {
-            case "open":
-              await prisma.newsletterCampaign.update({
-                where: { id: campaignId },
-                data: { opens: { increment: 1 } },
-              });
-              break;
-
-            case "click":
-              await prisma.newsletterCampaign.update({
-                where: { id: campaignId },
-                data: { clicks: { increment: 1 } },
-              });
-              break;
-
-            case "unsubscribe":
-              await prisma.newsletterCampaign.update({
-                where: { id: campaignId },
-                data: { unsubscribes: { increment: 1 } },
-              });
-              break;
-
-            case "bounce":
-            case "blocked":
-              await prisma.newsletterCampaign.update({
-                where: { id: campaignId },
-                data: { bounces: { increment: 1 } },
-              });
-              break;
-
-            case "spamreport":
-              await prisma.newsletterCampaign.update({
-                where: { id: campaignId },
-                data: { bounces: { increment: 1 } },
-              });
-              break;
-
-            case "deferred":
-            case "dropped":
-              break;
-
-            case "delivered":
-              break;
-
-            case "processed":
-              break;
-
-            default:
-              break;
-          }
-        }
-      }
-
-      if ((eventType === "unsubscribe" || eventType === "spamreport" || eventType === "bounce") && email) {
-        await prisma.newsletterSubscription.updateMany({
-          where: { email },
-          data: {
-            status: "unsubscribed",
-            unsubscribedAt: new Date(),
-          },
-        });
-      }
-
-      if (eventType === "bounce" && email) {
-        await prisma.newsletterSubscription.updateMany({
-          where: { email },
-          data: { status: "unsubscribed", unsubscribedAt: new Date() },
-        });
-      }
-
-      if (status || sgMessageId) {
-        const ip = typeof event.ip === "string" ? event.ip : undefined;
-        const userAgent = typeof event.useragent === "string" ? event.useragent : undefined;
-        const url = typeof event.url === "string" ? event.url : undefined;
-
-        if (sgMessageId) {
-          const logBySg = await prisma.emailLog.findFirst({
-            where: { sendgridMessageId: sgMessageId },
-            select: { id: true, messageId: true, status: true },
+      if (eventType === "unsubscribe" || eventType === "spamreport" || eventType === "bounce" || eventType === "blocked") {
+        if (email) {
+          await prisma.newsletterSubscription.updateMany({
+            where: { email },
+            data: {
+              status: "unsubscribed",
+              unsubscribedAt: new Date(),
+            },
           });
-          if (logBySg && status) {
-            await updateEmailStatus({
-              messageId: logBySg.messageId || undefined,
-              status,
-              ip,
-              userAgent,
-              clickUrl: url,
-            });
-          }
         }
+      }
 
-        if (email && campaignId && status) {
-          await updateEmailStatus({
-            to: email,
+      if (sgMessageId) {
+        const logBySg = await prisma.emailLog.findFirst({
+          where: { sendgridMessageId: sgMessageId },
+          select: { id: true, messageId: true },
+        });
+        if (logBySg) {
+          await trackEmailEvent({
+            messageId: logBySg.messageId || undefined,
+            eventType,
             campaignId,
-            status,
             ip,
             userAgent,
             clickUrl: url,
           });
         }
+      } else if (email && campaignId) {
+        await trackEmailEvent({
+          to: email,
+          campaignId,
+          eventType,
+          ip,
+          userAgent,
+          clickUrl: url,
+        });
       }
     }
 
