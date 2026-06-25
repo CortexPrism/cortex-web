@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const plugin = await prisma.plugin.findFirst({
     where: { OR: [{ id: params.id }, { slug: params.id }], status: "approved" },
   });

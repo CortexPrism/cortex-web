@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 import { syncGitHubRepo } from "@/lib/github-import";
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!requireAdmin(user)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });

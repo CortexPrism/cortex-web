@@ -4,8 +4,9 @@ import { deleteKbArticleComment } from "@/lib/knowledge-base";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string; commentId: string } }
+  { params: pp }: { params: Promise<{ slug: string; commentId: string }> }
 ) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!requireAdmin(user) && user?.userId) {
     return NextResponse.json({ error: "Admin access required" }, { status: 403 });

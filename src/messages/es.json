@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "Registro de cambios",
-    "subtitle": "Historial de versiones de cortex-web y cortex",
+    "subtitle": "Historial de versiones del motor Cortex",
     "recentCommits": "Commits recientes",
-    "website": "Sitio web",
     "cortexEngine": "Motor Cortex",
     "noChangelog": "No hay registro de cambios disponible.",
-    "couldNotFetch": "No se pudo obtener el registro de cambios de cortex desde GitHub.",
     "fullHistory": "Historial completo de commits"
   },
   "marketplaceList": {

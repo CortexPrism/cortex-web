@@ -8,7 +8,7 @@ import { StructuredData } from "@/components/seo/StructuredData";
 import { generateBreadcrumbSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
-  params: { slug?: string[] };
+  params: Promise<{ slug?: string[] }>;
 }
 
 export async function generateStaticParams() {
@@ -16,7 +16,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const slug = params.slug?.[0] || "index";
+  const { slug: slugArr } = await params;
+  const slug = slugArr?.[0] || "index";
   const { content, frontmatter } = getContentBySlug("getting-started", slug);
   const extractedTitle = extractH1FromMdx(content) || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const rawTitle = (frontmatter.title as string) || extractedTitle || "Getting Started";
@@ -40,7 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function GettingStartedPage({ params }: Props) {
-  const slug = params.slug?.[0] || "index";
+  const { slug: slugArr } = await params;
+  const slug = slugArr?.[0] || "index";
   let content: string;
   try {
     const result = getContentBySlug("getting-started", slug);

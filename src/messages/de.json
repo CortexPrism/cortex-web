@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "Änderungsprotokoll",
-    "subtitle": "Versionshistorie von cortex-web und cortex",
+    "subtitle": "Versionshistorie der Cortex Engine",
     "recentCommits": "Aktuelle Commits",
-    "website": "Website",
     "cortexEngine": "Cortex Engine",
     "noChangelog": "Kein Änderungsprotokoll verfügbar.",
-    "couldNotFetch": "Cortex-Änderungsprotokoll konnte nicht von GitHub abgerufen werden.",
     "fullHistory": "Vollständige Commit-Historie"
   },
   "marketplaceList": {

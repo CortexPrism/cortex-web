@@ -9,13 +9,14 @@ import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, generateAl
 import { safeJsonParse } from "@/lib/utils";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
   const t = await getTranslations("marketplaceList");
   const agent = await prisma.agentConfig.findFirst({
-    where: { status: "approved", OR: [{ id: params.id }, { slug: params.id }] },
+    where: { status: "approved", OR: [{ id }, { slug: id }] },
   });
   if (!agent) return { title: t("agentNotFound") };
   const desc = agent.description?.length
@@ -58,9 +59,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AgentDetailPage({ params }: Props) {
+  const { id } = await params;
   const t = await getTranslations("marketplaceList");
   const agent = await prisma.agentConfig.findFirst({
-    where: { status: "approved", OR: [{ id: params.id }, { slug: params.id }] },
+    where: { status: "approved", OR: [{ id }, { slug: id }] },
     include: { category: true, screenshots: { orderBy: { order: "asc" } }, versions: { orderBy: { createdAt: "desc" }, take: 10 } },
   });
 

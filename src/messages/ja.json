@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "変更履歴",
-    "subtitle": "cortex-web と cortex のリリース履歴",
+    "subtitle": "Cortex エンジンのリリース履歴",
     "recentCommits": "最近のコミット",
-    "website": "Webサイト",
     "cortexEngine": "Cortex エンジン",
     "noChangelog": "変更履歴はありません。",
-    "couldNotFetch": "GitHubからcortexの変更履歴を取得できませんでした。",
     "fullHistory": "完全なコミット履歴"
   },
   "marketplaceList": {

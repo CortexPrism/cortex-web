@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "Changelog",
-    "subtitle": "Release history from cortex-web and cortex",
+    "subtitle": "Release history from the Cortex engine",
     "recentCommits": "Recent Commits",
-    "website": "Website",
     "cortexEngine": "Cortex Engine",
     "noChangelog": "No changelog available.",
-    "couldNotFetch": "Could not fetch cortex changelog from GitHub.",
     "fullHistory": "Full commit history"
   },
   "marketplaceList": {

@@ -9,8 +9,9 @@ const commentSchema = z.object({
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params: pp }: { params: Promise<{ slug: string }> }
 ) {
+  const params = await pp;
   try {
     const comments = await getKbArticleComments(params.slug);
     return NextResponse.json(comments);
@@ -21,8 +22,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params: pp }: { params: Promise<{ slug: string }> }
 ) {
+  const params = await pp;
   const user = getAuthUser(request);
   const body = await request.json();
   const parsed = commentSchema.safeParse(body);

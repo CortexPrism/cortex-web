@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "سجل التغييرات",
-    "subtitle": "سجل الإصدارات من cortex-web و cortex",
+    "subtitle": "سجل الإصدارات من محرك Cortex",
     "recentCommits": "آخر التعديلات",
-    "website": "الموقع الإلكتروني",
     "cortexEngine": "محرك Cortex",
     "noChangelog": "لا يوجد سجل تغييرات متاح.",
-    "couldNotFetch": "تعذر جلب سجل تغييرات cortex من GitHub.",
     "fullHistory": "سجل التعديلات الكامل"
   },
   "marketplaceList": {

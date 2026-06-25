@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const authUser = getAuthUser(request);
   if (!requireAdmin(authUser)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });
@@ -27,7 +28,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   return Response.json({ user });
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const authUser = getAuthUser(request);
   if (!requireAdmin(authUser)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });

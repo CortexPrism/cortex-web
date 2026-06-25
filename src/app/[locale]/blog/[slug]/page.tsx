@@ -23,7 +23,7 @@ import { formatNumber } from "@/lib/utils";
 import { ArrowLeft, ArrowRight, Calendar, User, Clock, Eye } from "lucide-react";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 const accentColors = ["indigo", "purple", "green", "yellow", "red"] as const;
@@ -40,9 +40,10 @@ function estimateReadTime(content: string): number {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const t = await getTranslations("blogDetail");
   const post = await prisma.blogPost.findFirst({
-    where: { slug: params.slug, published: true },
+    where: { slug, published: true },
     select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, createdAt: true, updatedAt: true },
   });
 
@@ -92,10 +93,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogDetailPage({ params }: Props) {
+  const { slug } = await params;
   const t = await getTranslations("blogDetail");
   const tc = await getTranslations("components");
   const post = await prisma.blogPost.findFirst({
-    where: { slug: params.slug, published: true },
+    where: { slug, published: true },
     include: {
       author: { select: { username: true, avatar: true, displayName: true, bio: true } },
     },

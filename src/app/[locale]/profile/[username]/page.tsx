@@ -11,13 +11,14 @@ import { DownloadCount } from "@/components/shared/DownloadCount";
 import { MapPin, Globe, Package, Bot, Download, Calendar, ExternalLink } from "lucide-react";
 
 interface Props {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username } = await params;
   const t = await getTranslations("profilePage");
   const user = await prisma.user.findUnique({
-    where: { username: params.username },
+    where: { username },
   });
   if (!user) return { title: t("notFound") };
 
@@ -43,9 +44,10 @@ function formatSocialLinks(links: string | null): Record<string, string> {
 }
 
 export default async function ProfilePage({ params }: Props) {
+  const { username } = await params;
   const t = await getTranslations("profilePage");
   const user = await prisma.user.findUnique({
-    where: { username: params.username },
+    where: { username },
     include: {
       plugins: {
         where: { status: "approved" },
@@ -94,7 +96,7 @@ export default async function ProfilePage({ params }: Props) {
                 <h1 className="text-2xl sm:text-3xl font-bold text-[#e2e2ea]">{displayName}</h1>
                 <p className="text-[#9090a8]">@{user.username}{user.role === "admin" && <Badge variant="indigo" className="ml-2">{t("admin")}</Badge>}</p>
               </div>
-              <ProfileActions username={params.username} />
+              <ProfileActions username={username} />
             </div>
 
             {user.bio && <p className="text-[#e2e2ea] mt-3">{user.bio}</p>}

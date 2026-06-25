@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "Журнал изменений",
-    "subtitle": "История релизов cortex-web и cortex",
+    "subtitle": "История релизов Cortex Engine",
     "recentCommits": "Последние коммиты",
-    "website": "Веб-сайт",
     "cortexEngine": "Cortex Engine",
     "noChangelog": "Журнал изменений недоступен.",
-    "couldNotFetch": "Не удалось получить журнал изменений cortex с GitHub.",
     "fullHistory": "Полная история коммитов"
   },
   "marketplaceList": {

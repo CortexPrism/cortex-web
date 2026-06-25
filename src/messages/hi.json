@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "बदलाव लॉग",
-    "subtitle": "cortex-web और cortex से रिलीज़ इतिहास",
+    "subtitle": "Cortex इंजन से रिलीज़ इतिहास",
     "recentCommits": "हाल के कमिट",
-    "website": "वेबसाइट",
     "cortexEngine": "Cortex इंजन",
     "noChangelog": "कोई बदलाव लॉग उपलब्ध नहीं।",
-    "couldNotFetch": "GitHub से cortex बदलाव लॉग प्राप्त नहीं कर सका।",
     "fullHistory": "पूर्ण कमिट इतिहास"
   },
   "marketplaceList": {

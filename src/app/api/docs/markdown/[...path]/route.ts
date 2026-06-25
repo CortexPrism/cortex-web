@@ -24,8 +24,9 @@ function slugToTitle(slug: string): string {
 
 export async function GET(
   _request: Request,
-  { params }: { params: Params }
+  { params: pp }: { params: Promise<Params> }
 ) {
+  const params = await pp;
   const [section, ...slugParts] = params.path;
   if (!section) {
     return new Response("Missing section parameter", { status: 400 });

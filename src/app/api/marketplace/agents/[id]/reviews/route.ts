@@ -8,7 +8,8 @@ const ReviewSchema = z.object({
   review: z.string().max(1000).optional(),
 });
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const agent = await prisma.agentConfig.findFirst({
     where: { OR: [{ id: params.id }, { slug: params.id }] },
   });
@@ -42,7 +43,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   });
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!user) {
     return Response.json({ error: "Authentication required" }, { status: 401 });

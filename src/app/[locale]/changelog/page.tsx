@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import {
-  GitBranch, GitCommit, GitPullRequestArrow, ExternalLink, FileText,
-  ArrowRight, CalendarDays, Clock, GitFork, Github,
+  GitBranch, GitCommit, GitPullRequestArrow, ExternalLink,
+  ArrowRight, CalendarDays, Clock, Github,
 } from "lucide-react";
 import { MdxContent } from "@/components/docs/MdxContent";
 import { SITE_URL, generateAlternates } from "@/lib/seo";
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
   description:
-    "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history. Stay up to date with the latest features and fixes in the open-source Agent Operating System.",
+    "Track CortexPrism releases, recent commits from the cortex engine, and full changelog history. Stay up to date with the latest features and fixes in the open-source Agent Operating System.",
   alternates: generateAlternates("/changelog"),
   keywords: [
     "CortexPrism changelog",
@@ -24,19 +24,18 @@ export const metadata: Metadata = {
     "CortexPrism release notes",
     "AI agent operating system commits",
     "cortex engine commits",
-    "cortex-web changelog",
     "what's new CortexPrism",
   ],
   openGraph: {
     title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
     description:
-      "Recent commits from cortex engine and cortex-web repositories. Track changes, new features, bug fixes, and improvements in the open-source Agent Operating System.",
+      "Recent commits from the cortex engine repository. Track changes, new features, bug fixes, and improvements in the open-source Agent Operating System.",
     url: `${SITE_URL}/changelog`,
   },
   twitter: {
     title: "CortexPrism Changelog — Agent Operating System Release History & Commits",
     description:
-      "Track CortexPrism releases, recent commits from the cortex engine and cortex-web, and full changelog history.",
+      "Track CortexPrism releases, recent commits from the cortex engine, and full changelog history.",
   },
 };
 
@@ -70,7 +69,7 @@ function timeAgo(isoString: string): string {
   return `${Math.floor(days / 365)}y ago`;
 }
 
-async function getRecentCommits(owner: string, repo: string, limit = 10): Promise<Commit[]> {
+async function getRecentCommits(owner: string, repo: string, limit = 20): Promise<Commit[]> {
   try {
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${limit}`,
@@ -109,20 +108,14 @@ async function getChangelogMD(repo: string): Promise<string | null> {
 }
 
 export default async function ChangelogPage() {
-  const [websiteCommits, cortexCommits, websiteChangelog, cortexChangelog] = await Promise.all([
-    getRecentCommits("CortexPrism", "cortex-web", 10),
-    getRecentCommits("CortexPrism", "cortex", 10),
-    getChangelogMD("CortexPrism/cortex-web"),
+  const [cortexCommits, cortexChangelog] = await Promise.all([
+    getRecentCommits("CortexPrism", "cortex", 20),
     getChangelogMD("CortexPrism/cortex"),
   ]);
 
   const t = await getTranslations("changelogPage");
 
-  const allCommits = [...websiteCommits, ...cortexCommits]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 10);
-
-  const latestCommitDate = allCommits.length > 0 ? allCommits[0].date : null;
+  const latestCommitDate = cortexCommits.length > 0 ? cortexCommits[0].date : null;
 
   return (
     <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 2xl:px-16 py-12 md:py-20">
@@ -138,23 +131,17 @@ export default async function ChangelogPage() {
         </h1>
         <p className="mt-5 text-lg text-[#9090a8] max-w-3xl mx-auto leading-relaxed">
           {t("subtitle")}{" "}
-          <a href="https://github.com/CortexPrism/cortex-web" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">
-            cortex-web
-          </a>
-          {" "}and{" "}
           <a href="https://github.com/CortexPrism/cortex" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">
             cortex
           </a>
-          {" "}repositories.
+          {" "}repository.
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+      <div className="grid grid-cols-2 gap-4 mb-16 max-w-md mx-auto">
         {[
-          { value: String(allCommits.length), label: "Recent Commits", icon: GitCommit },
-          { value: "2", label: "Repositories", icon: GitFork },
-          { value: String(websiteCommits.length + cortexCommits.length), label: "Fetched", icon: Github },
+          { value: String(cortexCommits.length), label: "Recent Commits", icon: GitCommit },
           { value: latestCommitDate ? timeAgo(latestCommitDate) : "--", label: "Latest Activity", icon: Clock },
         ].map((stat) => (
           <div key={stat.label} className="glass-card p-4 text-center">
@@ -168,19 +155,19 @@ export default async function ChangelogPage() {
       </div>
 
       {/* Recent Commits */}
-      {allCommits.length > 0 && (
+      {cortexCommits.length > 0 && (
         <section className="mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/10" style={{ boxShadow: "0 0 20px rgba(99,102,241,0.18)" }}>
-              <GitCommit className="w-5 h-5 text-indigo-400" />
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/10" style={{ boxShadow: "0 0 20px rgba(167,139,250,0.18)" }}>
+              <GitCommit className="w-5 h-5 text-purple-400" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#e2e2ea]">{t("recentCommits")}</h2>
-              <p className="text-sm text-indigo-400 font-medium">Last {allCommits.length} commits across both repos</p>
+              <p className="text-sm text-purple-400 font-medium">Last {cortexCommits.length} commits on cortex</p>
             </div>
           </div>
           <div className="space-y-2">
-            {allCommits.map((c) => (
+            {cortexCommits.map((c) => (
               <a
                 key={c.sha}
                 href={c.url}
@@ -188,14 +175,9 @@ export default async function ChangelogPage() {
                 rel="noopener noreferrer"
                 className="group flex items-start gap-4 p-4 bg-[#111118] border border-[rgba(255,255,255,0.07)] rounded-xl hover:border-[rgba(255,255,255,0.14)] hover:bg-[#14141c] transition-all duration-200"
               >
-                <div className="flex items-center gap-2 shrink-0 mt-0.5">
-                  <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] text-[#666680] group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-colors">
-                    {c.sha}
-                  </span>
-                  <span className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded ${c.repo === "cortex" ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" : "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"}`}>
-                    {c.repo}
-                  </span>
-                </div>
+                <span className="font-mono text-xs px-2 py-0.5 rounded-md bg-[#0a0a0f] border border-[rgba(255,255,255,0.07)] text-[#666680] group-hover:text-purple-400 group-hover:border-purple-500/30 transition-colors shrink-0 mt-0.5">
+                  {c.sha}
+                </span>
                 <code className="flex-1 text-sm text-[#9090a8] group-hover:text-[#e2e2ea] transition-colors leading-relaxed">
                   {c.message}
                 </code>
@@ -212,91 +194,44 @@ export default async function ChangelogPage() {
         </section>
       )}
 
-      {/* CHANGELOG Sections */}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/10" style={{ boxShadow: "0 0 20px rgba(34,211,238,0.15)" }}>
-                <FileText className="w-5 h-5 text-cyan-400" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-[#e2e2ea]">{t("website")}</h2>
-                <p className="text-xs text-[#55556a]">cortex-web CHANGELOG.md</p>
-              </div>
+      {/* Cortex CHANGELOG.md */}
+      <section className="mb-16">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/10" style={{ boxShadow: "0 0 20px rgba(167,139,250,0.15)" }}>
+              <GitBranch className="w-5 h-5 text-purple-400" />
             </div>
-            <a
-              href="https://github.com/CortexPrism/cortex-web/blob/main/CHANGELOG.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 inline-flex items-center gap-1 text-xs text-[#55556a] hover:text-indigo-400 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              View raw
-            </a>
+            <div>
+              <h2 className="text-lg font-semibold text-[#e2e2ea]">{t("cortexEngine")}</h2>
+              <p className="text-xs text-[#55556a]">cortex CHANGELOG.md</p>
+            </div>
           </div>
-          {websiteChangelog ? (
-            <div className="glass-card p-6 md:p-8">
-              <div className="prose prose-invert max-w-none prose-headings:text-[#e2e2ea] prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-[#9090a8] prose-a:text-indigo-400 prose-strong:text-[#e2e2ea] prose-code:text-[#e2e2ea] prose-pre:bg-[#0a0a0f] prose-pre:border prose-pre:border-[rgba(255,255,255,0.07)] prose-pre:rounded-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-[#9090a8] prose-ul:space-y-1">
-                <MdxContent content={websiteChangelog} />
-              </div>
+          <a
+            href="https://github.com/CortexPrism/cortex/blob/main/CHANGELOG.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1 text-xs text-[#55556a] hover:text-indigo-400 transition-colors"
+          >
+            <ExternalLink className="w-3 h-3" />
+            View raw
+          </a>
+        </div>
+        {cortexChangelog ? (
+          <div className="glass-card p-6 md:p-8">
+            <div className="prose prose-invert max-w-none prose-headings:text-[#e2e2ea] prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-[#9090a8] prose-a:text-indigo-400 prose-strong:text-[#e2e2ea] prose-code:text-[#e2e2ea] prose-pre:bg-[#0a0a0f] prose-pre:border prose-pre:border-[rgba(255,255,255,0.07)] prose-pre:rounded-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-[#9090a8] prose-ul:space-y-1">
+              <MdxContent content={cortexChangelog} />
             </div>
-          ) : (
-            <div className="glass-card p-8 text-center">
-              <FileText className="w-8 h-8 text-[#55556a] mx-auto mb-3" />
-              <p className="text-sm text-[#55556a]">{t("noChangelog")}</p>
-            </div>
-          )}
-        </section>
-
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-purple-500/10" style={{ boxShadow: "0 0 20px rgba(167,139,250,0.15)" }}>
-                <GitBranch className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-[#e2e2ea]">{t("cortexEngine")}</h2>
-                <p className="text-xs text-[#55556a]">cortex CHANGELOG.md</p>
-              </div>
-            </div>
-            <a
-              href="https://github.com/CortexPrism/cortex/blob/main/CHANGELOG.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 inline-flex items-center gap-1 text-xs text-[#55556a] hover:text-indigo-400 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              View raw
-            </a>
           </div>
-          {cortexChangelog ? (
-            <div className="glass-card p-6 md:p-8">
-              <div className="prose prose-invert max-w-none prose-headings:text-[#e2e2ea] prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-[#9090a8] prose-a:text-indigo-400 prose-strong:text-[#e2e2ea] prose-code:text-[#e2e2ea] prose-pre:bg-[#0a0a0f] prose-pre:border prose-pre:border-[rgba(255,255,255,0.07)] prose-pre:rounded-xl prose-code:before:content-none prose-code:after:content-none prose-li:text-[#9090a8] prose-ul:space-y-1">
-                <MdxContent content={cortexChangelog} />
-              </div>
-            </div>
-          ) : (
-            <div className="glass-card p-8 text-center">
-              <GitBranch className="w-8 h-8 text-[#55556a] mx-auto mb-3" />
-              <p className="text-sm text-[#55556a]">{t("couldNotFetch")}</p>
-            </div>
-          )}
-        </section>
-      </div>
+        ) : (
+          <div className="glass-card p-8 text-center">
+            <GitBranch className="w-8 h-8 text-[#55556a] mx-auto mb-3" />
+            <p className="text-sm text-[#55556a]">{t("noChangelog")}</p>
+          </div>
+        )}
+      </section>
 
       {/* Footer Links */}
       <div className="flex items-center justify-center gap-6 mb-16">
-        <a
-          href="https://github.com/CortexPrism/cortex-web/commits/main"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-[#9090a8] hover:text-indigo-400 transition-colors"
-        >
-          <GitCommit className="w-4 h-4" />
-          {t("fullHistory")} (cortex-web)
-        </a>
-        <span className="w-px h-4 bg-[rgba(255,255,255,0.08)]" />
         <a
           href="https://github.com/CortexPrism/cortex/commits/main"
           target="_blank"
@@ -304,7 +239,7 @@ export default async function ChangelogPage() {
           className="inline-flex items-center gap-2 text-sm text-[#9090a8] hover:text-indigo-400 transition-colors"
         >
           <GitCommit className="w-4 h-4" />
-          Full history (cortex)
+          {t("fullHistory")}
         </a>
       </div>
 

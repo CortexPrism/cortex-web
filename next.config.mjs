@@ -9,10 +9,8 @@ const nextConfig = {
     domains: [],
   },
   experimental: {
-    workerThreads: true,
     cpus: 4,
   },
-  swcMinify: true,
   async rewrites() {
     return [
       {

@@ -742,12 +742,10 @@
   },
   "changelogPage": {
     "heading": "更新日志",
-    "subtitle": "cortex-web 和 cortex 的发布历史",
+    "subtitle": "Cortex 引擎的发布历史",
     "recentCommits": "最近提交",
-    "website": "网站",
     "cortexEngine": "Cortex 引擎",
     "noChangelog": "暂无更新日志。",
-    "couldNotFetch": "无法从 GitHub 获取 Cortex 更新日志。",
     "fullHistory": "完整提交历史"
   },
   "marketplaceList": {

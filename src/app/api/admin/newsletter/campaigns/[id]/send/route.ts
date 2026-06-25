@@ -53,8 +53,9 @@ async function processSend(campaignId: string, subject: string, content: string,
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!user || !requireAdmin(user)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });

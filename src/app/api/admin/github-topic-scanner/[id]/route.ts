@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireAdmin } from "@/lib/auth-middleware";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!requireAdmin(user)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });

@@ -20,8 +20,9 @@ const AutomationUpdateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!requireAdmin(user)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });
@@ -40,8 +41,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   const authUser = getAuthUser(request);
   if (!authUser || !requireAdmin(authUser)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });
@@ -101,8 +103,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   const user = getAuthUser(request);
   if (!user || !requireAdmin(user)) {
     return Response.json({ error: "Admin access required" }, { status: 403 });

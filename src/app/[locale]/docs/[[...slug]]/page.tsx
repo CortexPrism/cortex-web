@@ -12,7 +12,7 @@ import { KbViewTracker } from "@/components/docs/KbViewTracker";
 import { generateBreadcrumbSchema, generateArticleSchema, generateAlternates, SITE_URL } from "@/lib/seo";
 
 interface Props {
-  params: { slug?: string[] };
+  params: Promise<{ slug?: string[] }>;
 }
 
 const sectionMap: Record<string, string> = {
@@ -44,7 +44,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  if (!params.slug?.length) {
+  const { slug } = await params;
+  if (!slug?.length) {
     return {
       title: "CortexPrism Documentation — Guides, CLI & Architecture",
       description:
@@ -64,8 +65,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const section = params.slug[0];
-  const fileSlug = params.slug.slice(1).join("/") || undefined;
+  const section = slug[0];
+  const fileSlug = slug.slice(1).join("/") || undefined;
   const sectionLabel = sectionLabels[section] || section;
 
   if (section === "knowledge-base") {
@@ -114,7 +115,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (!sectionMap[section]) {
-    return { title: `Docs: ${params.slug.join(" / ")}` };
+    return { title: `Docs: ${slug.join(" / ")}` };
   }
 
   try {
@@ -136,12 +137,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     };
   } catch {
-    return { title: `Docs: ${params.slug.join(" / ")}` };
+    return { title: `Docs: ${slug.join(" / ")}` };
   }
 }
 
 export default async function DocsPage({ params }: Props) {
-  if (!params.slug?.length) {
+  const { slug } = await params;
+  if (!slug?.length) {
     const breadcrumbSchema = generateBreadcrumbSchema([
       { name: "Home", url: SITE_URL },
       { name: "Documentation", url: `${SITE_URL}/docs` },
@@ -161,13 +163,13 @@ export default async function DocsPage({ params }: Props) {
     );
   }
 
-  const section = sectionMap[params.slug[0]];
+  const section = sectionMap[slug[0]];
   if (!section) notFound();
 
-  const sectionLabel = sectionLabels[params.slug[0]] || params.slug[0];
+  const sectionLabel = sectionLabels[slug[0]] || slug[0];
 
-  if (params.slug[0] === "knowledge-base") {
-    const fileSlug = params.slug.slice(1).join("/") || undefined;
+  if (slug[0] === "knowledge-base") {
+    const fileSlug = slug.slice(1).join("/") || undefined;
 
     if (!fileSlug) {
       const { articles } = await getAllKbArticles({ publishedOnly: true, limit: 100, section: "knowledge-base" });
@@ -277,7 +279,8 @@ export default async function DocsPage({ params }: Props) {
     );
   }
 
-  const fileSlug = params.slug[1] || "index";
+  const fileSlug = slug[1] || "index";
+
   let content: string;
   try {
     const result = getContentBySlug(section, fileSlug);
@@ -286,16 +289,16 @@ export default async function DocsPage({ params }: Props) {
     notFound();
   }
 
+  const title = slug[1] ? slug[1].replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : sectionLabel;
   const breadcrumbItems = [
     { name: "Home", url: SITE_URL },
     { name: "Documentation", url: `${SITE_URL}/docs` },
-    { name: sectionLabel, url: `${SITE_URL}/docs/${params.slug[0]}` },
+    { name: sectionLabel, url: `${SITE_URL}/docs/${slug[0]}` },
   ];
-  if (params.slug[1] && params.slug[1] !== "index") {
-    const title = params.slug[1].replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  if (slug[1] && slug[1] !== "index") {
     breadcrumbItems.push({
       name: title,
-      url: `${SITE_URL}/docs/${params.slug.join("/")}`,
+      url: `${SITE_URL}/docs/${slug.join("/")}`,
     });
   }
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);

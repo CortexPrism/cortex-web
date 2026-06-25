@@ -15,8 +15,9 @@ const BlogUpdateSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   try {
     const post = await prisma.blogPost.findFirst({
       where: { OR: [{ id: params.id }, { slug: params.id }] },
@@ -37,8 +38,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   try {
     const user = getAuthUser(request);
     if (!requireAdmin(user)) {
@@ -97,8 +99,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params: pp }: { params: Promise<{ id: string }> }
 ) {
+  const params = await pp;
   try {
     const user = getAuthUser(request);
     if (!requireAdmin(user)) {

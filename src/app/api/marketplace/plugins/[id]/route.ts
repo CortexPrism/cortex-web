@@ -21,7 +21,8 @@ const PluginUpdateSchema = z.object({
   published: z.boolean().optional(),
 });
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const plugin = await prisma.plugin.findFirst({
     where: { OR: [{ id: params.id }, { slug: params.id }] },
     include: { category: true, user: { select: { username: true } } },
@@ -39,7 +40,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   });
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   try {
     const existing = await prisma.plugin.findUnique({ where: { id: params.id } });
     if (!existing) {
@@ -71,7 +73,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params: pp }: { params: Promise<{ id: string }> }) {
+  const params = await pp;
   const existing = await prisma.plugin.findUnique({ where: { id: params.id } });
   if (!existing) {
     return Response.json({ error: "Plugin not found" }, { status: 404 });

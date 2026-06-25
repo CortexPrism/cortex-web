@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import {
   Save, CheckCircle, XCircle, Eye, EyeOff, RefreshCw, Send,
   Bot, Shield, Settings as SettingsIcon, Bell, Globe, Play, Square,
@@ -685,7 +686,7 @@ export default function AdminDiscordPage() {
 
               <div className="mt-4 p-3 bg-[#111118] rounded-lg border border-[rgba(255,255,255,0.07)]">
                 <p className="text-xs text-[#55556a]">
-                  Auto-mod rules can be created via Discord using <code className="text-indigo-400">/automod create</code> or via the <a href="/admin/discord/automod" className="text-indigo-400">Auto-Mod Rules API</a>.
+                  Auto-mod rules can be created via Discord using <code className="text-indigo-400">/automod create</code> or via the <Link href="/admin/discord/automod" className="text-indigo-400">Auto-Mod Rules API</Link>.
                   Available rule types: keyword_filter, invite_filter, spam_filter, link_filter, mention_limit, caps_filter.
                 </p>
               </div>
