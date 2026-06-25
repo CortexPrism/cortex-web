@@ -64,7 +64,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const [section, fileSlug] = params.slug;
+  const section = params.slug[0];
+  const fileSlug = params.slug.slice(1).join("/") || undefined;
   const sectionLabel = sectionLabels[section] || section;
 
   if (section === "knowledge-base") {
@@ -166,10 +167,10 @@ export default async function DocsPage({ params }: Props) {
   const sectionLabel = sectionLabels[params.slug[0]] || params.slug[0];
 
   if (params.slug[0] === "knowledge-base") {
-    const fileSlug = params.slug[1];
+    const fileSlug = params.slug.slice(1).join("/") || undefined;
 
     if (!fileSlug) {
-      const { articles } = await getAllKbArticles({ publishedOnly: true, limit: 100 });
+      const { articles } = await getAllKbArticles({ publishedOnly: true, limit: 100, section: "knowledge-base" });
       const breadcrumbSchema = generateBreadcrumbSchema([
         { name: "Home", url: SITE_URL },
         { name: "Documentation", url: `${SITE_URL}/docs` },
