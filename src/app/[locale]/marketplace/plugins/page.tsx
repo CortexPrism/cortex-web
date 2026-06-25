@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Search, X } from "lucide-react";
+import { SearchBar } from "@/components/marketplace/SearchBar";
+import { CategoryFilter } from "@/components/marketplace/CategoryFilter";
 import { PluginCard } from "@/components/marketplace/PluginCard";
 import { Pagination } from "@/components/shared/Pagination";
+import { ArrowUpDown } from "lucide-react";
 
 interface Category { id: string; name: string; slug: string }
 
@@ -20,26 +23,66 @@ interface PluginResponse {
   plugins: Plugin[]; total: number; page: number; limit: number; totalPages: number;
 }
 
+const SORT_OPTIONS = [
+  { value: "downloads", labelKey: "sortDownloads" as const },
+  { value: "rating", labelKey: "sortRating" as const },
+  { value: "newest", labelKey: "sortNewest" as const },
+  { value: "name", labelKey: "sortName" as const },
+];
+
 export default function PluginListingPage() {
   const t = useTranslations("marketplaceList");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isInitialMount = useRef(true);
 
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedKind, setSelectedKind] = useState("");
-  const [page, setPage] = useState(1);
+  const currentSearch = searchParams.get("search") || "";
+  const currentCategory = searchParams.get("category") || "";
+  const currentKind = searchParams.get("kind") || "";
+  const currentSort = searchParams.get("sort") || "downloads";
+  const currentPage = parseInt(searchParams.get("page") || "1");
+
+  const [searchInput, setSearchInput] = useState(currentSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(currentSearch);
   const [data, setData] = useState<PluginResponse | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [fetchKey, setFetchKey] = useState(0);
+
+  const updateURL = useCallback((updates: Record<string, string | undefined>) => {
+    const sp = new URLSearchParams();
+    const search = updates.search !== undefined ? updates.search : currentSearch;
+    const category = updates.category !== undefined ? updates.category : currentCategory;
+    const kind = updates.kind !== undefined ? updates.kind : currentKind;
+    const sort = updates.sort !== undefined ? updates.sort : currentSort;
+    const page = updates.page !== undefined ? updates.page : "1";
+
+    if (search) sp.set("search", search);
+    if (category) sp.set("category", category);
+    if (kind) sp.set("kind", kind);
+    if (sort && sort !== "downloads") sp.set("sort", sort);
+    if (page && page !== "1") sp.set("page", page);
+
+    const qs = sp.toString();
+    router.replace(qs ? `?${qs}` : window.location.pathname, { scroll: false });
+  }, [currentSearch, currentCategory, currentKind, currentSort, router]);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    const t = setTimeout(() => setDebouncedSearch(searchInput), 300);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [searchInput]);
 
-  useEffect(() => { setPage(1) }, [debouncedSearch, selectedCategory, selectedKind]);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (searchInput !== debouncedSearch) return;
+    if (debouncedSearch !== currentSearch) {
+      updateURL({ search: debouncedSearch || undefined, page: "1" });
+    }
+  }, [debouncedSearch, searchInput, currentSearch, updateURL]);
 
   useEffect(() => {
     if (!categories.length) {
@@ -49,18 +92,24 @@ export default function PluginListingPage() {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     const params = new URLSearchParams();
-    if (debouncedSearch) params.set("search", debouncedSearch);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedKind) params.set("kind", selectedKind);
-    params.set("page", String(page));
+    if (currentSearch) params.set("search", currentSearch);
+    if (currentCategory) params.set("category", currentCategory);
+    if (currentKind) params.set("kind", currentKind);
+    if (currentSort && currentSort !== "downloads") params.set("sort", currentSort);
+    params.set("page", String(currentPage));
     params.set("limit", "12");
 
     fetch(`/api/marketplace/plugins?${params}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then(d => { setData(d); setError(null); setLoading(false) })
-      .catch(e => { setError(e.message); setLoading(false) });
-  }, [debouncedSearch, selectedCategory, selectedKind, page, retryCount]);
+      .then(d => { setData(d); setLoading(false); })
+      .catch(e => { setError(e.message); setLoading(false); });
+  }, [currentSearch, currentCategory, currentKind, currentSort, currentPage, fetchKey]);
+
+  useEffect(() => {
+    setSearchInput(currentSearch);
+  }, [currentSearch]);
 
   const kinds = ["esm", "mcp", "wasm"];
 
@@ -71,89 +120,49 @@ export default function PluginListingPage() {
         <p className="text-[#9090a8]">{t("subtitle_plugins")}</p>
       </div>
 
-      <div className="space-y-6 mb-8">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#55556a]" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={t("searchPlaceholder")}
-            className="w-full pl-10 pr-10 py-3 bg-[#111118] border border-[rgba(255,255,255,0.07)] rounded-xl text-sm text-[#e2e2ea] placeholder:text-[#55556a] focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-colors"
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#55556a] hover:text-[#e2e2ea]">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+      <div className="space-y-5 mb-8">
+        <SearchBar
+          value={searchInput}
+          onChange={(v) => setSearchInput(v)}
+          placeholder={t("searchPlaceholder")}
+        />
 
-        {/* Category Filter Section */}
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-3">
             <h3 className="text-xs font-semibold text-[#e2e2ea] uppercase tracking-wider">{t("categories")}</h3>
-            {selectedCategory && (
-              <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">
-                1 selected
-              </span>
+            {currentCategory && (
+              <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">1 selected</span>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => { setSelectedCategory(""); setPage(1) }}
-              className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${
-                !selectedCategory
-                  ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
-                  : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:border-indigo-500/30 hover:text-[#e2e2ea]"
-              }`}
-            >
-              {t("allCategories")}
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => { setSelectedCategory(cat.slug); setPage(1) }}
-                className={`px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${
-                  selectedCategory === cat.slug
-                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
-                    : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:border-indigo-500/30 hover:text-[#e2e2ea]"
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
+          <CategoryFilter
+            categories={categories}
+            selected={currentCategory}
+            onSelect={(slug) => updateURL({ category: slug || undefined, page: "1" })}
+          />
         </div>
 
-        {/* Kind Filter Section */}
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-3">
             <h3 className="text-xs font-semibold text-[#e2e2ea] uppercase tracking-wider">{t("pluginType")}</h3>
-            {selectedKind && (
-              <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">
-                1 selected
-              </span>
+            {currentKind && (
+              <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">1 selected</span>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
             {kinds.map(k => {
-              const kindColorMap: Record<string, string> = {
-                esm: "indigo",
-                mcp: "emerald",
-                wasm: "purple"
-              };
-              const color = kindColorMap[k];
-              const bgColor = color === "indigo" ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
-                            : color === "emerald" ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-sm shadow-emerald-500/20"
-                            : "bg-purple-500/20 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/20";
+              const colorMap: Record<string, string> = { esm: "indigo", mcp: "emerald", wasm: "purple" };
+              const color = colorMap[k];
+              const activeClass = color === "indigo" ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30 shadow-sm shadow-indigo-500/20"
+                : color === "emerald" ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-sm shadow-emerald-500/20"
+                : "bg-purple-500/20 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/20";
 
               return (
                 <button
                   key={k}
-                  onClick={() => { setSelectedKind(selectedKind === k ? "" : k); setPage(1) }}
+                  onClick={() => updateURL({ kind: currentKind === k ? undefined : k, page: "1" })}
                   className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 border ${
-                    selectedKind === k
-                      ? bgColor
+                    currentKind === k
+                      ? activeClass
                       : "bg-[#0f0f15] text-[#9090a8] border-[rgba(255,255,255,0.07)] hover:text-[#e2e2ea]"
                   }`}
                 >
@@ -165,14 +174,28 @@ export default function PluginListingPage() {
         </div>
       </div>
 
-      {data && !loading && (
-        <p className="text-sm text-[#55556a] mb-4">
-          {t("showing")} {data.plugins.length} of {data.total} plugin{data.total !== 1 ? "s" : ""}
-          {selectedCategory && categories.find(c => c.slug === selectedCategory) && (
-            <> in <span className="text-[#9090a8]">{categories.find(c => c.slug === selectedCategory)!.name}</span></>
-          )}
-        </p>
-      )}
+      <div className="flex items-center justify-between mb-4">
+        {data && !loading && (
+          <p className="text-sm text-[#55556a]">
+            {t("showing")} {data.plugins.length} of {data.total} plugin{data.total !== 1 ? "s" : ""}
+            {currentCategory && categories.find(c => c.slug === currentCategory) && (
+              <> in <span className="text-[#9090a8]">{categories.find(c => c.slug === currentCategory)!.name}</span></>
+            )}
+          </p>
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          <ArrowUpDown className="w-3.5 h-3.5 text-[#55556a]" />
+          <select
+            value={currentSort}
+            onChange={(e) => updateURL({ sort: e.target.value, page: "1" })}
+            className="text-sm bg-[#111118] border border-[rgba(255,255,255,0.07)] rounded-lg px-3 py-1.5 text-[#e2e2ea] focus:outline-none focus:border-indigo-500/50 appearance-none cursor-pointer"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{t(opt.labelKey)}</option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -195,7 +218,7 @@ export default function PluginListingPage() {
           <p className="text-lg text-[#9090a8] mb-1">{t("loadFailed")}</p>
           <p className="text-sm text-[#55556a]">{error}</p>
           <button
-            onClick={() => { setError(null); setLoading(true); setRetryCount(c => c + 1) }}
+            onClick={() => { setError(null); setFetchKey(k => k + 1); }}
             className="mt-4 px-4 py-2 text-sm rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
           >
             {t("retry")}
@@ -208,20 +231,24 @@ export default function PluginListingPage() {
               <PluginCard key={plugin.id} plugin={plugin} />
             ))}
           </div>
-          <Pagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
+          <Pagination
+            page={data.page}
+            totalPages={data.totalPages}
+            onPageChange={(p) => updateURL({ page: String(p) })}
+          />
         </>
       ) : (
         <div className="text-center py-20">
           <div className="text-4xl mb-4 opacity-30">🔌</div>
           <p className="text-lg text-[#9090a8] mb-1">{t("noResults")}</p>
           <p className="text-sm text-[#55556a]">
-            {search || selectedCategory || selectedKind
+            {currentSearch || currentCategory || currentKind
               ? t("noResultsDesc")
               : t("checkBack")}
           </p>
-          {(search || selectedCategory || selectedKind) && (
+          {(currentSearch || currentCategory || currentKind) && (
             <button
-              onClick={() => { setSearch(""); setSelectedCategory(""); setSelectedKind(""); setPage(1) }}
+              onClick={() => updateURL({ search: undefined, category: undefined, kind: undefined, page: "1" })}
               className="mt-4 px-4 py-2 text-sm rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
             >
               {t("clearFilters")}

@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search") || "";
   const category = searchParams.get("category") || "";
   const kind = searchParams.get("kind") || "";
+  const sort = searchParams.get("sort") || "downloads";
   const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
 
@@ -38,13 +39,21 @@ export async function GET(request: NextRequest) {
   if (category) where.category = { slug: category };
   if (kind) where.kind = kind;
 
+  const sortMap: Record<string, Record<string, string>> = {
+    downloads: { downloads: "desc" },
+    rating: { rating: "desc" },
+    newest: { createdAt: "desc" },
+    name: { name: "asc" },
+  };
+  const orderBy = sortMap[sort] || sortMap.downloads;
+
   const [plugins, total] = await Promise.all([
     prisma.plugin.findMany({
       where,
       skip: (page - 1) * limit,
       take: limit,
       include: { category: true, user: { select: { username: true } } },
-      orderBy: { downloads: "desc" },
+      orderBy,
     }),
     prisma.plugin.count({ where }),
   ]);

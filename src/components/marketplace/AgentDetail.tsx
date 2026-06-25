@@ -13,7 +13,7 @@ import { ShareButton } from "@/components/shared/ShareButton";
 import { getAgentShareText, SITE_URL } from "@/lib/share";
 import {
   Github, User, Brain, Thermometer, Globe, ExternalLink, Star, GitFork,
-  Tag, Wrench, Settings, Award
+  Tag, Wrench, Settings, Award, Sparkles
 } from "lucide-react";
 
 interface Screenshot {
@@ -256,6 +256,17 @@ export function AgentDetailView({ agent }: AgentDetailProps) {
           <h2 className="text-lg font-semibold text-[#e2e2ea] mb-4">System Prompt</h2>
           <div className="bg-[#0a0a0f] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
             <pre className="text-sm text-[#9090a8] font-mono whitespace-pre-wrap">{agent.systemPrompt}</pre>
+          </div>
+        </div>
+      )}
+
+      {agent.soulContent && (
+        <div className="glass-card p-8 mb-8">
+          <h2 className="text-lg font-semibold text-[#e2e2ea] mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-purple-400" /> Soul
+          </h2>
+          <div className="bg-[#0a0a0f] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
+            <div className="text-sm text-[#c8c8dc] whitespace-pre-wrap leading-relaxed">{agent.soulContent}</div>
           </div>
         </div>
       )}

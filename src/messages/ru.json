@@ -716,7 +716,14 @@
     "communityDriven": "Управляется сообществом",
     "communityDrivenDesc": "Открывайте и делитесь расширениями, созданными сообществом, которые решают реальные задачи и расширяют возможности платформы.",
     "curatedQuality": "Отобранное качество",
-    "curatedQualityDesc": "Все элементы marketplace проходят проверку на качество, безопасность и совместимость с экосистемой CortexPrism."
+    "curatedQualityDesc": "Все элементы marketplace проходят проверку на качество, безопасность и совместимость с экосистемой CortexPrism.",
+    "trendingTitle": "Trending",
+    "trendingPlugins": "Trending Plugins",
+    "trendingAgents": "Trending Agents",
+    "newTitle": "Recently Added",
+    "newPlugins": "New Plugins",
+    "newAgents": "New Agents",
+    "viewAll": "View All"
   },
   "blogList": {
     "heading": "Блог",
@@ -850,6 +857,11 @@
     "submissionReceived": "Заявка получена",
     "submissionDesc": "Ваша заявка получена и ожидает проверки.",
     "submitting": "Отправка...",
-    "submit": "Отправить"
+    "submit": "Отправить",
+    "sortBy": "Sort by",
+    "sortDownloads": "Most Downloads",
+    "sortRating": "Highest Rated",
+    "sortNewest": "Newest",
+    "sortName": "Name (A-Z)"
   }
 }

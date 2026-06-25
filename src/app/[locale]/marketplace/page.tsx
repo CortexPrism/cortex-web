@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, Puzzle, Bot, Sparkles, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight, Puzzle, Bot, Sparkles, TrendingUp, Zap, Clock, Flame } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import { SITE_URL, generateAlternates } from "@/lib/seo";
+import { PluginCard } from "@/components/marketplace/PluginCard";
+import { AgentCard } from "@/components/marketplace/AgentCard";
 
 export const dynamic = "force-dynamic";
 
@@ -37,11 +39,110 @@ export const metadata: Metadata = {
   },
 };
 
+const pluginSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  version: true,
+  description: true,
+  kind: true,
+  author: true,
+  downloads: true,
+  rating: true,
+  icon: true,
+  license: true,
+  repository: true,
+  githubStars: true,
+  category: { select: { name: true } },
+} as const;
+
+const agentSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  version: true,
+  description: true,
+  provider: true,
+  model: true,
+  author: true,
+  downloads: true,
+  rating: true,
+  icon: true,
+  tags: true,
+  repository: true,
+  githubStars: true,
+  category: { select: { name: true } },
+} as const;
+
+function mapPluginForCard(p: Record<string, unknown>) {
+  return {
+    id: p.id as string,
+    name: p.name as string,
+    slug: p.slug as string,
+    version: p.version as string,
+    description: p.description as string,
+    kind: p.kind as string,
+    author: p.author as string | null,
+    downloads: p.downloads as number,
+    rating: p.rating as number,
+    category: (p.category as { name: string } | null)?.name ?? null,
+    icon: p.icon as string | null,
+    license: p.license as string | null,
+    repository: p.repository as string | null,
+    githubStars: p.githubStars as number,
+  };
+}
+
+function mapAgentForCard(a: Record<string, unknown>) {
+  return {
+    id: a.id as string,
+    name: a.name as string,
+    slug: a.slug as string,
+    version: a.version as string,
+    description: a.description as string,
+    provider: a.provider as string | null,
+    model: a.model as string | null,
+    author: a.author as string | null,
+    downloads: a.downloads as number,
+    rating: a.rating as number,
+    tags: typeof a.tags === 'string' ? JSON.parse(a.tags || "[]") : (a.tags as string[] || []),
+    category: (a.category as { name: string } | null)?.name ?? null,
+    icon: a.icon as string | null,
+    repository: a.repository as string | null,
+    githubStars: a.githubStars as number,
+  };
+}
+
 export default async function MarketplacePage() {
-  const [pluginCount, agentCount] = await Promise.all([
-    prisma.plugin.count({ where: { status: "approved" } }),
-    prisma.agentConfig.count({ where: { status: "approved" } }),
-  ]);
+  const [pluginCount, agentCount, trendingPlugins, trendingAgents, newPlugins, newAgents] =
+    await Promise.all([
+      prisma.plugin.count({ where: { status: "approved" } }),
+      prisma.agentConfig.count({ where: { status: "approved" } }),
+      prisma.plugin.findMany({
+        where: { status: "approved" },
+        orderBy: { downloads: "desc" },
+        take: 6,
+        select: pluginSelect,
+      }),
+      prisma.agentConfig.findMany({
+        where: { status: "approved" },
+        orderBy: { downloads: "desc" },
+        take: 6,
+        select: agentSelect,
+      }),
+      prisma.plugin.findMany({
+        where: { status: "approved" },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        select: pluginSelect,
+      }),
+      prisma.agentConfig.findMany({
+        where: { status: "approved" },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        select: agentSelect,
+      }),
+    ]);
 
   const t = await getTranslations("marketplaceHub");
 
@@ -104,7 +205,7 @@ export default async function MarketplacePage() {
         </Link>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-3 gap-6 mb-16">
         <div className="glass-card p-6">
           <div className="flex items-start gap-3 mb-4">
             <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400">
@@ -158,6 +259,110 @@ export default async function MarketplacePage() {
               {t("shareAgent")} <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Trending Section */}
+      <div className="mb-16">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-orange-500/20 text-orange-400">
+              <Flame className="w-5 h-5" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#e2e2ea]">{t("trendingTitle")}</h2>
+          </div>
+        </div>
+
+        <div className="space-y-10">
+          {trendingPlugins.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Puzzle className="w-4 h-4 text-emerald-400" />
+                  {t("trendingPlugins")}
+                </h3>
+                <Link href="/marketplace/plugins?sort=downloads" className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                  {t("viewAll")} <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {trendingPlugins.map((p) => (
+                  <PluginCard key={p.id} plugin={mapPluginForCard(p)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {trendingAgents.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-purple-400" />
+                  {t("trendingAgents")}
+                </h3>
+                <Link href="/marketplace/agents?sort=downloads" className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                  {t("viewAll")} <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {trendingAgents.map((a) => (
+                  <AgentCard key={a.id} agent={mapAgentForCard(a)} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recently Added Section */}
+      <div className="mb-16">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400">
+              <Clock className="w-5 h-5" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#e2e2ea]">{t("newTitle")}</h2>
+          </div>
+        </div>
+
+        <div className="space-y-10">
+          {newPlugins.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Puzzle className="w-4 h-4 text-emerald-400" />
+                  {t("newPlugins")}
+                </h3>
+                <Link href="/marketplace/plugins?sort=newest" className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                  {t("viewAll")} <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {newPlugins.map((p) => (
+                  <PluginCard key={p.id} plugin={mapPluginForCard(p)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {newAgents.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-[#e2e2ea] flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-purple-400" />
+                  {t("newAgents")}
+                </h3>
+                <Link href="/marketplace/agents?sort=newest" className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                  {t("viewAll")} <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {newAgents.map((a) => (
+                  <AgentCard key={a.id} agent={mapAgentForCard(a)} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

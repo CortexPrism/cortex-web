@@ -380,8 +380,8 @@ function wrapTemplate(title: string, bodyHtml: string, cta?: { text: string; url
     <!-- Main wrapper -->
     <tr>
       <td align="center" class="body-padding" style="padding:40px 20px 20px">
-        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" align="center"><tr><td><![endif]-->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px">
+        <!--[if mso]><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="660" align="center"><tr><td><![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:660px">
           <!-- Header / Logo -->
           <tr>
             <td style="padding:0 0 28px 0;text-align:center">
@@ -403,7 +403,7 @@ function wrapTemplate(title: string, bodyHtml: string, cta?: { text: string; url
           </tr>
           <!-- Content card -->
           <tr>
-            <td class="card-padding" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:40px 48px">
+            <td class="card-padding" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:40px">
               <h1 class="h1-mobile" style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#f0f0f5;line-height:1.3;letter-spacing:-0.3px;">${escapeHtml(title)}</h1>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:20px 0 24px 0">
                 <tr>

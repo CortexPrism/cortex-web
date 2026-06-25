@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SITE_URL, generateAlternates } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -35,5 +36,5 @@ export const metadata: Metadata = {
 };
 
 export default function AgentsLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <Suspense fallback={null}>{children}</Suspense>;
 }

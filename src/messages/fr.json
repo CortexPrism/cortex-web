@@ -716,7 +716,14 @@
     "communityDriven": "Piloté par la communauté",
     "communityDrivenDesc": "Découvrez et partagez des extensions créées par la communauté qui résolvent des problèmes réels et étendent les capacités de la plateforme.",
     "curatedQuality": "Qualité contrôlée",
-    "curatedQualityDesc": "Tous les éléments du marketplace sont examinés pour leur qualité, leur sécurité et leur compatibilité avec l'écosystème CortexPrism."
+    "curatedQualityDesc": "Tous les éléments du marketplace sont examinés pour leur qualité, leur sécurité et leur compatibilité avec l'écosystème CortexPrism.",
+    "trendingTitle": "Trending",
+    "trendingPlugins": "Trending Plugins",
+    "trendingAgents": "Trending Agents",
+    "newTitle": "Recently Added",
+    "newPlugins": "New Plugins",
+    "newAgents": "New Agents",
+    "viewAll": "View All"
   },
   "blogList": {
     "heading": "Blog",
@@ -850,6 +857,11 @@
     "submissionReceived": "Soumission reçue",
     "submissionDesc": "Votre soumission a été reçue et est en attente de révision.",
     "submitting": "Envoi en cours...",
-    "submit": "Soumettre"
+    "submit": "Soumettre",
+    "sortBy": "Sort by",
+    "sortDownloads": "Most Downloads",
+    "sortRating": "Highest Rated",
+    "sortNewest": "Newest",
+    "sortName": "Name (A-Z)"
   }
 }

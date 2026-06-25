@@ -6,6 +6,7 @@ import { getRepoMetadata, getRepoReadme } from "@/lib/github";
 import { PluginDetailView } from "@/components/marketplace/PluginDetail";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, generateAlternates, SITE_URL } from "@/lib/seo";
+import { safeJsonParse } from "@/lib/utils";
 
 interface Props {
   params: { id: string };
@@ -99,8 +100,8 @@ export default async function PluginDetailPage({ params }: Props) {
           description: plugin.description,
           kind: plugin.kind,
           entryPoint: plugin.entryPoint,
-          capabilities: typeof plugin.capabilities === 'string' ? JSON.parse(plugin.capabilities || "[]") : (plugin.capabilities || []),
-          tags: typeof plugin.tags === 'string' ? JSON.parse(plugin.tags || "[]") : (plugin.tags || []),
+          capabilities: safeJsonParse<string[]>(plugin.capabilities as string, []),
+          tags: safeJsonParse<string[]>(plugin.tags as string, []),
           author: plugin.author,
           authorUrl: plugin.authorUrl,
           homepage: plugin.homepage,

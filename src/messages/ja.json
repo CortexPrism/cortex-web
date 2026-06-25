@@ -716,7 +716,14 @@
     "communityDriven": "コミュニティ主導",
     "communityDrivenDesc": "実世界の問題を解決し、プラットフォームの機能を拡張するコミュニティ構築の拡張機能を発見・共有。",
     "curatedQuality": "厳選された品質",
-    "curatedQualityDesc": "すべてのマーケットプレイスアイテムは、品質、セキュリティ、CortexPrismエコシステムとの互換性についてレビューされます。"
+    "curatedQualityDesc": "すべてのマーケットプレイスアイテムは、品質、セキュリティ、CortexPrismエコシステムとの互換性についてレビューされます。",
+    "trendingTitle": "Trending",
+    "trendingPlugins": "Trending Plugins",
+    "trendingAgents": "Trending Agents",
+    "newTitle": "Recently Added",
+    "newPlugins": "New Plugins",
+    "newAgents": "New Agents",
+    "viewAll": "View All"
   },
   "blogList": {
     "heading": "ブログ",
@@ -850,6 +857,11 @@
     "submissionReceived": "送信を受領しました",
     "submissionDesc": "送信が受領され、レビュー待ちです。",
     "submitting": "送信中...",
-    "submit": "送信"
+    "submit": "送信",
+    "sortBy": "Sort by",
+    "sortDownloads": "Most Downloads",
+    "sortRating": "Highest Rated",
+    "sortNewest": "Newest",
+    "sortName": "Name (A-Z)"
   }
 }

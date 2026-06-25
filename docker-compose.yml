@@ -5,6 +5,7 @@ services:
       - "3000:3000"
     environment:
       - DATABASE_URL=file:./prisma/marketplace.db
+      - TZ=America/Chicago
       - NEXT_PUBLIC_SITE_URL=https://cortexprism.io
       - SITE_URL=https://cortexprism.io
       - NEXT_PUBLIC_GITHUB_REPO=CortexPrism/cortex

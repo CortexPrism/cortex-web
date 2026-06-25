@@ -716,7 +716,14 @@
     "communityDriven": "社区驱动",
     "communityDrivenDesc": "发现和分享社区构建的扩展，解决实际问题并扩展平台能力。",
     "curatedQuality": "精选品质",
-    "curatedQualityDesc": "所有市场项目都经过质量、安全性和与 CortexPrism 生态系统兼容性的审核。"
+    "curatedQualityDesc": "所有市场项目都经过质量、安全性和与 CortexPrism 生态系统兼容性的审核。",
+    "trendingTitle": "Trending",
+    "trendingPlugins": "Trending Plugins",
+    "trendingAgents": "Trending Agents",
+    "newTitle": "Recently Added",
+    "newPlugins": "New Plugins",
+    "newAgents": "New Agents",
+    "viewAll": "View All"
   },
   "blogList": {
     "heading": "博客",
@@ -850,6 +857,11 @@
     "submissionReceived": "已收到提交",
     "submissionDesc": "你的提交已收到，正在等待审核。",
     "submitting": "提交中...",
-    "submit": "提交"
+    "submit": "提交",
+    "sortBy": "Sort by",
+    "sortDownloads": "Most Downloads",
+    "sortRating": "Highest Rated",
+    "sortNewest": "Newest",
+    "sortName": "Name (A-Z)"
   }
 }

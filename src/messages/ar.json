@@ -716,7 +716,14 @@
     "communityDriven": "مدفوع بالمجتمع",
     "communityDrivenDesc": "اكتشف وشارك الملحقات المبنية من المجتمع التي تحل مشاكل حقيقية وتوسع قدرات المنصة.",
     "curatedQuality": "جودة منتقاة",
-    "curatedQualityDesc": "جميع عناصر المتجر مراجعة للجودة والأمان والتوافق مع نظام CortexPrism البيئي."
+    "curatedQualityDesc": "جميع عناصر المتجر مراجعة للجودة والأمان والتوافق مع نظام CortexPrism البيئي.",
+    "trendingTitle": "Trending",
+    "trendingPlugins": "Trending Plugins",
+    "trendingAgents": "Trending Agents",
+    "newTitle": "Recently Added",
+    "newPlugins": "New Plugins",
+    "newAgents": "New Agents",
+    "viewAll": "View All"
   },
   "blogList": {
     "heading": "المدونة",
@@ -850,6 +857,11 @@
     "submissionReceived": "تم استلام التقديم",
     "submissionDesc": "تم استلام تقديمك وهو في انتظار المراجعة.",
     "submitting": "جارٍ التقديم...",
-    "submit": "تقديم"
+    "submit": "تقديم",
+    "sortBy": "Sort by",
+    "sortDownloads": "Most Downloads",
+    "sortRating": "Highest Rated",
+    "sortNewest": "Newest",
+    "sortName": "Name (A-Z)"
   }
 }

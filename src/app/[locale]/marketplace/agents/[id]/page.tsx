@@ -6,6 +6,7 @@ import { getRepoMetadata, getRepoReadme } from "@/lib/github";
 import { AgentDetailView } from "@/components/marketplace/AgentDetail";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { generateBreadcrumbSchema, generateSoftwareApplicationSchema, generateAlternates, SITE_URL } from "@/lib/seo";
+import { safeJsonParse } from "@/lib/utils";
 
 interface Props {
   params: { id: string };
@@ -100,8 +101,8 @@ export default async function AgentDetailPage({ params }: Props) {
           provider: agent.provider,
           model: agent.model,
           temperature: agent.temperature,
-          tools: JSON.parse(agent.tools || "[]"),
-          tags: typeof agent.tags === 'string' ? JSON.parse(agent.tags || "[]") : (agent.tags || []),
+          tools: safeJsonParse<string[]>(agent.tools as string, []),
+          tags: safeJsonParse<string[]>(agent.tags as string, []),
           systemPrompt: agent.systemPrompt,
           soulContent: agent.soulContent,
           author: agent.author,
