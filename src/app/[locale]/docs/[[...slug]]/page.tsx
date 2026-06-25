@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MdxContent } from "@/components/docs/MdxContent";
 import { getContentBySlug, extractH1FromMdx } from "@/lib/markdown";
-import { getAllKbArticles, getKbArticleBySlug } from "@/lib/knowledge-base";
+import { getAllKbArticles, getKbArticleBySlug, getKbSlugs } from "@/lib/knowledge-base";
 import { TableOfContents } from "@/components/docs/TableOfContents";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { KbArticleComments } from "@/components/docs/KbArticleComments";
@@ -35,6 +35,10 @@ export async function generateStaticParams() {
   const params: { slug: string[] }[] = [];
   for (const dir of Object.keys(sectionMap)) {
     params.push({ slug: [dir] });
+  }
+  const kbSlugs = await getKbSlugs();
+  for (const slug of kbSlugs) {
+    params.push({ slug: ["knowledge-base", slug] });
   }
   return params;
 }
